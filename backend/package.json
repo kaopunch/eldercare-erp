@@ -1,0 +1,20 @@
+{
+  "scripts": {
+    "dev": "node src/server.js",
+    "start": "node src/server.js",
+    "test": "node --test tests/*.test.js",
+    "check:supabase-key": "node scripts/check_supabase_key.js",
+    "set:user-pin": "node scripts/set_user_pin.js",
+    "seed:demo": "node scripts/seed_demo.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "latest",
+    "cors": "latest",
+    "dotenv": "latest",
+    "express": "latest",
+    "morgan": "latest",
+    "pdfkit": "^0.18.0",
+    "ws": "^8.20.0",
+    "zod": "latest"
+  }
+}

@@ -1,0 +1,41 @@
+services:
+  - type: web
+    runtime: node
+    name: eldercare-erp
+    plan: free
+    region: singapore
+    buildCommand: cd backend && npm ci
+    startCommand: cd backend && npm start
+    healthCheckPath: /health
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: ELDERCARE_AUTH_MODE
+        value: pin
+      - key: ELDERCARE_DEMO_AUTH
+        value: "false"
+      - key: ELDERCARE_SESSION_HOURS
+        value: "12"
+      - key: ELDERCARE_PAYMENT_EVIDENCE_BUCKET
+        value: payment-evidence
+      - key: AI_ANALYSIS_TIMEOUT_MS
+        value: "8000"
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: ELDERCARE_SESSION_SECRET
+        sync: false
+      - key: ELDERCARE_AI_WEBHOOK_SECRET
+        sync: false
+      - key: ELDERCARE_AI_ANALYSIS_URL
+        sync: false
+      - key: ELDERCARE_AI_ANALYSIS_SECRET
+        sync: false
+      - key: ELDERCARE_OUTBOUND_DELIVERY_URL
+        sync: false
+      - key: ELDERCARE_OUTBOUND_DELIVERY_SECRET
+        sync: false
+      - key: LINE_CHANNEL_ACCESS_TOKEN
+        sync: false
