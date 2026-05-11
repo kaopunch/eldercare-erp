@@ -63,6 +63,9 @@ app.use('/api/ai', requireRoles(['owner', 'super_admin', 'admin', 'branch_admin'
 app.use('/api', requireRoles(['owner', 'super_admin', 'admin', 'finance']), finance);
 
 app.get([
+  '/erp',
+  '/register',
+  '/staff-login',
   '/portal/status/:booking_no',
   '/portal/rating/:booking_no',
   '/portal/book/:token',

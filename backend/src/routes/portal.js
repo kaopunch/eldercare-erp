@@ -42,6 +42,31 @@ const PortalConsentSchema = z.object({
   consent_text_version: z.string().optional().nullable()
 });
 
+const emptyToNull = (value) => (value === '' ? null : value);
+
+const PortalRegistrationSchema = z.object({
+  customer_full_name: z.string().min(2),
+  phone: z.string().min(6),
+  line_id: z.preprocess(emptyToNull, z.string().optional().nullable()),
+  email: z.preprocess(emptyToNull, z.string().email().optional().nullable()),
+  relationship_to_elder: z.preprocess(emptyToNull, z.string().optional().nullable()),
+  address: z.preprocess(emptyToNull, z.string().optional().nullable()),
+  elder_full_name: z.string().min(2),
+  elder_nickname: z.preprocess(emptyToNull, z.string().optional().nullable()),
+  mobility_level: z.enum(['walk_independent', 'cane', 'walker', 'wheelchair', 'bed_to_wheelchair']),
+  medical_notes: z.preprocess(emptyToNull, z.string().optional().nullable()),
+  communication_notes: z.preprocess(emptyToNull, z.string().optional().nullable()),
+  service_interest: z.enum(SERVICE_TYPE_VALUES).optional().nullable(),
+  preferred_date: z.preprocess(emptyToNull, z.string().optional().nullable()),
+  general_service: z.boolean().refine(Boolean, 'general service consent is required'),
+  sensitive_health: z.boolean().optional(),
+  family_notification: z.boolean().optional(),
+  location_tracking: z.boolean().optional(),
+  photo: z.boolean().optional(),
+  marketing: z.boolean().optional(),
+  accept_non_emergency: z.boolean().refine(Boolean, 'non-emergency acknowledgement is required')
+});
+
 function firstRelation(value) {
   return Array.isArray(value) ? value[0] : value;
 }
@@ -543,6 +568,84 @@ router.get('/options', async (_, res, next) => {
         customers: customers.data || [],
         elders: elders.data || [],
         service_types: SERVICE_TYPE_VALUES
+      }
+    });
+  } catch (e) { next(e); }
+});
+
+router.post('/register', async (req, res, next) => {
+  try {
+    const input = PortalRegistrationSchema.parse(req.body);
+    const sb = getSupabase();
+
+    const { data: customer, error: customerError } = await sb.from('customers').insert({
+      full_name: input.customer_full_name,
+      phone: input.phone,
+      line_id: input.line_id || null,
+      email: input.email || null,
+      relationship_to_elder: input.relationship_to_elder || null,
+      address: input.address || null
+    }).select('*').single();
+    if (customerError) throw customerError;
+
+    const { data: elder, error: elderError } = await sb.from('elders').insert({
+      company_id: customer.company_id || null,
+      customer_id: customer.id,
+      full_name: input.elder_full_name,
+      nickname: input.elder_nickname || null,
+      mobility_level: input.mobility_level,
+      medical_notes: input.medical_notes || null,
+      communication_notes: input.communication_notes || null,
+      emergency_contact_name: customer.full_name,
+      emergency_contact_phone: customer.phone,
+      pdpa_sensitive_consent: Boolean(input.sensitive_health)
+    }).select('*').single();
+    if (elderError) throw elderError;
+
+    const consentTypes = [
+      ['general_service', true],
+      ['sensitive_health', Boolean(input.sensitive_health)],
+      ['family_notification', input.family_notification !== false],
+      ['location_tracking', input.location_tracking !== false],
+      ['photo', Boolean(input.photo)],
+      ['marketing', Boolean(input.marketing)]
+    ];
+    const consentPayload = consentTypes.map(([consent_type, consented]) => ({
+      customer_id: customer.id,
+      elder_id: elder.id,
+      consent_type,
+      consented,
+      consent_text_version: 'website-registration-v1',
+      ip_address: req.ip || null,
+      user_agent: req.get('user-agent') || null
+    }));
+    const { data: consents, error: consentError } = await sb.from('pdpa_consents').insert(consentPayload).select('*');
+    if (consentError) throw consentError;
+
+    await sb.from('audit_logs').insert({
+      company_id: customer.company_id || null,
+      action: 'portal_customer_registered',
+      entity_type: 'customer',
+      entity_id: customer.id,
+      payload: {
+        elder_id: elder.id,
+        service_interest: input.service_interest || null,
+        preferred_date: input.preferred_date || null,
+        source: 'public_website'
+      }
+    });
+
+    res.status(201).json({
+      ok: true,
+      registration: {
+        customer,
+        elder,
+        consents: consents || [],
+        service_interest: input.service_interest || null,
+        preferred_date: input.preferred_date || null,
+        links: {
+          consent: `/portal/consent/${elder.id}`
+        }
       }
     });
   } catch (e) { next(e); }
