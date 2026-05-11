@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
   <meta charset="utf-8"/>
-  <title>ElderCare ERP</title>
+  <title>SandyCare ERP</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="theme-color" content="#f7fbff"/>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -522,8 +522,224 @@
       flex-wrap: wrap;
     }
 
+    .public-login-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding-left: 10px;
+      border-left: 1px solid var(--line);
+    }
+
+    .public-login-actions .btn {
+      white-space: nowrap;
+    }
+
     .public-section {
       padding: 24px 0;
+    }
+
+    .public-section-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 14px;
+    }
+
+    .public-section-title {
+      display: grid;
+      gap: 5px;
+      max-width: 760px;
+    }
+
+    .public-kicker {
+      color: var(--accent-strong);
+      font-size: 11px;
+      line-height: 1.25;
+      font-weight: 900;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .public-section-title h2 {
+      margin: 0;
+      font-size: clamp(24px, 3vw, 36px);
+      line-height: 1.16;
+      font-family: var(--font-display);
+      font-weight: 850;
+    }
+
+    .public-section-title p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .public-card-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .public-card-grid.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .public-info-card,
+    .public-price-card,
+    .public-status-card,
+    .public-contact-card,
+    .public-faq-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .94);
+      box-shadow: 0 8px 22px rgba(30, 67, 118, .06);
+    }
+
+    .public-info-card,
+    .public-price-card,
+    .public-contact-card {
+      padding: 16px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+
+    .public-info-card svg,
+    .public-price-card svg,
+    .public-contact-card svg {
+      color: var(--accent);
+    }
+
+    .public-info-card strong,
+    .public-price-card strong,
+    .public-contact-card strong {
+      font-size: 15px;
+      line-height: 1.25;
+    }
+
+    .public-info-card span,
+    .public-price-card span,
+    .public-contact-card span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      font-weight: 650;
+    }
+
+    .public-status-card {
+      padding: 18px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(280px, .9fr);
+      gap: 16px;
+      align-items: start;
+      background:
+        linear-gradient(135deg, rgba(230, 251, 246, .92) 0%, rgba(238, 245, 255, .94) 55%, rgba(255, 249, 236, .92) 100%);
+    }
+
+    .public-status-form,
+    .public-contact-form {
+      display: grid;
+      gap: 10px;
+    }
+
+    .public-status-note {
+      display: grid;
+      gap: 8px;
+    }
+
+    .public-status-note span,
+    .public-price-meta {
+      min-height: 34px;
+      padding: 8px 10px;
+      border-radius: var(--radius);
+      background: #ffffff;
+      border: 1px solid rgba(21, 34, 58, .08);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+      font-weight: 750;
+    }
+
+    .public-price-card.featured {
+      border-color: rgba(18, 184, 166, .28);
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, .96) 0%, rgba(230, 251, 246, .9) 100%);
+      box-shadow: 0 14px 32px rgba(18, 184, 166, .12);
+    }
+
+    .public-price-card h3 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.25;
+      font-family: var(--font-display);
+      font-weight: 850;
+    }
+
+    .public-price-card ul,
+    .public-info-card ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+      font-weight: 650;
+    }
+
+    .public-faq-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .public-faq-card {
+      overflow: hidden;
+    }
+
+    .public-faq-card summary {
+      padding: 14px 16px;
+      cursor: pointer;
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 850;
+      list-style: none;
+    }
+
+    .public-faq-card summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .public-faq-card summary::after {
+      content: "+";
+      float: right;
+      color: var(--accent);
+      font-weight: 900;
+    }
+
+    .public-faq-card[open] summary::after {
+      content: "-";
+    }
+
+    .public-faq-card p {
+      margin: 0;
+      padding: 0 16px 14px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .public-contact-layout {
+      display: grid;
+      grid-template-columns: minmax(0, .92fr) minmax(320px, 1.08fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .public-contact-list {
+      display: grid;
+      gap: 10px;
     }
 
     .public-hero {
@@ -634,6 +850,10 @@
       gap: 18px;
       align-items: start;
       padding-bottom: 36px;
+    }
+
+    .public-site[data-public-entry="login"] .public-entry-grid {
+      display: grid;
     }
 
     .public-site[data-public-entry="register"] .public-entry-grid,
@@ -2412,6 +2632,8 @@
       .ai-grid,
       .exec-layout,
       .public-hero,
+      .public-status-card,
+      .public-contact-layout,
       .public-entry-grid,
       .portal-shell {
         grid-template-columns: 1fr;
@@ -2420,6 +2642,8 @@
       .ai-kpi-grid,
       .party-grid,
       .guard-grid,
+      .public-card-grid,
+      .public-card-grid.two,
       .public-service-strip,
       .exec-summary-grid,
       .portal-service-strip {
@@ -2657,6 +2881,8 @@
       .exec-overview,
       .exec-summary-grid,
       .trip-check-grid,
+      .public-card-grid,
+      .public-card-grid.two,
       .public-proof,
       .public-service-strip,
       .public-form-grid,
@@ -2671,6 +2897,11 @@
         grid-template-columns: 1fr;
       }
 
+      .public-section-head {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
       .portal-hero-meta {
         justify-items: stretch;
       }
@@ -2679,6 +2910,8 @@
       .portal-hero-meta strong,
       .public-actions .btn,
       .public-wizard-actions .btn,
+      .public-status-form .btn,
+      .public-contact-form .btn,
       .portal-booking-actions .btn {
         width: 100%;
       }
@@ -2690,8 +2923,19 @@
       }
 
       .public-nav,
+      .public-login-actions,
       .public-actions {
         width: 100%;
+      }
+
+      .public-nav,
+      .public-login-actions {
+        justify-content: flex-start;
+      }
+
+      .public-login-actions {
+        padding-left: 0;
+        border-left: 0;
       }
 
       .public-copy h1 {
@@ -2787,23 +3031,37 @@
 <section class="public-site" id="publicSite">
   <header class="public-header">
     <div class="public-wrap public-header-inner">
-      <a class="public-brand" href="#top" aria-label="ElderCare" data-public-home>
+      <a class="public-brand" href="#top" aria-label="SandyCare" data-public-home>
         <div class="brand-mark"><svg><use href="#icon-heart"/></svg></div>
         <span>
-          <strong>ElderCare</strong>
+          <strong>SandyCare</strong>
           <span>Assisted non-emergency elder transport</span>
         </span>
       </a>
       <nav class="public-nav" aria-label="Customer website navigation">
-        <button class="btn ghost" type="button" data-public-scroll="#services">
-          <svg><use href="#icon-board"/></svg>
-          <span>บริการ</span>
+        <button class="btn ghost" type="button" data-public-scroll="#status">
+          <svg><use href="#icon-calendar"/></svg>
+          <span>สถานะงาน</span>
+        </button>
+        <button class="btn ghost" type="button" data-public-scroll="#pricing">
+          <svg><use href="#icon-shield"/></svg>
+          <span>ราคา</span>
+        </button>
+        <button class="btn ghost" type="button" data-public-scroll="#contact">
+          <svg><use href="#icon-send"/></svg>
+          <span>ติดต่อเรา</span>
         </button>
         <button class="btn ghost" type="button" data-public-entry="register">
           <svg><use href="#icon-profile"/></svg>
           <span>ลงทะเบียนลูกค้า</span>
         </button>
       </nav>
+      <div class="public-login-actions" aria-label="เข้าสู่ระบบ">
+        <button class="btn primary" type="button" data-public-entry="login">
+          <svg><use href="#icon-profile"/></svg>
+          <span>เข้าสู่ระบบ</span>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -2841,6 +3099,13 @@
     </section>
 
     <section class="public-wrap public-section" id="services">
+      <div class="public-section-head">
+        <div class="public-section-title">
+          <span class="public-kicker">Services</span>
+          <h2>เลือกบริการให้ตรงกับระดับการดูแล</h2>
+          <p>เริ่มจากงานรับส่งพื้นฐาน ไปจนถึงงานที่ต้องมีผู้ช่วยดูแลหรือผู้ประสานงานทางการแพทย์ ทีมจะตรวจความพร้อมก่อนรับเคสทุกครั้ง</p>
+        </div>
+      </div>
       <div class="public-service-strip">
         <article class="public-service-item">
           <svg><use href="#icon-send"/></svg>
@@ -2862,6 +3127,196 @@
           <strong>เส้นทางประจำ</strong>
           <span>รองรับฟอกไต กายภาพ หรือการเดินทางซ้ำตามรอบเดือน</span>
         </article>
+      </div>
+    </section>
+
+    <section class="public-wrap public-section" id="status">
+      <div class="public-section-head">
+        <div class="public-section-title">
+          <span class="public-kicker">Customer portal</span>
+          <h2>ลูกค้าตรวจสถานะงานได้จาก Booking No.</h2>
+          <p>ครอบครัวสามารถดู timeline, สถานะการชำระเงิน, ทีมหน้างาน และลิงก์ consent/rating ได้จาก portal โดยไม่ต้องโทรถามซ้ำหลายรอบ</p>
+        </div>
+      </div>
+      <div class="public-status-card">
+        <form class="public-status-form" id="publicStatusLookupForm">
+          <label class="field">
+            <span>Booking No.</span>
+            <input class="input" id="publicStatusBookingInput" name="booking_no" placeholder="เช่น BK-1001" autocomplete="off">
+          </label>
+          <button class="btn primary" type="submit" id="publicStatusLookupBtn">
+            <svg><use href="#icon-send"/></svg>
+            <span>เปิด Customer Portal</span>
+          </button>
+          <div class="public-result" id="publicStatusLookupResult">
+            <strong>ตัวอย่างสำหรับทดลอง</strong>
+            <span>ใช้ BK-1001 เพื่อเปิดสถานะตัวอย่าง หรือใช้ booking number จริงเมื่อเชื่อม API แล้ว</span>
+          </div>
+        </form>
+        <div class="public-status-note">
+          <span>เห็นสถานะรับงาน จัดทีม กำลังเดินทาง ถึงจุดรับ และปิดงาน</span>
+          <span>ครอบครัวดูยอด invoice/payment และหลักฐานประกอบได้ในที่เดียว</span>
+          <span>รองรับลิงก์ consent และ rating หลังจบงานสำหรับตรวจสอบย้อนหลัง</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="public-wrap public-section" id="pricing">
+      <div class="public-section-head">
+        <div class="public-section-title">
+          <span class="public-kicker">Pricing</span>
+          <h2>แพ็กเกจบริการและการประเมินราคา</h2>
+          <p>ราคาขึ้นกับระยะทาง เวลา ระดับ mobility และจำนวนผู้ช่วยดูแล ทีมจะยืนยันราคาอีกครั้งก่อนเริ่มงานจริง</p>
+        </div>
+        <button class="btn primary" type="button" data-public-entry="register">
+          <svg><use href="#icon-plus"/></svg>
+          <span>ขอใบเสนอราคา</span>
+        </button>
+      </div>
+      <div class="public-card-grid">
+        <article class="public-price-card">
+          <svg><use href="#icon-send"/></svg>
+          <h3>รับส่งตามนัด</h3>
+          <span class="public-price-meta">คิดตามระยะทางและช่วงเวลา</span>
+          <ul>
+            <li>เหมาะกับผู้สูงวัยที่เดินได้เองหรือมีญาติดูแล</li>
+            <li>มีสถานะงานและแจ้งเตือนครอบครัว</li>
+            <li>ออกใบเสนอราคาก่อนยืนยัน booking</li>
+          </ul>
+        </article>
+        <article class="public-price-card featured">
+          <svg><use href="#icon-user-check"/></svg>
+          <h3>ช่วยพยุงและรถเข็น</h3>
+          <span class="public-price-meta">รวมการเตรียมผู้ช่วยดูแลตามเคส</span>
+          <ul>
+            <li>ประเมิน mobility ก่อนมอบหมายทีม</li>
+            <li>ช่วยขึ้นลงรถและสื่อสารกับญาติ</li>
+            <li>เหมาะกับนัดโรงพยาบาลหรือกายภาพ</li>
+          </ul>
+        </article>
+        <article class="public-price-card">
+          <svg><use href="#icon-calendar"/></svg>
+          <h3>เส้นทางประจำ</h3>
+          <span class="public-price-meta">เหมาะกับรายเดือนหรือรอบฟอกไต</span>
+          <ul>
+            <li>จัดตารางเดินทางล่วงหน้า</li>
+            <li>พยายามใช้ทีมเดิมเมื่อพร้อมให้บริการ</li>
+            <li>มีรายงานยอดคงเหลือและสถานะรวม</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="public-wrap public-section" id="safety">
+      <div class="public-section-head">
+        <div class="public-section-title">
+          <span class="public-kicker">Safety & Consent</span>
+          <h2>ความปลอดภัยและข้อมูลส่วนบุคคลมาก่อน</h2>
+          <p>เราเก็บเฉพาะข้อมูลที่จำเป็นต่อการเตรียมบริการและแยกข้อมูลสุขภาพ/ตำแหน่งตาม consent เพื่อให้ทีมทำงานได้แม่นยำและตรวจสอบได้</p>
+        </div>
+      </div>
+      <div class="public-card-grid">
+        <article class="public-info-card">
+          <svg><use href="#icon-alert"/></svg>
+          <strong>ไม่ใช่รถฉุกเฉิน</strong>
+          <span>รับเฉพาะงานนัดหมายล่วงหน้า หากมีอาการฉุกเฉินต้องติดต่อ 1669 หรือโรงพยาบาลใกล้ที่สุดทันที</span>
+        </article>
+        <article class="public-info-card">
+          <svg><use href="#icon-shield"/></svg>
+          <strong>Consent แยกตามประเภทข้อมูล</strong>
+          <span>แยก consent ข้อมูลทั่วไป ข้อมูลสุขภาพ การแจ้งครอบครัว รูปภาพ และตำแหน่งระหว่างงาน</span>
+        </article>
+        <article class="public-info-card">
+          <svg><use href="#icon-user-check"/></svg>
+          <strong>ทีมงานผ่านการตรวจความพร้อม</strong>
+          <span>คนขับและผู้ช่วยดูแลถูกจัดตามความเหมาะสมของเคส mobility, เวลา, เส้นทาง และข้อควรระวัง</span>
+        </article>
+      </div>
+    </section>
+
+    <section class="public-wrap public-section" id="faq">
+      <div class="public-section-head">
+        <div class="public-section-title">
+          <span class="public-kicker">FAQ</span>
+          <h2>คำถามที่พบบ่อย</h2>
+          <p>รวมคำตอบสำหรับครอบครัวก่อนลงทะเบียนและก่อนจองงานจริง</p>
+        </div>
+      </div>
+      <div class="public-faq-list">
+        <details class="public-faq-card" open>
+          <summary>ต้องจองล่วงหน้านานแค่ไหน?</summary>
+          <p>แนะนำจองล่วงหน้าอย่างน้อย 24 ชั่วโมง เพื่อให้ทีมประเมินระยะทาง mobility consent และความพร้อมของผู้ช่วยดูแลได้รอบคอบ</p>
+        </details>
+        <details class="public-faq-card">
+          <summary>รับเคสฉุกเฉินหรือผู้ป่วยหนักไหม?</summary>
+          <p>ไม่รับเคสฉุกเฉินหรือเคสที่ต้องใช้เครื่องมือแพทย์/ทีมกู้ชีพ บริการนี้ออกแบบสำหรับ non-emergency assisted transport แบบนัดหมายล่วงหน้า</p>
+        </details>
+        <details class="public-faq-card">
+          <summary>ครอบครัวติดตามสถานะได้อย่างไร?</summary>
+          <p>หลังยืนยันงาน ทีมจะให้ booking number หรือ portal link สำหรับดู timeline สถานะทีมหน้างาน payment และ rating หลังจบงาน</p>
+        </details>
+        <details class="public-faq-card">
+          <summary>ข้อมูลสุขภาพถูกใช้เพื่ออะไร?</summary>
+          <p>ใช้เพื่อเตรียมการช่วยเหลือขึ้นลงรถ การสื่อสาร และข้อควรระวังระหว่างเดินทางเท่านั้น โดยอิง consent ที่ลูกค้าให้ไว้</p>
+        </details>
+      </div>
+    </section>
+
+    <section class="public-wrap public-section" id="contact">
+      <div class="public-section-head">
+        <div class="public-section-title">
+          <span class="public-kicker">Contact us</span>
+          <h2>ติดต่อทีมประสานงาน</h2>
+          <p>ส่งข้อมูลเบื้องต้นไว้ได้ ทีมจะติดต่อกลับเพื่อประเมินเคส ราคา และเวลาที่เหมาะสมก่อนสร้าง booking จริง</p>
+        </div>
+      </div>
+      <div class="public-contact-layout">
+        <div class="public-contact-list">
+          <article class="public-contact-card">
+            <svg><use href="#icon-send"/></svg>
+            <strong>LINE Official Account</strong>
+            <span>@sandycare-service สำหรับส่งรายละเอียด นัดหมาย และรูปจุดรับ</span>
+          </article>
+          <article class="public-contact-card">
+            <svg><use href="#icon-calendar"/></svg>
+            <strong>เวลาทำการ</strong>
+            <span>ทุกวัน 08:00-18:00 สำหรับงานนัดหมายล่วงหน้าในเขตกรุงเทพฯ และปริมณฑล</span>
+          </article>
+          <article class="public-contact-card">
+            <svg><use href="#icon-alert"/></svg>
+            <strong>กรณีฉุกเฉิน</strong>
+            <span>โปรดติดต่อ 1669 หรือโรงพยาบาลโดยตรง บริการนี้ไม่ใช่รถพยาบาลฉุกเฉิน</span>
+          </article>
+        </div>
+        <section class="public-panel">
+          <div class="public-panel-header">
+            <div>
+              <h3>ให้ทีมติดต่อกลับ</h3>
+              <p>ฝากเบอร์และเวลาที่สะดวก ทีมจะประสานรายละเอียดต่อ</p>
+            </div>
+          </div>
+          <div class="public-panel-body">
+            <form class="public-contact-form" id="publicContactForm">
+              <label class="field">
+                <span>ชื่อผู้ติดต่อ</span>
+                <input class="input" name="name" placeholder="ชื่อ-นามสกุล" required>
+              </label>
+              <label class="field">
+                <span>เบอร์โทร / LINE</span>
+                <input class="input" name="contact" placeholder="08x-xxx-xxxx หรือ LINE ID" required>
+              </label>
+              <label class="field">
+                <span>เรื่องที่ต้องการให้ช่วย</span>
+                <textarea class="textarea" name="message" rows="3" placeholder="เช่น จองไปโรงพยาบาล วันเวลา จุดรับ และ mobility"></textarea>
+              </label>
+              <button class="btn primary" type="submit">
+                <svg><use href="#icon-send"/></svg>
+                <span>ส่งคำขอติดต่อกลับ</span>
+              </button>
+            </form>
+            <div class="public-result" id="publicContactResult" hidden></div>
+          </div>
+        </section>
       </div>
     </section>
 
@@ -3051,7 +3506,7 @@
     <div class="brand">
       <div class="brand-mark"><svg><use href="#icon-heart"/></svg></div>
       <div>
-        <h1>ElderCare ERP</h1>
+        <h1>SandyCare ERP</h1>
         <p data-i18n="brand.subtitle">Assisted Transport Operations</p>
       </div>
     </div>
@@ -4691,7 +5146,7 @@
                 </label>
                 <label class="field">
                   <span data-i18n="users.email">อีเมล</span>
-                  <input class="input" name="email" type="email" placeholder="finance.demo@eldercare.example" required>
+                  <input class="input" name="email" type="email" placeholder="finance.demo@sandycare.example" required>
                 </label>
                 <label class="field">
                   <span data-i18n="users.phone">โทร</span>
@@ -7294,6 +7749,8 @@
   }
 
   function getPublicEntryFromPath() {
+    if (window.location.hash === '#login') return 'login';
+    if (/^\/login\/?$/i.test(window.location.pathname)) return 'login';
     if (/^\/register\/?$/i.test(window.location.pathname)) return 'register';
     if (/^\/staff-login\/?$/i.test(window.location.pathname)) return 'staff';
     return '';
@@ -7453,8 +7910,14 @@
 
   function setPublicRoute(entry) {
     if (window.location.protocol === 'file:') return;
-    const nextPath = entry === 'register' ? '/register' : entry === 'staff' ? '/staff-login' : '/';
-    if (window.location.pathname !== nextPath) window.history.pushState(null, '', nextPath);
+    const nextPath = entry === 'register'
+      ? '/register'
+      : entry === 'staff'
+        ? '/staff-login'
+        : entry === 'login'
+          ? '/#login'
+          : '/';
+    if (`${window.location.pathname}${window.location.hash}` !== nextPath) window.history.pushState(null, '', nextPath);
   }
 
   function showPublicSite({ persist = true } = {}) {
@@ -7468,14 +7931,14 @@
   }
 
   function showPublicEntry(entry) {
-    const nextEntry = entry === 'staff' ? 'staff' : 'register';
-    const target = document.querySelector(nextEntry === 'staff' ? '#staff-login' : '#customer-register');
+    const nextEntry = entry === 'staff' ? 'staff' : entry === 'login' ? 'login' : 'register';
+    const target = document.querySelector(nextEntry === 'staff' ? '#staff-login' : '.public-entry-grid');
     state.publicMode = true;
     state.publicEntry = nextEntry;
     localStorage.removeItem('eldercare.shell');
     syncShellMode();
     setPublicRoute(nextEntry);
-    if (nextEntry === 'register') {
+    if (nextEntry === 'register' || nextEntry === 'login') {
       setPublicRegisterStep(Number(state.publicRegisterStep || 1));
       renderPublicServiceDescription();
     }
@@ -11361,6 +11824,46 @@
       event.preventDefault();
       showPublicSite({ persist: true });
     });
+  });
+
+  document.getElementById('publicStatusLookupForm')?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const bookingNo = String(document.getElementById('publicStatusBookingInput')?.value || '').trim();
+    const result = document.getElementById('publicStatusLookupResult');
+    if (!bookingNo) {
+      if (result) result.innerHTML = '<strong>กรุณากรอก Booking No.</strong><span>ตัวอย่างเช่น BK-1001</span>';
+      return;
+    }
+    state.portalBookingNo = bookingNo;
+    state.portalStatusToken = '';
+    state.portalRatingToken = '';
+    state.portalStatus = null;
+    state.activeView = 'portal';
+    if (result) result.innerHTML = `<strong>กำลังเปิด Customer Portal</strong><span>${escapeHtml(bookingNo)}</span>`;
+    await enterErpShell({ persist: false, load: false });
+    setView('portal');
+    renderPortal();
+    showToast(tr('toast.portalLoaded', { id: bookingNo }));
+  });
+
+  document.getElementById('publicContactForm')?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const input = new FormData(event.currentTarget);
+    const name = String(input.get('name') || '').trim() || 'ลูกค้า';
+    const contact = String(input.get('contact') || '').trim();
+    const result = document.getElementById('publicContactResult');
+    if (!contact) {
+      if (result) {
+        result.hidden = false;
+        result.innerHTML = '<strong>กรุณากรอกช่องทางติดต่อ</strong><span>ทีมต้องมีเบอร์โทรหรือ LINE ID เพื่อประสานกลับ</span>';
+      }
+      return;
+    }
+    if (result) {
+      result.hidden = false;
+      result.innerHTML = `<strong>รับคำขอติดต่อกลับแล้ว</strong><span>ขอบคุณ ${escapeHtml(name)} ทีมจะติดต่อกลับผ่าน ${escapeHtml(contact)} เพื่อประเมินเคสและราคา</span>`;
+    }
+    showToast('รับคำขอติดต่อกลับแล้ว');
   });
 
   window.addEventListener('popstate', () => {
