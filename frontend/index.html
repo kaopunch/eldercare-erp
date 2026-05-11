@@ -1953,6 +1953,11 @@
           <span data-i18n="nav.portal">Customer Portal</span>
           <span class="nav-count" id="navPortalCount">0</span>
         </button>
+        <button class="nav-item" data-view="intake" type="button">
+          <svg><use href="#icon-plus"/></svg>
+          <span data-i18n="nav.intake">Lead Intake</span>
+          <span class="nav-count" id="navIntakeCount">0</span>
+        </button>
         <button class="nav-item" data-view="profiles" type="button">
           <svg><use href="#icon-profile"/></svg>
           <span data-i18n="nav.profiles">Customer Profile</span>
@@ -2407,6 +2412,202 @@
             </div>
             <div class="panel-body" id="bookingDetail"></div>
           </aside>
+        </div>
+      </section>
+
+      <section class="view" id="view-intake">
+        <div class="two-col">
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <h3 data-i18n="intake.leadTitle">Lead Intake</h3>
+                <p data-i18n="intake.leadSubtitle">รับเคสใหม่ก่อนแปลงเป็น profile และ booking ตาม SOP v2</p>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div class="score-grid" style="margin-bottom:16px">
+                <div class="score-card"><strong id="intakeMetricLeads">0</strong><span data-i18n="intake.metricLeads">leads</span></div>
+                <div class="score-card"><strong id="intakeMetricUrgent">0</strong><span data-i18n="intake.metricUrgent">urgent</span></div>
+                <div class="score-card"><strong id="intakeMetricAssessments">0</strong><span data-i18n="intake.metricAssessments">assessments</span></div>
+              </div>
+              <form class="form-grid" id="leadIntakeForm">
+                <label class="field">
+                  <span data-i18n="intake.leadSource">ช่องทาง lead</span>
+                  <select class="select" name="lead_source">
+                    <option value="phone" data-i18n="intake.sourcePhone">โทรศัพท์</option>
+                    <option value="line" data-i18n="intake.sourceLine">LINE</option>
+                    <option value="web" data-i18n="intake.sourceWeb">เว็บไซต์</option>
+                    <option value="referral" data-i18n="intake.sourceReferral">แนะนำต่อ</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span data-i18n="detail.contact">ผู้ติดต่อ</span>
+                  <input class="input" name="contact_name" value="คุณภัทร" required>
+                </label>
+                <label class="field">
+                  <span data-i18n="table.phone">เบอร์โทร</span>
+                  <input class="input" name="contact_phone" value="081-555-1299">
+                </label>
+                <label class="field">
+                  <span data-i18n="profiles.elderName">ชื่อผู้สูงวัย</span>
+                  <input class="input" name="elder_name" value="คุณละออ">
+                </label>
+                <label class="field">
+                  <span data-i18n="detail.service">บริการ</span>
+                  <select class="select" name="service_interest">
+                    <option value="hospital_companion" data-i18n="service.hospital">Hospital Companion</option>
+                    <option value="home_companion" data-i18n="service.homeCompanion">Home Companion</option>
+                    <option value="elderly_transport" data-i18n="service.elderlyTransport">Elderly Transport</option>
+                    <option value="assisted_ride" data-i18n="service.assisted">Assisted Ride</option>
+                    <option value="monthly_transport" data-i18n="service.monthly">Monthly Transport</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span data-i18n="intake.preferredDate">วันเวลาที่ต้องการ</span>
+                  <input class="input" name="preferred_date" id="leadPreferredDate" type="datetime-local">
+                </label>
+                <label class="field">
+                  <span data-i18n="intake.urgency">ความเร่งด่วน</span>
+                  <select class="select" name="urgency_level">
+                    <option value="normal" data-i18n="status.normal">normal</option>
+                    <option value="low" data-i18n="status.low">low</option>
+                    <option value="urgent" data-i18n="status.urgent">urgent</option>
+                    <option value="critical" data-i18n="status.critical">critical</option>
+                  </select>
+                </label>
+                <label class="field wide">
+                  <span data-i18n="detail.notes">หมายเหตุ</span>
+                  <textarea class="textarea" name="notes">ต้องการพาไปพบแพทย์และมีญาติตามไปด้วย</textarea>
+                </label>
+                <div class="wide">
+                  <button class="btn primary" type="submit" id="leadIntakeSubmit">
+                    <svg><use href="#icon-send"/></svg>
+                    <span data-i18n="intake.saveLead">บันทึก Lead</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <h3 data-i18n="intake.assessmentTitle">Elder Assessment</h3>
+                <p data-i18n="intake.assessmentSubtitle">ประเมินความเสี่ยงและ requirement ก่อนสร้าง booking</p>
+              </div>
+            </div>
+            <div class="panel-body">
+              <form class="form-grid" id="assessmentForm">
+                <label class="field">
+                  <span data-i18n="detail.elder">ผู้สูงวัย</span>
+                  <select class="select" name="elder_id" id="assessmentElderSelect"></select>
+                </label>
+                <label class="field">
+                  <span data-i18n="intake.walkingAbility">การเดิน</span>
+                  <select class="select" name="walking_ability">
+                    <option value="walk_independent" data-i18n="mobility.walkIndependent">walk independent</option>
+                    <option value="cane" data-i18n="mobility.cane">cane</option>
+                    <option value="walker" data-i18n="mobility.walker">walker</option>
+                    <option value="wheelchair" data-i18n="mobility.wheelchair">wheelchair</option>
+                    <option value="bed_to_wheelchair" data-i18n="intake.bedToWheelchair">bed to wheelchair</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span data-i18n="intake.fallRisk">ความเสี่ยงล้ม</span>
+                  <select class="select" name="fall_risk">
+                    <option value="low" data-i18n="status.low">low</option>
+                    <option value="medium" data-i18n="status.medium">medium</option>
+                    <option value="high" data-i18n="status.high">high</option>
+                    <option value="critical" data-i18n="status.critical">critical</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span data-i18n="intake.cognitiveStatus">การรับรู้</span>
+                  <select class="select" name="cognitive_status">
+                    <option value="clear" data-i18n="intake.cognitiveClear">สื่อสารรู้เรื่อง</option>
+                    <option value="forgetful" data-i18n="intake.cognitiveForgetful">หลงลืมบ้าง</option>
+                    <option value="confused" data-i18n="intake.cognitiveConfused">สับสนง่าย</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span data-i18n="table.mobility">Wheelchair support</span>
+                  <select class="select" name="wheelchair_required">
+                    <option value="false" data-i18n="common.noConsent">ไม่ต้องใช้</option>
+                    <option value="true" data-i18n="common.yesConsent">ต้องใช้</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span data-i18n="detail.risk">ความเสี่ยงรวม</span>
+                  <select class="select" name="risk_level">
+                    <option value="low" data-i18n="status.low">low</option>
+                    <option value="medium" data-i18n="status.medium">medium</option>
+                    <option value="high" data-i18n="status.high">high</option>
+                    <option value="critical" data-i18n="status.critical">critical</option>
+                  </select>
+                </label>
+                <label class="field wide">
+                  <span data-i18n="intake.currentMedication">ยา/โรคประจำตัว</span>
+                  <textarea class="textarea" name="current_medication">มียาความดัน ต้องแจ้งญาติก่อนออกจากบ้าน</textarea>
+                </label>
+                <label class="field wide">
+                  <span data-i18n="intake.communicationNote">ข้อควรสื่อสาร</span>
+                  <textarea class="textarea" name="communication_note">พูดช้า ๆ ให้เวลาลุกยืน และยืนยันจุดนัดหมายกับญาติ</textarea>
+                </label>
+                <div class="wide">
+                  <button class="btn primary" type="submit" id="assessmentSubmit">
+                    <svg><use href="#icon-shield"/></svg>
+                    <span data-i18n="intake.saveAssessment">บันทึก Assessment</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </section>
+        </div>
+
+        <div class="two-col" style="margin-top:18px">
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <h3 data-i18n="intake.recentLeads">Lead ล่าสุด</h3>
+                <p data-i18n="intake.recentLeadsSubtitle">ดึงจากตาราง leads ใน Supabase</p>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th data-i18n="detail.contact">ผู้ติดต่อ</th>
+                    <th data-i18n="detail.service">บริการ</th>
+                    <th data-i18n="intake.urgency">ความเร่งด่วน</th>
+                    <th data-i18n="table.status">สถานะ</th>
+                  </tr>
+                </thead>
+                <tbody id="leadRows"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <h3 data-i18n="intake.recentAssessments">Assessment ล่าสุด</h3>
+                <p data-i18n="intake.recentAssessmentsSubtitle">หลังประเมินแล้วสามารถเปิดฟอร์ม booking ต่อได้ทันที</p>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th data-i18n="detail.elder">ผู้สูงวัย</th>
+                    <th data-i18n="detail.risk">ความเสี่ยง</th>
+                    <th data-i18n="table.mobility">Mobility</th>
+                    <th data-i18n="table.time">เวลา</th>
+                  </tr>
+                </thead>
+                <tbody id="assessmentRows"></tbody>
+              </table>
+            </div>
+          </section>
         </div>
       </section>
 
@@ -3416,6 +3617,7 @@
       'nav.finance': 'Finance Desk',
       'nav.notifications': 'Notification Center',
       'nav.portal': 'Customer Portal',
+      'nav.intake': 'Lead Intake',
       'nav.executive': 'Dashboard ผู้บริหาร',
       'nav.reports': 'Reports',
       'nav.ai': 'AI Ops Center',
@@ -3477,6 +3679,8 @@
       'view.notifications.subtitle': 'คุมข้อความแจ้งเตือนจากงานจริงให้ทุกฝ่ายเห็นสถานะเดียวกัน',
       'view.portal.title': 'Customer Portal',
       'view.portal.subtitle': 'หน้าสถานะสำหรับลูกค้า/ญาติ พร้อม timeline, payment และ rating',
+      'view.intake.title': 'Lead Intake',
+      'view.intake.subtitle': 'รับ lead ประเมินผู้สูงวัย และส่งต่อเป็น booking ตาม SOP v2',
       'view.executive.title': 'Dashboard ผู้บริหาร',
       'view.reports.title': 'Reports',
       'view.reports.subtitle': 'BI รายได้ งานสำเร็จ incident และ performance',
@@ -3706,6 +3910,38 @@
       'portal.photoConsentShort': 'Photo consent',
       'portal.locationConsentShort': 'Location consent',
       'portal.noConsentProfile': 'ยังไม่ได้เลือก/โหลด consent profile',
+      'intake.leadTitle': 'Lead Intake',
+      'intake.leadSubtitle': 'รับเคสใหม่ก่อนแปลงเป็น profile และ booking ตาม SOP v2',
+      'intake.assessmentTitle': 'Elder Assessment',
+      'intake.assessmentSubtitle': 'ประเมินความเสี่ยงและ requirement ก่อนสร้าง booking',
+      'intake.metricLeads': 'leads',
+      'intake.metricUrgent': 'urgent',
+      'intake.metricAssessments': 'assessments',
+      'intake.leadSource': 'ช่องทาง lead',
+      'intake.sourcePhone': 'โทรศัพท์',
+      'intake.sourceLine': 'LINE',
+      'intake.sourceWeb': 'เว็บไซต์',
+      'intake.sourceReferral': 'แนะนำต่อ',
+      'intake.preferredDate': 'วันเวลาที่ต้องการ',
+      'intake.urgency': 'ความเร่งด่วน',
+      'intake.saveLead': 'บันทึก Lead',
+      'intake.walkingAbility': 'การเดิน',
+      'intake.bedToWheelchair': 'จากเตียงสู่รถเข็น',
+      'intake.fallRisk': 'ความเสี่ยงล้ม',
+      'intake.cognitiveStatus': 'การรับรู้',
+      'intake.cognitiveClear': 'สื่อสารรู้เรื่อง',
+      'intake.cognitiveForgetful': 'หลงลืมบ้าง',
+      'intake.cognitiveConfused': 'สับสนง่าย',
+      'intake.currentMedication': 'ยา/โรคประจำตัว',
+      'intake.communicationNote': 'ข้อควรสื่อสาร',
+      'intake.saveAssessment': 'บันทึก Assessment',
+      'intake.recentLeads': 'Lead ล่าสุด',
+      'intake.recentLeadsSubtitle': 'ดึงจากตาราง leads ใน Supabase',
+      'intake.recentAssessments': 'Assessment ล่าสุด',
+      'intake.recentAssessmentsSubtitle': 'หลังประเมินแล้วสามารถเปิดฟอร์ม booking ต่อได้ทันที',
+      'intake.noLeads': 'ยังไม่มี lead',
+      'intake.noAssessments': 'ยังไม่มี assessment',
+      'intake.openBooking': 'เปิด Booking',
       'reports.title': 'Business Intelligence',
       'reports.subtitle': 'รายงานรายได้ งานสำเร็จ incident และ performance สำหรับผู้บริหาร',
       'reports.bookings': 'bookings',
@@ -3894,6 +4130,12 @@
       'status.consent': 'active',
       'status.partial': 'partial',
       'status.no-consent': 'inactive',
+      'status.new': 'ใหม่',
+      'status.contacted': 'ติดต่อแล้ว',
+      'status.qualified': 'ผ่านคัดกรอง',
+      'status.converted': 'แปลงเป็นลูกค้า',
+      'status.normal': 'ปกติ',
+      'status.urgent': 'เร่งด่วน',
       'status.syncing': 'กำลัง sync',
       'status.connected': 'Supabase connected',
       'status.offline': 'API offline',
@@ -3968,6 +4210,9 @@
       'toast.apiOffline': 'ยังต่อ API ไม่ได้ จึงแสดงข้อมูลตัวอย่างไว้ก่อน',
       'toast.bookingCreated': 'สร้าง booking {id} ใน Supabase แล้ว',
       'toast.bookingCreateNeedsProfile': 'ต้องมี profile ผู้สูงวัยก่อนสร้าง booking',
+      'toast.leadSaved': 'บันทึก lead แล้ว',
+      'toast.assessmentSaved': 'บันทึก assessment แล้ว',
+      'toast.assessmentNeedsProfile': 'ต้องมี profile ผู้สูงวัยก่อนบันทึก assessment',
       'toast.savedToSupabase': 'บันทึกลง Supabase แล้ว',
       'toast.saveFailed': 'บันทึกไม่สำเร็จ: {message}',
       'toast.notificationUpdated': 'อัปเดต notification เป็น {status} แล้ว',
@@ -4053,6 +4298,7 @@
       'nav.finance': 'Finance Desk',
       'nav.notifications': 'Notification Center',
       'nav.portal': 'Customer Portal',
+      'nav.intake': 'Lead Intake',
       'nav.executive': 'Executive Dashboard',
       'nav.reports': 'Reports',
       'nav.ai': 'AI Ops Center',
@@ -4114,6 +4360,8 @@
       'view.notifications.subtitle': 'Control real booking messages so every party sees the same status',
       'view.portal.title': 'Customer Portal',
       'view.portal.subtitle': 'Customer/family status page with timeline, payment, and rating',
+      'view.intake.title': 'Lead Intake',
+      'view.intake.subtitle': 'Capture leads, assess elders, and hand off to SOP v2 booking',
       'view.executive.title': 'Executive Dashboard',
       'view.reports.title': 'Reports',
       'view.reports.subtitle': 'BI for revenue, completion, incidents, and performance',
@@ -4343,6 +4591,38 @@
       'portal.photoConsentShort': 'Photo consent',
       'portal.locationConsentShort': 'Location consent',
       'portal.noConsentProfile': 'No consent profile loaded yet',
+      'intake.leadTitle': 'Lead Intake',
+      'intake.leadSubtitle': 'Capture new cases before converting to profile and SOP v2 booking',
+      'intake.assessmentTitle': 'Elder Assessment',
+      'intake.assessmentSubtitle': 'Assess risk and requirements before booking',
+      'intake.metricLeads': 'leads',
+      'intake.metricUrgent': 'urgent',
+      'intake.metricAssessments': 'assessments',
+      'intake.leadSource': 'Lead source',
+      'intake.sourcePhone': 'Phone',
+      'intake.sourceLine': 'LINE',
+      'intake.sourceWeb': 'Website',
+      'intake.sourceReferral': 'Referral',
+      'intake.preferredDate': 'Preferred date',
+      'intake.urgency': 'Urgency',
+      'intake.saveLead': 'Save lead',
+      'intake.walkingAbility': 'Walking ability',
+      'intake.bedToWheelchair': 'Bed to wheelchair',
+      'intake.fallRisk': 'Fall risk',
+      'intake.cognitiveStatus': 'Cognitive status',
+      'intake.cognitiveClear': 'Clear',
+      'intake.cognitiveForgetful': 'Forgetful',
+      'intake.cognitiveConfused': 'Easily confused',
+      'intake.currentMedication': 'Medication/conditions',
+      'intake.communicationNote': 'Communication note',
+      'intake.saveAssessment': 'Save assessment',
+      'intake.recentLeads': 'Recent leads',
+      'intake.recentLeadsSubtitle': 'Loaded from Supabase leads',
+      'intake.recentAssessments': 'Recent assessments',
+      'intake.recentAssessmentsSubtitle': 'Open booking directly after assessment',
+      'intake.noLeads': 'No leads yet',
+      'intake.noAssessments': 'No assessments yet',
+      'intake.openBooking': 'Open booking',
       'reports.title': 'Business Intelligence',
       'reports.subtitle': 'Executive reports for revenue, completion, incidents, and performance',
       'reports.bookings': 'bookings',
@@ -4531,6 +4811,12 @@
       'status.consent': 'active',
       'status.partial': 'partial',
       'status.no-consent': 'inactive',
+      'status.new': 'New',
+      'status.contacted': 'Contacted',
+      'status.qualified': 'Qualified',
+      'status.converted': 'Converted',
+      'status.normal': 'Normal',
+      'status.urgent': 'Urgent',
       'status.syncing': 'Syncing',
       'status.connected': 'Supabase connected',
       'status.offline': 'API offline',
@@ -4605,6 +4891,9 @@
       'toast.apiOffline': 'API is unavailable, keeping sample data on screen',
       'toast.bookingCreated': 'Booking {id} created in Supabase',
       'toast.bookingCreateNeedsProfile': 'Create an elder profile before booking',
+      'toast.leadSaved': 'Lead saved',
+      'toast.assessmentSaved': 'Assessment saved',
+      'toast.assessmentNeedsProfile': 'Create an elder profile before assessment',
       'toast.savedToSupabase': 'Saved to Supabase',
       'toast.saveFailed': 'Save failed: {message}',
       'toast.notificationUpdated': 'Notification marked {status}',
@@ -5203,6 +5492,7 @@
     finance: ['owner', 'super_admin', 'admin', 'finance'],
     notifications: ['owner', 'super_admin', 'admin', 'branch_admin', 'dispatcher', 'coordinator', 'driver', 'care_assistant', 'hospital_companion', 'home_companion', 'finance'],
     portal: ['*'],
+    intake: ['owner', 'super_admin', 'admin', 'branch_admin', 'dispatcher', 'coordinator'],
     executive: ['owner', 'super_admin', 'admin', 'branch_admin', 'dispatcher', 'coordinator', 'finance'],
     reports: ['owner', 'super_admin', 'admin', 'branch_admin', 'dispatcher', 'coordinator', 'finance'],
     ai: ['owner', 'super_admin', 'admin', 'branch_admin', 'dispatcher', 'coordinator'],
@@ -5270,6 +5560,8 @@
     session: null,
     customers: [],
     elders: [],
+    leads: [],
+    elderAssessments: [],
     careAssistants: [],
     vehicles: [],
     dispatchers: [],
@@ -5563,6 +5855,14 @@
     bookingCreateCancel: document.getElementById('bookingCreateCancel'),
     bookingElderSelect: document.getElementById('bookingElderSelect'),
     bookingPickupAt: document.getElementById('bookingPickupAt'),
+    leadIntakeForm: document.getElementById('leadIntakeForm'),
+    leadIntakeSubmit: document.getElementById('leadIntakeSubmit'),
+    leadPreferredDate: document.getElementById('leadPreferredDate'),
+    leadRows: document.getElementById('leadRows'),
+    assessmentForm: document.getElementById('assessmentForm'),
+    assessmentSubmit: document.getElementById('assessmentSubmit'),
+    assessmentElderSelect: document.getElementById('assessmentElderSelect'),
+    assessmentRows: document.getElementById('assessmentRows'),
     driverRows: document.getElementById('driverRows'),
     screeningDriverName: document.getElementById('screeningDriverName'),
     trainingModules: document.getElementById('trainingModules'),
@@ -5590,6 +5890,25 @@
     const key = `status.${status}`;
     const label = tr(key);
     return label === key ? prettifyCode(status) : label;
+  }
+
+  function urgencyStatusClass(level) {
+    return {
+      low: 'active',
+      normal: 'pending',
+      urgent: 'high',
+      critical: 'critical'
+    }[level] || 'pending';
+  }
+
+  function leadStatusClass(status) {
+    return {
+      new: 'pending',
+      contacted: 'queued',
+      qualified: 'active',
+      converted: 'completed',
+      closed: 'closed'
+    }[status] || 'pending';
   }
 
   function notificationTypeLabel(type) {
@@ -6133,7 +6452,51 @@
       customer: customer.full_name || '-',
       phone: customer.phone || elder.emergency_contact_phone || '-',
       mobility: elder.mobility_level || 'walk_independent',
-      notes: elder.medical_notes || elder.communication_notes || '-'
+      notes: elder.medical_notes || elder.communication_notes || elder.communication_note || '-',
+      walkingAbility: elder.walking_ability || elder.mobility_level || 'walk_independent',
+      fallRisk: elder.fall_risk || 'low',
+      cognitiveStatus: elder.cognitive_status || '',
+      riskLevel: elder.risk_level || 'low',
+      wheelchairRequired: elder.wheelchair_required === true,
+      communicationNote: elder.communication_note || elder.communication_notes || ''
+    };
+  }
+
+  function mapApiLead(lead) {
+    return {
+      id: lead.id,
+      companyId: lead.company_id || null,
+      branchId: lead.branch_id || null,
+      source: lead.lead_source || '-',
+      contactName: lead.contact_name || '-',
+      contactPhone: lead.contact_phone || '-',
+      elderName: lead.elder_name || '-',
+      serviceInterest: lead.service_interest || '',
+      preferredDate: lead.preferred_date || null,
+      urgencyLevel: lead.urgency_level || 'normal',
+      status: lead.status || 'new',
+      customerId: lead.customer_id || null,
+      elderId: lead.elder_id || null,
+      notes: lead.notes || '',
+      createdAt: lead.created_at || null
+    };
+  }
+
+  function mapApiAssessment(assessment) {
+    const profile = state.profiles.find((item) => item.id === assessment.elder_id) || {};
+    return {
+      id: assessment.id,
+      elderId: assessment.elder_id,
+      elderName: profile.elder || assessment.elder_id || '-',
+      customer: profile.customer || '-',
+      walkingAbility: assessment.walking_ability || profile.walkingAbility || profile.mobility || 'walk_independent',
+      fallRisk: assessment.fall_risk || 'low',
+      cognitiveStatus: assessment.cognitive_status || '',
+      wheelchairRequired: assessment.wheelchair_required === true,
+      communicationNote: assessment.communication_note || '',
+      currentMedication: assessment.current_medication || '',
+      riskLevel: assessment.risk_level || profile.riskLevel || 'low',
+      assessedAt: assessment.assessed_at || null
     };
   }
 
@@ -6798,6 +7161,8 @@
       ['elders', '/api/elders', ['owner', 'super_admin', 'admin', 'branch_admin', 'dispatcher', 'coordinator', 'care_assistant', 'hospital_companion', 'home_companion']],
       ['customers', '/api/customers', ['owner', 'super_admin', 'admin', 'branch_admin', 'dispatcher', 'coordinator']],
       ['consents', '/api/consents', ['owner', 'super_admin', 'admin', 'branch_admin', 'dispatcher', 'coordinator']],
+      ['sopLeads', '/api/sop/leads?limit=80', ['owner', 'super_admin', 'admin', 'branch_admin', 'dispatcher', 'coordinator']],
+      ['sopAssessments', '/api/sop/elder-assessments?limit=80', ['owner', 'super_admin', 'admin', 'branch_admin', 'dispatcher', 'coordinator']],
       ['finance', '/api/finance/ledger', ['owner', 'super_admin', 'admin', 'finance']],
       ['notifications', '/api/notifications', ['owner', 'super_admin', 'admin', 'branch_admin', 'dispatcher', 'coordinator', 'driver', 'care_assistant', 'hospital_companion', 'home_companion', 'finance']],
       ['quality', '/api/quality/dashboard', ['owner', 'super_admin', 'admin', 'branch_admin', 'dispatcher', 'trainer']],
@@ -6854,6 +7219,8 @@
     }
     if (payloads.customers?.customers) state.customers = payloads.customers.customers.map(mapApiCustomer);
     if (payloads.consents?.consents) state.consents = payloads.consents.consents.map(mapApiConsent);
+    if (payloads.sopLeads?.leads) state.leads = payloads.sopLeads.leads.map(mapApiLead);
+    if (payloads.sopAssessments?.assessments) state.elderAssessments = payloads.sopAssessments.assessments.map(mapApiAssessment);
     if (payloads.finance?.ledger) state.financeLedger = payloads.finance.ledger.map(mapApiFinanceRow);
     if (payloads.notifications?.notifications) state.notifications = payloads.notifications.notifications.map(mapApiNotification);
     if (payloads.quality?.drivers) {
@@ -7218,6 +7585,7 @@
     setText('navFinanceCount', financeOpen);
     setText('navNotificationCount', notificationOpen);
     setText('navPortalCount', state.portalStatus ? 1 : 0);
+    setText('navIntakeCount', state.leads.filter((lead) => !['converted', 'closed'].includes(lead.status)).length);
     setText('navExecutiveCount', getExecutiveAlerts().length);
     setText('navReportsCount', state.reports?.summary?.open_incidents || 0);
     setText('navAiCount', state.aiTasks.filter((task) => task.status !== 'approved').length);
@@ -8161,10 +8529,10 @@
   function renderProfiles() {
     els.profileRows.innerHTML = state.profiles.length ? state.profiles.map((profile) => `
       <tr>
-        <td><div class="person"><strong>${profile.elder}</strong><span>${profile.phone}</span></div></td>
-        <td>${profile.customer}</td>
-        <td>${mobilityLabel(profile.mobility)}</td>
-        <td>${profile.notes}</td>
+        <td><div class="person"><strong>${escapeHtml(profile.elder)}</strong><span>${escapeHtml(profile.phone)} / ${statusLabel(profile.riskLevel)}</span></div></td>
+        <td>${escapeHtml(profile.customer)}</td>
+        <td><div class="person"><strong>${mobilityLabel(profile.mobility)}</strong><span>${profile.wheelchairRequired ? tr('common.yesConsent') : tr('common.noConsent')}</span></div></td>
+        <td>${escapeHtml(profile.notes)}</td>
       </tr>
     `).join('') : `<tr><td colspan="4"><div class="empty">${tr('detail.pickFromTable')}</div></td></tr>`;
   }
@@ -8293,11 +8661,54 @@
     if (!els.bookingElderSelect) return;
     const selected = els.bookingElderSelect.value;
     els.bookingElderSelect.innerHTML = state.profiles.length
-      ? state.profiles.map((profile) => `<option value="${profile.id || ''}" ${profile.id === selected ? 'selected' : ''}>${profile.elder} / ${profile.customer}</option>`).join('')
+      ? state.profiles.map((profile) => `<option value="${profile.id || ''}" ${profile.id === selected ? 'selected' : ''}>${escapeHtml(profile.elder)} / ${escapeHtml(profile.customer)}</option>`).join('')
       : `<option value="">${tr('toast.bookingCreateNeedsProfile')}</option>`;
     if (!els.bookingPickupAt.value) {
       els.bookingPickupAt.value = defaultPickupLocalValue();
     }
+  }
+
+  function renderIntake() {
+    if (!els.leadRows || !els.assessmentRows) return;
+    if (els.leadPreferredDate && !els.leadPreferredDate.value) {
+      els.leadPreferredDate.value = defaultPickupLocalValue();
+    }
+
+    const urgentLeads = state.leads.filter((lead) => ['urgent', 'critical'].includes(lead.urgencyLevel)).length;
+    setText('intakeMetricLeads', state.leads.length);
+    setText('intakeMetricUrgent', urgentLeads);
+    setText('intakeMetricAssessments', state.elderAssessments.length);
+
+    if (els.assessmentElderSelect) {
+      const selected = els.assessmentElderSelect.value;
+      els.assessmentElderSelect.innerHTML = state.profiles.length
+        ? state.profiles.map((profile) => `<option value="${profile.id || ''}" ${profile.id === selected ? 'selected' : ''}>${escapeHtml(profile.elder)} / ${escapeHtml(profile.customer)}</option>`).join('')
+        : `<option value="">${tr('toast.assessmentNeedsProfile')}</option>`;
+    }
+
+    els.leadRows.innerHTML = state.leads.length ? state.leads.map((lead) => `
+      <tr>
+        <td><div class="person"><strong>${escapeHtml(lead.contactName)}</strong><span>${escapeHtml(lead.contactPhone)} / ${escapeHtml(lead.elderName)}</span></div></td>
+        <td><div class="person"><strong>${serviceLabel(lead.serviceInterest)}</strong><span>${escapeHtml(prettifyCode(lead.source))} / ${dateTimeFromIso(lead.preferredDate)}</span></div></td>
+        <td><span class="status ${urgencyStatusClass(lead.urgencyLevel)}">${statusLabel(lead.urgencyLevel)}</span></td>
+        <td><span class="status ${leadStatusClass(lead.status)}">${statusLabel(lead.status)}</span></td>
+      </tr>
+    `).join('') : `<tr><td colspan="4"><div class="empty">${tr('intake.noLeads')}</div></td></tr>`;
+
+    els.assessmentRows.innerHTML = state.elderAssessments.length ? state.elderAssessments.map((assessment) => {
+      const canOpenBooking = assessment.elderId && state.profiles.some((profile) => profile.id === assessment.elderId);
+      const bookingAction = canOpenBooking
+        ? `<button class="row-action" type="button" data-intake-booking-profile-id="${assessment.elderId}">${tr('intake.openBooking')}</button>`
+        : '';
+      return `
+        <tr>
+          <td><div class="person"><strong>${escapeHtml(assessment.elderName)}</strong><span>${escapeHtml(assessment.customer)}</span></div></td>
+          <td><span class="status ${urgencyStatusClass(assessment.riskLevel)}">${statusLabel(assessment.riskLevel)}</span></td>
+          <td><div class="person"><strong>${mobilityLabel(assessment.walkingAbility)}</strong><span>${assessment.wheelchairRequired ? tr('common.yesConsent') : tr('common.noConsent')} / ${statusLabel(assessment.fallRisk)}</span></div></td>
+          <td><div class="person"><strong>${dateTimeFromIso(assessment.assessedAt)}</strong><span>${bookingAction}</span></div></td>
+        </tr>
+      `;
+    }).join('') : `<tr><td colspan="4"><div class="empty">${tr('intake.noAssessments')}</div></td></tr>`;
   }
 
   function renderAll() {
@@ -8307,6 +8718,7 @@
     renderMetrics();
     renderExecutiveDashboard();
     renderBookingCreateControls();
+    renderIntake();
     renderBookings();
     renderTrips();
     renderFinance();
@@ -8416,6 +8828,83 @@
       renderAll();
       showToast(tr('toast.bookingCreated', { id: state.selectedBookingId }));
     });
+  }
+
+  async function createLeadFromForm(form, button) {
+    const input = new FormData(form);
+    const preferredDate = input.get('preferred_date');
+    await withSaveToast(button, async () => {
+      const result = await apiPost('/api/sop/leads', {
+        company_id: state.defaultCompanyId,
+        branch_id: state.defaultBranchId,
+        lead_source: input.get('lead_source') || null,
+        contact_name: String(input.get('contact_name') || '').trim(),
+        contact_phone: String(input.get('contact_phone') || '').trim() || null,
+        elder_name: String(input.get('elder_name') || '').trim() || null,
+        service_interest: input.get('service_interest') || null,
+        preferred_date: preferredDate ? localInputToIso(preferredDate) : null,
+        urgency_level: input.get('urgency_level') || 'normal',
+        status: 'new',
+        assigned_coordinator_id: state.defaultDispatcherId || null,
+        notes: String(input.get('notes') || '').trim() || null
+      });
+      if (result?.lead) {
+        state.leads = [mapApiLead(result.lead), ...state.leads.filter((lead) => lead.id !== result.lead.id)];
+      }
+      form.reset();
+      if (els.leadPreferredDate) els.leadPreferredDate.value = defaultPickupLocalValue();
+      await loadApiData({ silent: true });
+      showToast(tr('toast.leadSaved'));
+    });
+  }
+
+  async function saveAssessmentFromForm(form, button) {
+    const input = new FormData(form);
+    const elderId = input.get('elder_id');
+    if (!elderId) {
+      showToast(tr('toast.assessmentNeedsProfile'));
+      return;
+    }
+
+    await withSaveToast(button, async () => {
+      const payload = {
+        elder_id: elderId,
+        assessed_by: state.defaultDispatcherId || null,
+        walking_ability: input.get('walking_ability') || null,
+        fall_risk: input.get('fall_risk') || null,
+        cognitive_status: input.get('cognitive_status') || null,
+        current_medication: String(input.get('current_medication') || '').trim() || null,
+        wheelchair_required: booleanFromForm(input.get('wheelchair_required')),
+        communication_note: String(input.get('communication_note') || '').trim() || null,
+        support_requirement: {
+          intake_form: true,
+          preferred_booking_flow: 'sop_v2',
+          wheelchair_required: booleanFromForm(input.get('wheelchair_required'))
+        },
+        risk_level: input.get('risk_level') || null
+      };
+      const result = await apiPost('/api/sop/elder-assessments', payload);
+      if (result?.assessment) {
+        state.elderAssessments = [mapApiAssessment(result.assessment), ...state.elderAssessments.filter((assessment) => assessment.id !== result.assessment.id)];
+      }
+      await loadApiData({ silent: true });
+      showToast(tr('toast.assessmentSaved'));
+    });
+  }
+
+  function openBookingForProfile(profileId) {
+    const profile = selectedProfileById(profileId);
+    setView('dispatch');
+    els.bookingCreatePanel.hidden = false;
+    renderBookingCreateControls();
+    if (profile?.id) els.bookingElderSelect.value = profile.id;
+    const wheelchairSelect = els.bookingCreateForm?.elements?.need_wheelchair_support;
+    if (wheelchairSelect && profile) wheelchairSelect.value = profile.wheelchairRequired ? 'true' : 'false';
+    const assistantSelect = els.bookingCreateForm?.elements?.need_care_assistant;
+    if (assistantSelect && ['high', 'critical'].includes(profile?.riskLevel)) assistantSelect.value = 'true';
+    const notesField = els.bookingCreateForm?.elements?.special_notes;
+    if (notesField && profile?.communicationNote) notesField.value = profile.communicationNote;
+    if (els.bookingPickupAt) els.bookingPickupAt.focus();
   }
 
   async function approveAndConfirmBooking(booking, button) {
@@ -9298,6 +9787,22 @@
   document.getElementById('profileForm').addEventListener('submit', async (event) => {
     event.preventDefault();
     await createProfileFromForm(event.currentTarget, event.submitter);
+  });
+
+  els.leadIntakeForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    await createLeadFromForm(event.currentTarget, event.submitter || els.leadIntakeSubmit);
+  });
+
+  els.assessmentForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    await saveAssessmentFromForm(event.currentTarget, event.submitter || els.assessmentSubmit);
+  });
+
+  els.assessmentRows.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-intake-booking-profile-id]');
+    if (!button) return;
+    openBookingForProfile(button.dataset.intakeBookingProfileId);
   });
 
   document.getElementById('incidentForm').addEventListener('submit', async (event) => {

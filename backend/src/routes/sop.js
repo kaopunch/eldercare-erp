@@ -57,6 +57,33 @@ const BranchChecklistSchema = z.object({
   unresolved_issues: z.array(z.any()).optional()
 });
 
+const LeadListQuerySchema = z.object({
+  company_id: z.string().uuid().optional(),
+  branch_id: z.string().uuid().optional(),
+  status: z.enum(['new', 'contacted', 'qualified', 'converted', 'closed']).optional(),
+  lead_source: z.string().min(1).max(100).optional(),
+  service_interest: z.string().min(1).max(100).optional(),
+  urgency_level: z.enum(['low', 'normal', 'urgent', 'critical']).optional(),
+  assigned_coordinator_id: z.string().uuid().optional(),
+  customer_id: z.string().uuid().optional(),
+  elder_id: z.string().uuid().optional(),
+  limit: z.string().optional()
+});
+
+const AssessmentListQuerySchema = z.object({
+  elder_id: z.string().uuid().optional(),
+  assessed_by: z.string().uuid().optional(),
+  risk_level: z.enum(['low', 'medium', 'high', 'critical']).optional(),
+  wheelchair_required: z.enum(['true', 'false']).optional(),
+  limit: z.string().optional()
+});
+
+function parseLimit(value, fallback = 100, max = 200) {
+  const parsed = Number(value || fallback);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.min(Math.max(Math.round(parsed), 1), max);
+}
+
 router.get('/v2/templates', (_, res) => {
   res.json({
     ok: true,
@@ -70,6 +97,31 @@ router.get('/v2/templates/:service_type', (req, res, next) => {
   try {
     const snapshot = workflowSnapshotForBooking({ service_type: req.params.service_type });
     res.json({ ok: true, workflow: snapshot });
+  } catch (e) { next(e); }
+});
+
+router.get('/leads', async (req, res, next) => {
+  try {
+    const filters = LeadListQuerySchema.parse(req.query);
+    const sb = getSupabase();
+    let query = sb.from('leads')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(parseLimit(filters.limit));
+
+    if (filters.company_id) query = query.eq('company_id', filters.company_id);
+    if (filters.branch_id) query = query.eq('branch_id', filters.branch_id);
+    if (filters.status) query = query.eq('status', filters.status);
+    if (filters.lead_source) query = query.eq('lead_source', filters.lead_source);
+    if (filters.service_interest) query = query.eq('service_interest', filters.service_interest);
+    if (filters.urgency_level) query = query.eq('urgency_level', filters.urgency_level);
+    if (filters.assigned_coordinator_id) query = query.eq('assigned_coordinator_id', filters.assigned_coordinator_id);
+    if (filters.customer_id) query = query.eq('customer_id', filters.customer_id);
+    if (filters.elder_id) query = query.eq('elder_id', filters.elder_id);
+
+    const { data, error } = await query;
+    if (error) throw error;
+    res.json({ ok: true, leads: data || [] });
   } catch (e) { next(e); }
 });
 
@@ -92,6 +144,26 @@ router.post('/leads', async (req, res, next) => {
       }
     });
     res.status(201).json({ ok: true, lead: data });
+  } catch (e) { next(e); }
+});
+
+router.get('/elder-assessments', async (req, res, next) => {
+  try {
+    const filters = AssessmentListQuerySchema.parse(req.query);
+    const sb = getSupabase();
+    let query = sb.from('elder_assessments')
+      .select('*')
+      .order('assessed_at', { ascending: false })
+      .limit(parseLimit(filters.limit));
+
+    if (filters.elder_id) query = query.eq('elder_id', filters.elder_id);
+    if (filters.assessed_by) query = query.eq('assessed_by', filters.assessed_by);
+    if (filters.risk_level) query = query.eq('risk_level', filters.risk_level);
+    if (filters.wheelchair_required) query = query.eq('wheelchair_required', filters.wheelchair_required === 'true');
+
+    const { data, error } = await query;
+    if (error) throw error;
+    res.json({ ok: true, assessments: data || [] });
   } catch (e) { next(e); }
 });
 

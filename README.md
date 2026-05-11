@@ -23,7 +23,7 @@
 ## SOP workflow ที่มีใน backend
 - Customer/Elder/Consent: `POST /api/customers`, `POST /api/elders`, `PATCH /api/elders/:id`, `POST /api/consents`, `GET /api/elders/:id/consents`
 - Booking core: `POST /api/bookings`, `POST /api/bookings/:id/quote`, `POST /api/bookings/:id/confirm`, `POST /api/bookings/:id/cancel`, `POST /api/bookings/:id/segments`
-- SOP v2 workflow: `GET /api/sop/v2/templates`, `POST /api/sop/leads`, `POST /api/sop/elder-assessments`, `POST /api/sop/branch-checklists`, `GET /api/sop/sla-escalations`
+- SOP v2 workflow: `GET /api/sop/v2/templates`, `GET/POST /api/sop/leads`, `GET/POST /api/sop/elder-assessments`, `POST /api/sop/branch-checklists`, `GET /api/sop/sla-escalations`
 - Visit execution control: `POST /api/bookings/:id/family-updates`, `POST /api/bookings/:id/visit-summary`, `POST /api/bookings/:id/complete`, `GET /api/bookings/:id/compliance`
 - Assignment: `GET /api/assignments/recommend?booking_id=...`, `POST /api/assignments`, `POST /api/assignments/:id/accept`, `POST /api/assignments/:id/reject`
 - Trip operation: `POST /api/trips/:booking_id/checklist`, `POST /api/trips/:booking_id/events`, `POST /api/trips/:booking_id/location`, `POST /api/trips/:booking_id/complete`
