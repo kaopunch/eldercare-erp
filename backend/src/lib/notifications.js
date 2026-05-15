@@ -1,10 +1,16 @@
 const CUSTOMER_FAMILY_AUDIENCE = 'customer_family';
 
 function buildBookingPayload(booking = {}, payload = {}) {
+  const bookingNo = booking.booking_no || payload.booking_no || null;
+  const elderId = booking.elder_id || payload.elder_id || null;
   return {
-    booking_no: booking.booking_no || payload.booking_no || null,
+    booking_no: bookingNo,
     service_type: booking.service_type || payload.service_type || null,
     pickup_at: booking.pickup_at || payload.pickup_at || null,
+    status_url: payload.status_url || (bookingNo ? `/portal/status/${bookingNo}` : null),
+    rating_url: payload.rating_url || (bookingNo ? `/portal/rating/${bookingNo}` : null),
+    consent_url: payload.consent_url || (elderId ? `/portal/consent/${elderId}` : null),
+    customer_visible: payload.customer_visible !== false,
     ...payload
   };
 }
@@ -39,6 +45,7 @@ async function queueNotification(sb, {
 async function queueCustomerNotification(sb, booking, type, payload = {}) {
   await queueNotification(sb, {
     booking,
+    channel: payload.delivery_channel || 'line',
     type,
     payload: {
       audience: CUSTOMER_FAMILY_AUDIENCE,

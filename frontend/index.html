@@ -2334,6 +2334,215 @@
       background: #ffffff;
     }
 
+    .portal-status-card {
+      display: grid;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .portal-live-card,
+    .portal-care-card,
+    .portal-recovery-card {
+      padding: 14px;
+      border: 1px solid rgba(18, 184, 166, .18);
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, rgba(255, 255, 255, .98), rgba(239, 250, 247, .92));
+      box-shadow: 0 10px 24px rgba(30, 67, 118, .07);
+      display: grid;
+      gap: 12px;
+    }
+
+    .portal-card-head {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    .portal-card-head span {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.25;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .portal-card-head strong {
+      display: block;
+      margin-top: 3px;
+      font-size: 16px;
+      line-height: 1.25;
+    }
+
+    .portal-live-meta,
+    .portal-line-hints,
+    .portal-care-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .portal-live-meta {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .portal-mini-metric,
+    .portal-line-hint,
+    .portal-care-item,
+    .portal-next-action {
+      padding: 10px;
+      border: 1px solid rgba(21, 34, 58, .08);
+      border-radius: var(--radius-sm);
+      background: #ffffff;
+      display: grid;
+      gap: 3px;
+    }
+
+    .portal-mini-metric span,
+    .portal-line-hint span,
+    .portal-care-item span,
+    .portal-next-action span {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.25;
+      font-weight: 850;
+    }
+
+    .portal-mini-metric strong,
+    .portal-line-hint strong,
+    .portal-care-item strong,
+    .portal-next-action strong {
+      font-size: 13px;
+      line-height: 1.3;
+    }
+
+    .portal-journey-progress {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(21, 34, 58, .08);
+    }
+
+    .portal-journey-progress span {
+      display: block;
+      height: 100%;
+      width: var(--progress, 0%);
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent), var(--blue));
+    }
+
+    .portal-journey-steps {
+      display: grid;
+      gap: 8px;
+    }
+
+    .portal-journey-step {
+      display: grid;
+      grid-template-columns: 28px minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: #ffffff;
+    }
+
+    .portal-journey-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: #edf3fb;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 950;
+    }
+
+    .portal-journey-step.done .portal-journey-dot,
+    .portal-journey-step.active .portal-journey-dot {
+      background: linear-gradient(135deg, var(--accent), var(--blue));
+      color: #ffffff;
+    }
+
+    .portal-journey-step strong {
+      font-size: 13px;
+      line-height: 1.25;
+    }
+
+    .portal-journey-step small {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.25;
+      font-weight: 800;
+    }
+
+    .portal-trust-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin: 14px 0;
+    }
+
+    .portal-trust-card {
+      min-height: 132px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #ffffff;
+      box-shadow: 0 8px 20px rgba(30, 67, 118, .05);
+      display: grid;
+      gap: 8px;
+      align-content: start;
+    }
+
+    .portal-trust-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background: linear-gradient(135deg, rgba(18, 184, 166, .14), rgba(74, 124, 255, .12));
+      color: var(--accent-strong);
+      font-size: 13px;
+      font-weight: 950;
+    }
+
+    .portal-trust-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .portal-trust-card strong {
+      font-size: 14px;
+      line-height: 1.25;
+    }
+
+    .portal-trust-card span {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.35;
+      font-weight: 800;
+    }
+
+    .portal-payment-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(220px, .75fr);
+      gap: 12px;
+      align-items: start;
+      margin-top: 14px;
+    }
+
+    .portal-recovery-card {
+      border-color: rgba(228, 93, 108, .28);
+      background: linear-gradient(135deg, rgba(255, 246, 247, .98), rgba(255, 251, 236, .92));
+    }
+
+    .portal-recovery-card .portal-card-head span {
+      color: var(--rose);
+    }
+
     .ai-hero {
       padding: 18px;
       background: linear-gradient(135deg, #e6fbf6 0%, #eef5ff 54%, #fff9ec 100%);
@@ -2649,6 +2858,12 @@
       .portal-service-strip {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
+
+      .portal-live-meta,
+      .portal-trust-grid,
+      .portal-payment-layout {
+        grid-template-columns: 1fr;
+      }
     }
 
     @media (max-width: 980px) {
@@ -2891,6 +3106,9 @@
       .public-service-points,
       .portal-hero,
       .portal-service-strip,
+      .portal-live-meta,
+      .portal-trust-grid,
+      .portal-payment-layout,
       .portal-stepper,
       .portal-step-panel,
       .portal-service-points {
@@ -10370,46 +10588,233 @@
     const team = portal.field_team || {};
     const driver = team.driver || {};
     const assistant = team.care_assistant || {};
+    const journey = portal.customer_journey || {};
+    const trustCard = portal.trust_card || {};
+    const careSummary = portal.care_summary || {};
+    const nextAction = portal.next_action || {};
+    const lineExperience = portal.line_experience || {};
+    const serviceRecovery = portal.service_recovery || {};
+    const latestRating = portal.rating?.latest;
+    const lowRating = Number(latestRating?.rating || latestRating?.score || 0) > 0 && Number(latestRating?.rating || latestRating?.score || 0) <= 3;
+    const recoveryStatus = serviceRecovery.status || '';
+    const hasRecovery = Boolean(
+      serviceRecovery.active
+      || serviceRecovery.exists
+      || ['opened', 'open', 'active', 'in_progress', 'reviewing'].includes(recoveryStatus)
+      || serviceRecovery.owner
+      || serviceRecovery.message
+      || serviceRecovery.next_step
+      || serviceRecovery.summary
+      || lowRating
+    );
+    const textFor = (value, fallback = '-') => {
+      if (Array.isArray(value)) return value.filter(Boolean).join(' / ') || fallback;
+      if (value && typeof value === 'object') return value.label || value.text || value.title || value.name || fallback;
+      return value || fallback;
+    };
+    const timeFor = (value) => value ? dateTimeFromIso(value) : '-';
+    const safeClass = (value) => String(value || '').replace(/[^a-z0-9_-]/gi, '-');
+    const initialsFor = (value, fallback = '?') => {
+      const text = String(value || '').trim();
+      if (!text) return fallback;
+      return text.split(/\s+/).slice(0, 2).map((part) => part[0]).join('').toUpperCase();
+    };
+    const percentFrom = (value, fallback = 0) => {
+      const numeric = Number(value ?? fallback);
+      if (!Number.isFinite(numeric)) return 0;
+      return Math.min(100, Math.max(0, numeric));
+    };
+    const timelineSteps = (portal.timeline || []).map((step, index) => ({
+      label: step.label || step.title || step.event_type || `Step ${index + 1}`,
+      done: Boolean(step.done || step.completed),
+      active: Boolean(step.active || step.current),
+      event_at: step.event_at || step.completed_at || step.at,
+      note: step.note || step.description || ''
+    }));
+    const journeySteps = Array.isArray(journey.steps) && journey.steps.length
+      ? journey.steps.map((step, index) => ({
+        label: step.label || step.title || step.name || `Step ${index + 1}`,
+        done: Boolean(step.done || step.completed || step.status === 'done' || step.status === 'completed'),
+        active: Boolean(step.active || step.current || step.status === 'active' || step.key === journey.current_step || step.key === journey.current_step_key),
+        event_at: step.event_at || step.completed_at || step.updated_at || step.at,
+        note: step.customer_message || step.note || step.description || step.status || ''
+      }))
+      : timelineSteps;
+    const completedJourneySteps = journeySteps.filter((step) => step.done).length;
+    const journeyProgress = percentFrom(
+      journey.progress_percent ?? journey.progress,
+      journeySteps.length ? (completedJourneySteps / journeySteps.length) * 100 : 0
+    );
+    const activeJourneyStep = journeySteps.find((step) => step.active) || journeySteps.find((step) => !step.done) || journeySteps[journeySteps.length - 1] || {};
+    const journeyTitle = textFor(journey.status_headline || journey.headline || journey.title || journey.current_step_label || activeJourneyStep.label, statusLabel(booking.status));
+    const journeySubtitle = textFor(journey.status_detail || journey.summary || journey.message || journey.current_message || activeJourneyStep.note, `${serviceLabel(booking.service_type)} / ${statusLabel(booking.status)}`);
+    const vehicleFallback = team.vehicle || portal.vehicle || {};
+    const trustPeople = [
+      {
+        role: textFor(trustCard.driver?.role, tr('detail.driver')),
+        name: textFor(trustCard.driver?.name || trustCard.driver?.full_name || driver.full_name, tr('detail.waitingDriver')),
+        detail: textFor(trustCard.driver?.detail || trustCard.driver?.rating || driver.phone || driver.status, tr('common.pending')),
+        photo: trustCard.driver?.photo_url || trustCard.driver?.avatar_url || driver.photo_url || ''
+      },
+      {
+        role: textFor(trustCard.assistant?.role, tr('detail.assistant')),
+        name: textFor(trustCard.assistant?.name || trustCard.assistant?.full_name || assistant.full_name, tr('detail.noAssistant')),
+        detail: textFor(trustCard.assistant?.detail || trustCard.assistant?.certification || assistant.phone || assistant.status, tr('common.pending')),
+        photo: trustCard.assistant?.photo_url || trustCard.assistant?.avatar_url || assistant.photo_url || ''
+      },
+      {
+        role: textFor(trustCard.vehicle?.role, 'Vehicle'),
+        name: textFor(trustCard.vehicle?.name || trustCard.vehicle?.plate_no || trustCard.vehicle?.license_plate || trustCard.vehicle?.plate_number || vehicleFallback.plate_no || vehicleFallback.license_plate || vehicleFallback.plate_number, tr('common.pending')),
+        detail: textFor(trustCard.vehicle?.detail || trustCard.vehicle?.model || vehicleFallback.model || vehicleFallback.vehicle_type, 'Clean vehicle / ready'),
+        photo: trustCard.vehicle?.photo_url || vehicleFallback.photo_url || ''
+      }
+    ];
+    const lineHints = Array.isArray(lineExperience.hints)
+      ? lineExperience.hints
+      : Array.isArray(lineExperience.messages)
+        ? lineExperience.messages
+        : Array.isArray(lineExperience.touchpoints)
+          ? lineExperience.touchpoints.map((item) => item.label || item.title || item.key)
+          : [
+          lineExperience.latest_message || lineExperience.status_message || 'LINE updates will appear when the team sends status notifications.',
+          lineExperience.next_message || lineExperience.next_hint || 'Family can follow ETA, payment, and care summary from this portal link.'
+        ];
+    const careItems = [
+      {
+        label: careSummary.title || careSummary.headline || 'Post-service care',
+        value: careSummary.family_summary || careSummary.summary || careSummary.note || careSummary.visit_outcome || careSummary.outcome || (booking.status === 'completed' ? 'Service completed. Care summary will stay available here.' : 'Care summary will appear after service completion.')
+      },
+      {
+        label: careSummary.next_appointment ? 'Next appointment' : (careSummary.mobility_label || 'Mobility note'),
+        value: careSummary.next_appointment ? timeFor(careSummary.next_appointment) : (careSummary.mobility_note || careSummary.mobility || elder.mobility_level || tr('common.pending'))
+      },
+      {
+        label: careSummary.follow_up_label || 'Follow-up',
+        value: careSummary.follow_up_requirement || careSummary.follow_up || careSummary.next_check || careSummary.recommendation || tr('common.pending')
+      }
+    ];
+    const primaryNextAction = textFor(nextAction.title || nextAction.label || nextAction.action, finance.balance > 0 ? tr('portal.payment') : tr('portal.rateTrip'));
+    const primaryNextActionDetail = textFor(nextAction.body || nextAction.description || nextAction.detail || nextAction.message, finance.balance > 0 ? `${tr('finance.balance')}: ${formatCurrency(finance.balance)}` : 'Review service and send rating when available.');
     els.selectedPortalBooking.textContent = `${booking.booking_no} / ${statusLabel(booking.status)}`;
     els.portalStatusCard.innerHTML = `
-      <div class="detail-grid" style="margin-top:14px">
-        <div class="detail-item"><span>${tr('detail.elder')}</span><strong>${escapeHtml(elder.full_name || '-')}</strong></div>
-        <div class="detail-item"><span>${tr('detail.contact')}</span><strong>${escapeHtml(customer.full_name || '-')}</strong></div>
-        <div class="detail-item"><span>${tr('detail.service')}</span><strong>${serviceLabel(booking.service_type)}</strong></div>
-        <div class="detail-item"><span>${tr('table.status')}</span><strong>${statusLabel(booking.status)}</strong></div>
-        <div class="detail-item" style="grid-column:1/-1"><span>${tr('detail.route')}</span><strong>${escapeHtml(booking.pickup_address || '-')} -> ${escapeHtml(booking.dropoff_address || '-')}</strong></div>
+      <div class="portal-status-card">
+        <section class="portal-live-card">
+          <div class="portal-card-head">
+            <div>
+              <span>Live journey</span>
+              <strong>${escapeHtml(journeyTitle)}</strong>
+            </div>
+            <span class="status ${safeClass(booking.status)}">${statusLabel(booking.status)}</span>
+          </div>
+          <div class="portal-journey-progress" aria-label="Journey progress">
+            <span style="--progress:${journeyProgress}%"></span>
+          </div>
+          <div class="portal-live-meta">
+            <div class="portal-mini-metric"><span>${tr('detail.elder')}</span><strong>${escapeHtml(elder.full_name || '-')}</strong></div>
+            <div class="portal-mini-metric"><span>${tr('detail.contact')}</span><strong>${escapeHtml(customer.full_name || '-')}</strong></div>
+            <div class="portal-mini-metric"><span>ETA / update</span><strong>${escapeHtml(textFor(journey.eta || journey.next_eta || timeFor(journey.updated_at || booking.updated_at)))}</strong></div>
+          </div>
+          <div class="portal-next-action">
+            <span>${escapeHtml(primaryNextAction)}</span>
+            <strong>${escapeHtml(primaryNextActionDetail)}</strong>
+          </div>
+          <div class="portal-line-hints">
+            ${lineHints.filter(Boolean).slice(0, 2).map((hint) => `
+              <div class="portal-line-hint"><span>LINE notification</span><strong>${escapeHtml(textFor(hint))}</strong></div>
+            `).join('')}
+          </div>
+        </section>
+        <div class="detail-grid" style="margin-bottom:0">
+          <div class="detail-item"><span>${tr('detail.service')}</span><strong>${serviceLabel(booking.service_type)}</strong></div>
+          <div class="detail-item"><span>${tr('finance.total')}</span><strong>${formatCurrency(finance.total)}</strong></div>
+          <div class="detail-item"><span>${tr('finance.balance')}</span><strong>${formatCurrency(finance.balance)}</strong></div>
+          <div class="detail-item"><span>${tr('detail.route')}</span><strong>${escapeHtml(booking.pickup_address || '-')} -> ${escapeHtml(booking.dropoff_address || '-')}</strong></div>
+        </div>
       </div>
     `;
 
-    const timeline = (portal.timeline || []).map((step) => `
-      <div class="event ${step.done ? 'done' : ''}">
-        <strong>${escapeHtml(step.label)}</strong>
-        <span>${step.event_at ? dateTimeFromIso(step.event_at) : (step.done ? tr('common.completed') : tr('common.pending'))}</span>
+    const timeline = journeySteps.length ? journeySteps.map((step, index) => `
+      <div class="portal-journey-step ${step.done ? 'done' : ''} ${step.active ? 'active' : ''}">
+        <span class="portal-journey-dot">${step.done ? '&#10003;' : index + 1}</span>
+        <div>
+          <strong>${escapeHtml(step.label)}</strong>
+          <small>${escapeHtml(step.note || (step.event_at ? timeFor(step.event_at) : (step.done ? tr('common.completed') : tr('common.pending'))))}</small>
+        </div>
+        <span class="status ${step.done ? 'completed' : step.active ? 'active' : 'pending'}">${step.done ? tr('common.completed') : step.active ? statusLabel(booking.status) : tr('common.pending')}</span>
       </div>
-    `).join('');
+    `).join('') : '';
     const payments = (finance.payments || []).length ? finance.payments.map((payment) => `
       <div class="finance-row">
         <div>
           <strong>${formatCurrency(payment.amount)} / ${escapeHtml(payment.payment_method || '-')}</strong>
           <span>${escapeHtml(payment.transaction_ref || '-')} / ${dateTimeFromIso(payment.paid_at)}</span>
         </div>
-        <span class="status ${payment.payment_status}">${statusLabel(payment.payment_status)}</span>
+        <span class="status ${safeClass(payment.payment_status)}">${statusLabel(payment.payment_status)}</span>
       </div>
     `).join('') : `<div class="empty">${tr('finance.noPayments')}</div>`;
-    const latestRating = portal.rating?.latest;
 
     els.portalDetail.innerHTML = `
-      <div class="detail-grid">
-        <div class="detail-item"><span>${tr('portal.fieldTeam')}</span><strong>${escapeHtml(driver.full_name || tr('detail.waitingDriver'))}</strong></div>
-        <div class="detail-item"><span>${tr('detail.assistant')}</span><strong>${escapeHtml(assistant.full_name || tr('detail.noAssistant'))}</strong></div>
-        <div class="detail-item"><span>${tr('finance.total')}</span><strong>${formatCurrency(finance.total)}</strong></div>
-        <div class="detail-item"><span>${tr('finance.balance')}</span><strong>${formatCurrency(finance.balance)}</strong></div>
+      ${hasRecovery ? `
+        <section class="portal-recovery-card">
+          <div class="portal-card-head">
+            <div>
+              <span>Service recovery</span>
+              <strong>${escapeHtml(textFor(serviceRecovery.title || serviceRecovery.summary || serviceRecovery.message, lowRating ? 'Care team is reviewing this rating' : 'Recovery case is active'))}</strong>
+            </div>
+            <span class="status ${safeClass(serviceRecovery.status || 'open')}">${statusLabel(serviceRecovery.status || 'open')}</span>
+          </div>
+          <div class="portal-next-action">
+            <span>${escapeHtml(textFor(serviceRecovery.owner || serviceRecovery.owner_name, 'Care manager'))}</span>
+            <strong>${escapeHtml(textFor(serviceRecovery.next_step || serviceRecovery.detail || serviceRecovery.follow_up, 'The team will contact family and close the loop.'))}</strong>
+          </div>
+        </section>
+      ` : ''}
+      <div class="portal-trust-grid">
+        ${trustPeople.map((person) => `
+          <article class="portal-trust-card">
+            <div class="portal-trust-avatar">
+              ${person.photo ? `<img src="${escapeHtml(person.photo)}" alt=""/>` : escapeHtml(initialsFor(person.name))}
+            </div>
+            <span>${escapeHtml(person.role)}</span>
+            <strong>${escapeHtml(person.name)}</strong>
+            <span>${escapeHtml(person.detail)}</span>
+          </article>
+        `).join('')}
       </div>
-      <div class="timeline">${timeline}</div>
-      <div class="finance-list">
-        <strong>${tr('portal.payment')}</strong>
-        ${payments}
+      <section class="portal-live-card">
+        <div class="portal-card-head">
+          <div>
+            <span>${tr('portal.timeline')}</span>
+            <strong>${escapeHtml(journeySubtitle)}</strong>
+          </div>
+          <span>${Math.round(journeyProgress)}%</span>
+        </div>
+        <div class="portal-journey-steps">${timeline || `<div class="empty">${tr('portal.noStatus')}</div>`}</div>
+      </section>
+      <div class="portal-payment-layout">
+        <div class="finance-list" style="margin-top:0">
+          <strong>${tr('portal.payment')}</strong>
+          ${payments}
+        </div>
+        <div class="portal-next-action">
+          <span>${escapeHtml(primaryNextAction)}</span>
+          <strong>${escapeHtml(primaryNextActionDetail)}</strong>
+        </div>
       </div>
+      <section class="portal-care-card">
+        <div class="portal-card-head">
+          <div>
+            <span>Post-service summary</span>
+            <strong>${escapeHtml(textFor(careSummary.headline || careSummary.title, 'Care summary for family'))}</strong>
+          </div>
+          <span class="status ${booking.status === 'completed' ? 'completed' : 'pending'}">${booking.status === 'completed' ? tr('common.completed') : tr('common.pending')}</span>
+        </div>
+        <div class="portal-care-list">
+          ${careItems.map((item) => `
+            <div class="portal-care-item"><span>${escapeHtml(item.label)}</span><strong>${escapeHtml(textFor(item.value))}</strong></div>
+          `).join('')}
+        </div>
+      </section>
       <form class="form-grid" id="portalRatingForm" style="margin-top:14px">
         <label class="field">
           <span>${tr('portal.rateTrip')}</span>

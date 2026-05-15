@@ -10,6 +10,15 @@ const {
   workflowSnapshotForBooking
 } = require('../lib/businessRules');
 const { queueCustomerNotification, queueNotification } = require('../lib/notifications');
+const { configured: lineConfigured } = require('../lib/line');
+const {
+  buildCareSummary,
+  buildCustomerJourney,
+  buildLineExperience,
+  buildNextAction,
+  buildServiceRecovery,
+  buildTrustCard
+} = require('../lib/customerExperience');
 
 const router = express.Router();
 
@@ -148,7 +157,11 @@ function verifyPortalToken(token, expectedScope) {
 }
 
 function absoluteUrl(req, path) {
-  return `${req.protocol}://${req.get('host')}${path}`;
+  const protocol = req?.protocol || 'http';
+  const host = typeof req?.get === 'function'
+    ? req.get('host')
+    : (req?.headers?.host || 'localhost');
+  return `${protocol}://${host}${path}`;
 }
 
 function bookingPortalLinks(req, bookingNo, elderId) {
@@ -170,6 +183,18 @@ function bookingPortalLinks(req, bookingNo, elderId) {
         .filter(([, value]) => value)
         .map(([key, value]) => [key, absoluteUrl(req, value)])
     )
+  };
+}
+
+function relativePortalLinks(bookingNo, elderId) {
+  return {
+    status: `/portal/status/${bookingNo}`,
+    rating: `/portal/rating/${bookingNo}`,
+    consent: elderId ? `/portal/consent/${elderId}` : null,
+    raw_status: `/portal/status/${bookingNo}`,
+    raw_rating: `/portal/rating/${bookingNo}`,
+    raw_consent: elderId ? `/portal/consent/${elderId}` : null,
+    absolute: {}
   };
 }
 
@@ -256,6 +281,20 @@ async function latestSensitiveConsent(sb, elderId) {
     .limit(1);
   if (error) throw error;
   return data?.[0]?.consented === true;
+}
+
+async function latestConsentState(sb, elderId) {
+  const { data, error } = await sb.from('pdpa_consents')
+    .select('consent_type,consented,consented_at')
+    .eq('elder_id', elderId)
+    .order('consented_at', { ascending: false });
+  if (error) throw error;
+  return (data || []).reduce((state, consent) => {
+    if (!Object.prototype.hasOwnProperty.call(state, consent.consent_type)) {
+      state[consent.consent_type] = consent.consented === true;
+    }
+    return state;
+  }, {});
 }
 
 async function activePriceRule(sb, booking) {
@@ -360,22 +399,26 @@ function timelineForBooking(booking, events = []) {
 
 async function getPortalBooking(sb, bookingNo) {
   const { data, error } = await sb.from('bookings')
-    .select('id,company_id,branch_id,booking_no,customer_id,elder_id,service_type,pickup_address,dropoff_address,pickup_at,estimated_return_at,appointment_at,appointment_place,status,risk_level,quoted_price,final_price,payment_status,customers(id,full_name,phone,line_id),elders(id,full_name,mobility_level,emergency_contact_name,emergency_contact_phone)')
+    .select('id,company_id,branch_id,booking_no,customer_id,elder_id,service_type,pickup_address,dropoff_address,pickup_at,estimated_return_at,appointment_at,appointment_place,status,risk_level,quoted_price,final_price,payment_status,confirmed_at,service_completed_at,family_contact_name,family_contact_phone,preferred_communication_channel,workflow_snapshot,customers(id,full_name,phone,line_id,email),elders(id,full_name,mobility_level,emergency_contact_name,emergency_contact_phone)')
     .eq('booking_no', bookingNo)
     .single();
   if (error) throw error;
   return data;
 }
 
-async function portalPayload(sb, bookingNo) {
+async function portalPayload(sb, bookingNo, req = null) {
   const booking = await getPortalBooking(sb, bookingNo);
-  const [assignments, events, invoices, payments, refunds, ratings] = await Promise.all([
-    sb.from('assignments').select('id,status,driver_id,care_assistant_id,vehicle_id,drivers(full_name,phone,driver_level),care_assistant:app_users!assignments_care_assistant_id_fkey(full_name,phone),vehicles(plate_number,vehicle_type)').eq('booking_id', booking.id).order('assigned_at', { ascending: false }),
+  const [assignments, events, invoices, payments, refunds, ratings, summaries, familyUpdates, locations, consentState] = await Promise.all([
+    sb.from('assignments').select('id,status,driver_id,care_assistant_id,vehicle_id,drivers(id,full_name,phone,line_id,driver_level,status,rating_avg,total_jobs),care_assistant:app_users!assignments_care_assistant_id_fkey(id,full_name,phone,email,role,status),vehicles(id,plate_number,vehicle_type,status,condition_score,public_transport_license_status,insurance_expiry)').eq('booking_id', booking.id).order('assigned_at', { ascending: false }),
     sb.from('trip_events').select('event_type,event_at,notes,event_payload').eq('booking_id', booking.id).order('event_at', { ascending: true }),
     sb.from('invoices').select('invoice_no,total,status,issued_at').eq('booking_id', booking.id).order('issued_at', { ascending: false }),
     sb.from('payments').select('amount,payment_method,payment_status,paid_at,transaction_ref').eq('booking_id', booking.id).order('paid_at', { ascending: false }),
     sb.from('refunds').select('amount,status,created_at').eq('booking_id', booking.id).order('created_at', { ascending: false }),
-    sb.from('ratings').select('rating,comment,created_at').eq('booking_id', booking.id).order('created_at', { ascending: false })
+    sb.from('ratings').select('rating,comment,created_at').eq('booking_id', booking.id).order('created_at', { ascending: false }),
+    sb.from('visit_summaries').select('id,visit_outcome,medication_pickup_status,next_appointment,follow_up_requirement,family_summary,status,submitted_at,approved_at').eq('booking_id', booking.id).order('submitted_at', { ascending: false }),
+    sb.from('family_updates').select('id,update_type,channel,message,factual_only,sent_at,recipient_name,payload').eq('booking_id', booking.id).order('sent_at', { ascending: false }),
+    sb.from('trip_locations').select('lat,lng,speed,recorded_at').eq('booking_id', booking.id).order('recorded_at', { ascending: false }).limit(1),
+    latestConsentState(sb, booking.elder_id)
   ]);
   if (assignments.error) throw assignments.error;
   if (events.error) throw events.error;
@@ -383,11 +426,27 @@ async function portalPayload(sb, bookingNo) {
   if (payments.error) throw payments.error;
   if (refunds.error) throw refunds.error;
   if (ratings.error) throw ratings.error;
+  if (summaries.error) throw summaries.error;
+  if (familyUpdates.error) throw familyUpdates.error;
+  if (locations.error) throw locations.error;
 
   const assignment = (assignments.data || [])[0] || {};
   const driver = firstRelation(assignment.drivers) || {};
   const careAssistant = firstRelation(assignment.care_assistant) || {};
   const vehicle = firstRelation(assignment.vehicles) || {};
+  const [driverDocuments, driverTrainingRecords, qualityReviews] = driver.id ? await Promise.all([
+    sb.from('driver_documents').select('id,doc_type,verified,expiry_date').eq('driver_id', driver.id),
+    sb.from('driver_training_records').select('id,status,completed_at').eq('driver_id', driver.id),
+    sb.from('driver_quality_reviews').select('id,review_result,reviewed_at,avg_rating,on_time_rate,incident_count,complaint_count').eq('driver_id', driver.id).order('reviewed_at', { ascending: false }).limit(1)
+  ]) : [
+    { data: [], error: null },
+    { data: [], error: null },
+    { data: [], error: null }
+  ];
+  if (driverDocuments.error) throw driverDocuments.error;
+  if (driverTrainingRecords.error) throw driverTrainingRecords.error;
+  if (qualityReviews.error) throw qualityReviews.error;
+
   const total = numeric(booking.final_price || booking.quoted_price);
   const paid = (payments.data || [])
     .filter((payment) => !['refunded', 'partial_refunded'].includes(payment.payment_status))
@@ -407,7 +466,61 @@ async function portalPayload(sb, bookingNo) {
     }
   });
 
+  const links = req
+    ? bookingPortalLinks(req, booking.booking_no, booking.elder_id)
+    : relativePortalLinks(booking.booking_no, booking.elder_id);
+  const finance = {
+    total,
+    paid,
+    refunded,
+    balance: Math.max(0, Math.round((total - Math.max(0, paid - refunded)) * 100) / 100),
+    latest_invoice: (invoices.data || [])[0] || null,
+    payments: payments.data || [],
+    refunds: refunds.data || []
+  };
+  const rating = {
+    can_rate: booking.status === 'completed',
+    latest: (ratings.data || [])[0] || null
+  };
+  const customerJourney = buildCustomerJourney({
+    booking,
+    events: events.data || [],
+    assignment
+  });
+  const trustCard = buildTrustCard({
+    assignment,
+    driver,
+    careAssistant,
+    vehicle,
+    driverDocuments: driverDocuments.data || [],
+    driverTrainingRecords: driverTrainingRecords.data || []
+  });
+  const careSummary = buildCareSummary({
+    booking,
+    summaries: summaries.data || [],
+    familyUpdates: familyUpdates.data || []
+  });
+  const nextAction = buildNextAction({
+    booking,
+    finance,
+    rating,
+    links,
+    careSummary,
+    trustCard
+  });
+  const serviceRecovery = buildServiceRecovery({
+    latestRating: rating.latest,
+    latestQualityReview: (qualityReviews.data || [])[0] || null
+  });
+  const lineExperience = buildLineExperience({
+    booking,
+    lineConfigured: lineConfigured(),
+    links
+  });
+  const canShowLocation = consentState.location_tracking === true;
+
   return {
+    links,
     booking: {
       id: booking.id,
       booking_no: booking.booking_no,
@@ -440,18 +553,22 @@ async function portalPayload(sb, bookingNo) {
         vehicle_type: vehicle.vehicle_type || null
       }
     },
-    timeline: timelineForBooking(booking, events.data || []),
-    finance: {
-      total,
-      paid,
-      refunded,
-      balance: Math.max(0, Math.round((total - Math.max(0, paid - refunded)) * 100) / 100),
-      latest_invoice: (invoices.data || [])[0] || null,
-      payments: payments.data || []
-    },
-    rating: {
-      can_rate: booking.status === 'completed',
-      latest: (ratings.data || [])[0] || null
+    timeline: customerJourney.steps,
+    journey: customerJourney,
+    customer_journey: customerJourney,
+    trust: trustCard,
+    trust_card: trustCard,
+    finance,
+    rating,
+    care_summary: careSummary,
+    line_experience: lineExperience,
+    service_recovery: serviceRecovery,
+    next_action: nextAction,
+    latest_location: canShowLocation ? ((locations.data || [])[0] || null) : null,
+    privacy: {
+      family_notification: consentState.family_notification === true,
+      location_tracking: consentState.location_tracking === true,
+      photo: consentState.photo === true
     }
   };
 }

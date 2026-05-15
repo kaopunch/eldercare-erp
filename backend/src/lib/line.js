@@ -15,14 +15,53 @@ function lineRecipient(context = {}, notification = {}) {
     || null;
 }
 
+const TYPE_MESSAGES = {
+  portal_booking_requested: 'รับคำขอจองแล้ว ทีมจะตรวจราคา เวลา และความพร้อมก่อนยืนยันงาน',
+  booking_requested: 'รับคำขอจองแล้ว ทีมกำลังตรวจรายละเอียด',
+  booking_updated: 'มีการอัปเดตข้อมูล booking',
+  booking_confirmed: 'ยืนยันงานเรียบร้อยแล้ว',
+  booking_cancelled: 'booking นี้ถูกยกเลิกแล้ว',
+  portal_link_ready: 'ลิงก์ติดตามสถานะพร้อมแล้ว',
+  trip_driver_accepted: 'คนขับรับงานแล้ว',
+  trip_arrived_pickup: 'ทีมถึงจุดรับแล้ว',
+  arrived_at_location: 'ทีมถึงสถานที่บริการแล้ว',
+  trip_elder_onboard: 'ผู้สูงวัยขึ้นรถเรียบร้อยแล้ว',
+  patient_onboarded: 'ผู้สูงวัยขึ้นรถเรียบร้อยแล้ว',
+  trip_started: 'เริ่มเดินทางแล้ว',
+  service_started: 'เริ่มให้บริการแล้ว',
+  patient_checked_in: 'เช็กอินที่สถานที่นัดหมายแล้ว',
+  consultation_started: 'อยู่ระหว่างพบแพทย์/รับบริการ',
+  lab_or_xray: 'อยู่ระหว่างขั้นตอนแล็บหรือเอกซเรย์',
+  pharmacy_completed: 'ขั้นตอนรับยาเสร็จแล้ว',
+  home_check_in: 'ผู้ช่วยดูแลเช็กอินที่บ้านแล้ว',
+  midpoint_update: 'มีอัปเดตระหว่างงาน',
+  home_check_out: 'ผู้ช่วยดูแลเช็กเอาต์จากงานที่บ้านแล้ว',
+  coordination_started: 'เริ่มประสานงานทางการแพทย์แล้ว',
+  coordination_update: 'มีอัปเดตการประสานงาน',
+  coordination_completed: 'ประสานงานเสร็จแล้ว',
+  monitoring_started: 'เริ่มติดตามสถานะครอบครัวแล้ว',
+  monitoring_completed: 'ติดตามสถานะเสร็จแล้ว',
+  family_update: 'มีอัปเดตถึงครอบครัว',
+  visit_summary_submitted: 'ทีมส่งสรุปการดูแลแล้ว',
+  summary_approved: 'สรุปหลังจบงานพร้อมให้ครอบครัวดูแล้ว',
+  trip_arrived_dropoff: 'ทีมถึงจุดส่งแล้ว',
+  trip_handover_completed: 'ส่งมอบและ handover เสร็จแล้ว',
+  trip_completed: 'เดินทางเสร็จแล้ว',
+  service_completed: 'บริการเสร็จสมบูรณ์',
+  quality_review_created: 'เปิดเคสติดตามคุณภาพบริการแล้ว'
+};
+
 function messageText(notification = {}, context = {}) {
   const payload = notification.payload || {};
   const bookingNo = payload.booking_no || context.booking?.booking_no || '-';
   const type = notification.notification_type || 'notification';
-  const statusUrl = payload.absolute_status_url || payload.status_url || '';
+  const statusUrl = payload.absolute_status_url || payload.status_url || payload.rating_url || '';
   const amount = payload.amount ? `\nAmount: ${payload.amount}` : '';
-  const link = statusUrl ? `\nPortal: ${statusUrl}` : '';
-  return `ElderCare ERP\nBooking: ${bookingNo}\nType: ${type}${amount}${link}`;
+  const summary = payload.family_summary || payload.message || payload.notes || '';
+  const summaryLine = summary ? `\nรายละเอียด: ${String(summary).slice(0, 180)}` : '';
+  const link = statusUrl ? `\nดูสถานะ: ${statusUrl}` : '';
+  const title = TYPE_MESSAGES[type] || 'มีการอัปเดตจากทีม ElderCare';
+  return `SandyCare\nBooking: ${bookingNo}\n${title}${summaryLine}${amount}${link}`;
 }
 
 async function sendLinePush({ to, text }) {
