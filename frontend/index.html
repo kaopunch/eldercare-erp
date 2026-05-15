@@ -1132,7 +1132,8 @@
       gap: 12px;
     }
 
-    body[data-active-view="executive"] .metrics {
+    body[data-active-view="executive"] .metrics,
+    body[data-active-view="guide"] .metrics {
       display: none;
     }
 
@@ -1174,6 +1175,237 @@
 
     .metric:nth-child(4) {
       --metric-color: linear-gradient(180deg, var(--amber), var(--purple));
+    }
+
+    .guide-hero {
+      padding: 22px;
+      border: 1px solid rgba(18, 184, 166, .18);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(135deg, rgba(230, 251, 246, .96) 0%, rgba(238, 245, 255, .94) 55%, rgba(255, 249, 236, .9) 100%);
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .guide-kicker {
+      color: var(--accent-strong);
+      font-size: 11px;
+      line-height: 1.25;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .guide-hero h3,
+    .guide-panel-title h3 {
+      margin: 4px 0 0;
+      font-family: var(--font-display);
+      font-size: 24px;
+      line-height: 1.2;
+    }
+
+    .guide-hero p,
+    .guide-panel-title p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .guide-hero-stats,
+    .guide-feature-grid,
+    .guide-checklist-grid,
+    .guide-menu-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .guide-hero-stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .guide-stat,
+    .guide-feature,
+    .guide-menu-card,
+    .guide-check-card,
+    .guide-role-row {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .92);
+      display: grid;
+      gap: 5px;
+    }
+
+    .guide-stat strong {
+      font-size: 22px;
+      line-height: 1;
+      color: var(--ink);
+    }
+
+    .guide-stat span,
+    .guide-feature span,
+    .guide-menu-card span,
+    .guide-check-card span,
+    .guide-role-row span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+      font-weight: 750;
+    }
+
+    .guide-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(300px, .7fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .guide-panel-title {
+      margin-bottom: 14px;
+    }
+
+    .guide-feature-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .guide-feature svg,
+    .guide-menu-card svg {
+      color: var(--accent);
+    }
+
+    .guide-feature strong,
+    .guide-menu-card strong,
+    .guide-check-card strong {
+      font-size: 14px;
+      line-height: 1.25;
+    }
+
+    .guide-map {
+      display: grid;
+      gap: 10px;
+      padding: 4px 0;
+    }
+
+    .guide-map-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .guide-map-node {
+      min-height: 98px;
+      padding: 12px;
+      border: 1px solid rgba(21, 34, 58, .10);
+      border-radius: var(--radius);
+      background: #ffffff;
+      display: grid;
+      gap: 6px;
+      align-content: start;
+      position: relative;
+    }
+
+    .guide-map-node::after {
+      content: "";
+      position: absolute;
+      right: -11px;
+      top: 50%;
+      width: 10px;
+      height: 2px;
+      background: rgba(18, 184, 166, .36);
+    }
+
+    .guide-map-node:last-child::after {
+      display: none;
+    }
+
+    .guide-map-node strong {
+      font-size: 14px;
+      line-height: 1.25;
+    }
+
+    .guide-map-node span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+      font-weight: 750;
+    }
+
+    .guide-flow {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .guide-flow-step {
+      min-height: 142px;
+      padding: 12px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(18, 184, 166, .16);
+      background: linear-gradient(180deg, #ffffff, #f7fbff);
+      display: grid;
+      gap: 8px;
+      align-content: start;
+    }
+
+    .guide-flow-number {
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--accent), var(--blue));
+      color: #ffffff;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 950;
+    }
+
+    .guide-flow-step strong {
+      font-size: 13px;
+      line-height: 1.25;
+    }
+
+    .guide-flow-step span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+      font-weight: 750;
+    }
+
+    .guide-menu-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .guide-role-matrix {
+      display: grid;
+      gap: 8px;
+    }
+
+    .guide-role-row {
+      grid-template-columns: 120px minmax(0, 1fr);
+      align-items: center;
+    }
+
+    .guide-role-row strong {
+      font-size: 13px;
+      line-height: 1.25;
+    }
+
+    .guide-checklist-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .guide-check-card ul {
+      margin: 4px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+      font-weight: 700;
     }
 
     .metric-label {
@@ -2844,6 +3076,8 @@
       .public-status-card,
       .public-contact-layout,
       .public-entry-grid,
+      .guide-hero,
+      .guide-layout,
       .portal-shell {
         grid-template-columns: 1fr;
       }
@@ -2855,14 +3089,24 @@
       .public-card-grid.two,
       .public-service-strip,
       .exec-summary-grid,
+      .guide-feature-grid,
+      .guide-flow,
+      .guide-menu-grid,
+      .guide-checklist-grid,
       .portal-service-strip {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
+      .guide-map-row,
+      .guide-role-row,
       .portal-live-meta,
       .portal-trust-grid,
       .portal-payment-layout {
         grid-template-columns: 1fr;
+      }
+
+      .guide-map-node::after {
+        display: none;
       }
     }
 
@@ -3106,6 +3350,15 @@
       .public-service-points,
       .portal-hero,
       .portal-service-strip,
+      .guide-hero,
+      .guide-hero-stats,
+      .guide-layout,
+      .guide-feature-grid,
+      .guide-map-row,
+      .guide-flow,
+      .guide-menu-grid,
+      .guide-role-row,
+      .guide-checklist-grid,
       .portal-live-meta,
       .portal-trust-grid,
       .portal-payment-layout,
@@ -3827,6 +4080,11 @@
           <svg><use href="#icon-shield"/></svg>
           <span data-i18n="nav.privacy">Privacy Guard</span>
           <span class="nav-count" id="navPrivacyCount">0</span>
+        </button>
+        <button class="nav-item" data-view="guide" type="button">
+          <svg><use href="#icon-book"/></svg>
+          <span data-i18n="nav.guide">คู่มือระบบ</span>
+          <span class="nav-count" id="navGuideCount">6</span>
         </button>
         <button class="nav-item" data-view="security" type="button">
           <svg><use href="#icon-shield"/></svg>
@@ -5347,6 +5605,270 @@
         </section>
       </section>
 
+      <section class="view" id="view-guide">
+        <section class="guide-hero">
+          <div>
+            <span class="guide-kicker">Admin system manual</span>
+            <h3>คู่มือระบบ SandyCare ERP</h3>
+            <p>หน้าสรุปสำหรับแอดมินและผู้ใช้งานใหม่ เพื่อเข้าใจว่าแต่ละเมนูทำอะไร ต้องเริ่มงานจากตรงไหน และควรตรวจอะไรทุกวันก่อนส่งบริการจริงให้ลูกค้า</p>
+          </div>
+          <div class="guide-hero-stats">
+            <div class="guide-stat">
+              <strong>6</strong>
+              <span>ขั้นตอนหลักตั้งแต่รับ lead ถึงปิดงาน</span>
+            </div>
+            <div class="guide-stat">
+              <strong>18</strong>
+              <span>เมนูปฏิบัติงาน ครอบคลุม operation, ลูกค้า, ทีม, AI, governance</span>
+            </div>
+            <div class="guide-stat">
+              <strong>SOP</strong>
+              <span>ทุกงานต้องมีข้อมูล, ทีม, consent, หลักฐาน และ audit</span>
+            </div>
+            <div class="guide-stat">
+              <strong>PDPA</strong>
+              <span>แยกข้อมูลอ่อนไหวและบันทึกการเข้าถึงเพื่อความน่าเชื่อถือ</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-body">
+            <div class="guide-panel-title">
+              <span class="guide-kicker">System capabilities</span>
+              <h3>คุณสมบัติหลักที่ทำให้ลูกค้าเชื่อมั่น</h3>
+              <p>ระบบถูกวางให้ทีมเห็นข้อมูลเดียวกัน ลดงานหลุด ลดการสื่อสารซ้ำ และทำให้ครอบครัวติดตามบริการได้ชัดเจน</p>
+            </div>
+            <div class="guide-feature-grid">
+              <article class="guide-feature">
+                <svg><use href="#icon-profile"/></svg>
+                <strong>Customer &amp; Elder Profile</strong>
+                <span>เก็บข้อมูลผู้ว่าจ้าง ผู้สูงวัย mobility, note แพทย์ และ consent เพื่อให้ทีมดูแลถูกต้องตั้งแต่แรก</span>
+              </article>
+              <article class="guide-feature">
+                <svg><use href="#icon-board"/></svg>
+                <strong>Dispatch &amp; Trip Control</strong>
+                <span>จัดคิวงาน มอบหมายคนขับและผู้ช่วย ติดตาม pickup, onboard, dropoff และเหตุการณ์หน้างาน</span>
+              </article>
+              <article class="guide-feature">
+                <svg><use href="#icon-send"/></svg>
+                <strong>Customer Updates</strong>
+                <span>รวม notification, portal link, payment status และ rating ให้ลูกค้าเห็นความคืบหน้าแบบมืออาชีพ</span>
+              </article>
+              <article class="guide-feature">
+                <svg><use href="#icon-ai"/></svg>
+                <strong>AI Ops Center</strong>
+                <span>ช่วยรับสาย สรุป intent สร้างงานให้แอดมินตรวจ และแจ้งทุกฝ่ายเมื่อข้อมูลสำคัญถูกยืนยันแล้ว</span>
+              </article>
+              <article class="guide-feature">
+                <svg><use href="#icon-chart"/></svg>
+                <strong>Executive Reports</strong>
+                <span>ดูรายได้ งานสำเร็จ incident, service mix, performance และ alert ที่ต้องตัดสินใจเร็ว</span>
+              </article>
+              <article class="guide-feature">
+                <svg><use href="#icon-shield"/></svg>
+                <strong>Governance &amp; Security</strong>
+                <span>จัดการ consent, privacy audit, session, readiness, role และ PIN เพื่อพร้อมใช้งาน production</span>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <div class="guide-layout">
+          <section class="panel">
+            <div class="panel-body">
+              <div class="guide-panel-title">
+                <span class="guide-kicker">Customer journey map</span>
+                <h3>แผนภาพการไหลของงาน</h3>
+                <p>ใช้ภาพนี้เป็น checklist เวลาสอนแอดมินใหม่หรือไล่หาว่างานค้างอยู่ขั้นตอนไหน</p>
+              </div>
+              <div class="guide-map" aria-label="แผนภาพ workflow ของระบบ">
+                <div class="guide-map-row">
+                  <article class="guide-map-node">
+                    <strong>1. Portal / Lead</strong>
+                    <span>ลูกค้ากรอกคำขอ หรือทีมรับ lead จากโทรศัพท์ LINE และ referral</span>
+                  </article>
+                  <article class="guide-map-node">
+                    <strong>2. Profile / Assessment</strong>
+                    <span>สร้าง profile ผู้สูงวัย ประเมิน mobility ความเสี่ยง และข้อมูลแพทย์</span>
+                  </article>
+                  <article class="guide-map-node">
+                    <strong>3. Booking / Quote</strong>
+                    <span>ยืนยันวันเวลา เส้นทาง บริการ ราคา และ consent ก่อนเปิดงานจริง</span>
+                  </article>
+                </div>
+                <div class="guide-map-row">
+                  <article class="guide-map-node">
+                    <strong>4. Assignment</strong>
+                    <span>Dispatch เลือกทีมที่ผ่าน screening, training และพร้อมรับงานตามข้อจำกัดของเคส</span>
+                  </article>
+                  <article class="guide-map-node">
+                    <strong>5. Trip Updates</strong>
+                    <span>ทีมหน้างานอัปเดตสถานะ ส่งหลักฐาน และเปิด incident หากมีความเสี่ยง</span>
+                  </article>
+                  <article class="guide-map-node">
+                    <strong>6. Finance / Rating</strong>
+                    <span>ออก invoice รับเงิน ส่งสรุปงาน และเก็บ rating เพื่อเข้าวงจร quality</span>
+                  </article>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-body">
+              <div class="guide-panel-title">
+                <span class="guide-kicker">Role clarity</span>
+                <h3>ใครควรใช้เมนูไหน</h3>
+                <p>กำหนดบทบาทให้ชัด ช่วยลดการเปิดข้อมูลเกินจำเป็นและทำให้ audit อ่านง่าย</p>
+              </div>
+              <div class="guide-role-matrix">
+                <div class="guide-role-row">
+                  <strong>Owner / Admin</strong>
+                  <span>ดูภาพรวมทั้งหมด ตั้งค่า user, security, PDPA, reports และแก้งานติดขัด</span>
+                </div>
+                <div class="guide-role-row">
+                  <strong>Branch / Dispatch</strong>
+                  <span>ดู lead, profile, booking, dispatch, notification, incident และ customer updates</span>
+                </div>
+                <div class="guide-role-row">
+                  <strong>Driver / Care Team</strong>
+                  <span>ใช้ Trip Execution เพื่อรับงาน เช็กข้อมูลที่จำเป็น อัปเดตสถานะ และแจ้ง incident</span>
+                </div>
+                <div class="guide-role-row">
+                  <strong>Finance</strong>
+                  <span>ดู Finance Desk, reports และสถานะชำระเงินเพื่อออก invoice และปิดยอดคงเหลือ</span>
+                </div>
+                <div class="guide-role-row">
+                  <strong>Trainer</strong>
+                  <span>ดู screening, training และ quality เพื่อให้เฉพาะทีมที่พร้อมจริงรับงานลูกค้า</span>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <section class="panel">
+          <div class="panel-body">
+            <div class="guide-panel-title">
+              <span class="guide-kicker">Daily operation flow</span>
+              <h3>วิธีใช้งานระบบในหนึ่งวัน</h3>
+              <p>ลำดับนี้ช่วยให้แอดมินทำงานซ้ำได้อย่างมั่นใจ และเห็นจุดที่ต้องส่งต่อให้ทีมอื่นทันที</p>
+            </div>
+            <div class="guide-flow">
+              <article class="guide-flow-step">
+                <span class="guide-flow-number">01</span>
+                <strong>เปิด Dashboard</strong>
+                <span>เช็กงานวันนี้ รายได้โดยประมาณ alert และ incident ที่ต้องจัดการก่อน</span>
+              </article>
+              <article class="guide-flow-step">
+                <span class="guide-flow-number">02</span>
+                <strong>ตรวจ Lead Intake</strong>
+                <span>บันทึกคำขอใหม่ ประเมินผู้สูงวัย และแปลงเป็น booking เมื่อข้อมูลครบ</span>
+              </article>
+              <article class="guide-flow-step">
+                <span class="guide-flow-number">03</span>
+                <strong>จัดทีมที่ Dispatch</strong>
+                <span>เลือกคนขับและผู้ช่วยที่เหมาะกับความเสี่ยงของงาน แล้วกด assign</span>
+              </article>
+              <article class="guide-flow-step">
+                <span class="guide-flow-number">04</span>
+                <strong>ติดตาม Trip</strong>
+                <span>ดูสถานะ pickup, onboard, dropoff และเปิด incident ถ้ามีเหตุผิดปกติ</span>
+              </article>
+              <article class="guide-flow-step">
+                <span class="guide-flow-number">05</span>
+                <strong>สื่อสารลูกค้า</strong>
+                <span>ส่ง portal link, notification, payment และแจ้งสรุปงานให้ทุกฝ่ายเข้าใจตรงกัน</span>
+              </article>
+              <article class="guide-flow-step">
+                <span class="guide-flow-number">06</span>
+                <strong>ปิดงานและเรียนรู้</strong>
+                <span>ออก invoice เก็บ rating ตรวจ quality และอัปเดต SOP หากพบจุดเสี่ยง</span>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-body">
+            <div class="guide-panel-title">
+              <span class="guide-kicker">Menu map</span>
+              <h3>แผนผังเมนูในระบบ</h3>
+              <p>ใช้เป็นสารบัญสั้น ๆ เพื่อรู้ว่าเมื่อเจอสถานการณ์หนึ่งควรเข้าหน้าใด</p>
+            </div>
+            <div class="guide-menu-grid">
+              <article class="guide-menu-card">
+                <svg><use href="#icon-board"/></svg>
+                <strong>Operations</strong>
+                <span>Dispatch Board จัดทีม, Trip Execution ติดตามหน้างาน, Finance Desk เก็บเงิน, Notification Center สื่อสารสถานะ</span>
+              </article>
+              <article class="guide-menu-card">
+                <svg><use href="#icon-profile"/></svg>
+                <strong>Customers &amp; Care</strong>
+                <span>Customer Portal สำหรับลูกค้า, Lead Intake รับเคส, Customer Profile เก็บข้อมูลผู้สูงวัย, Incident Desk ดูเหตุการณ์</span>
+              </article>
+              <article class="guide-menu-card">
+                <svg><use href="#icon-user-check"/></svg>
+                <strong>Workforce</strong>
+                <span>Driver Screening ตรวจคนขับ, Training ติดตามหลักสูตร, Quality Control เฝ้าดู rating และ incident ของทีม</span>
+              </article>
+              <article class="guide-menu-card">
+                <svg><use href="#icon-chart"/></svg>
+                <strong>Insights &amp; AI</strong>
+                <span>Executive Dashboard ดูภาพรวม, Reports วิเคราะห์ธุรกิจ, AI Ops Center ช่วยรับสายและสร้างงานตรวจสอบ</span>
+              </article>
+              <article class="guide-menu-card">
+                <svg><use href="#icon-shield"/></svg>
+                <strong>Governance</strong>
+                <span>PDPA Consent, Privacy Guard, Security และ User Admin ดูแลสิทธิ์ การเข้าถึง และความพร้อม production</span>
+              </article>
+              <article class="guide-menu-card">
+                <svg><use href="#icon-book"/></svg>
+                <strong>คู่มือระบบ</strong>
+                <span>หน้าแนะนำ flow การใช้งาน เหตุผลของแต่ละเมนู และ checklist ที่ควรทำก่อนส่งบริการจริง</span>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-body">
+            <div class="guide-panel-title">
+              <span class="guide-kicker">Admin checklist</span>
+              <h3>สิ่งที่แอดมินควรตรวจเป็นประจำ</h3>
+              <p>รายการนี้ออกแบบมาให้ทีมทำซ้ำได้ทุกวัน โดยไม่ต้องจำขั้นตอนทั้งหมดจากศูนย์</p>
+            </div>
+            <div class="guide-checklist-grid">
+              <article class="guide-check-card">
+                <strong>ก่อนเริ่มวัน</strong>
+                <ul>
+                  <li>เช็ก Dashboard และงานที่ยังไม่ได้ assign</li>
+                  <li>ตรวจ incident เปิดอยู่และงาน high risk</li>
+                  <li>ดู driver ที่พร้อมงานและคนที่ติด training</li>
+                </ul>
+              </article>
+              <article class="guide-check-card">
+                <strong>ระหว่างให้บริการ</strong>
+                <ul>
+                  <li>ติดตามสถานะ trip และหลักฐานสำคัญ</li>
+                  <li>ส่ง notification เมื่องานเปลี่ยนสถานะ</li>
+                  <li>เปิด incident ทันทีเมื่อมีเหตุเสี่ยงหรือ complaint</li>
+                </ul>
+              </article>
+              <article class="guide-check-card">
+                <strong>หลังปิดงาน</strong>
+                <ul>
+                  <li>ออก invoice และตรวจยอดคงเหลือ</li>
+                  <li>เก็บ rating และดู quality trigger</li>
+                  <li>ตรวจ consent, audit และ user access ที่ผิดปกติ</li>
+                </ul>
+              </article>
+            </div>
+          </div>
+        </section>
+      </section>
+
       <section class="view" id="view-users">
         <div class="two-col">
           <section class="panel">
@@ -5524,6 +6046,7 @@
       'nav.incidents': 'Incident Desk',
       'nav.pdpa': 'PDPA Consent',
       'nav.privacy': 'Privacy Guard',
+      'nav.guide': 'คู่มือระบบ',
       'nav.security': 'Security',
       'nav.users': 'User Admin',
       'sidebar.footerTitle': 'Ops mode',
@@ -5597,6 +6120,8 @@
       'view.pdpa.subtitle': 'ทะเบียน consent และ audit trail สำหรับข้อมูลอ่อนไหว',
       'view.privacy.title': 'Privacy Guard',
       'view.privacy.subtitle': 'ควบคุมการเปิดดูข้อมูลอ่อนไหวและ audit log',
+      'view.guide.title': 'คู่มือระบบ',
+      'view.guide.subtitle': 'อธิบายคุณสมบัติ วิธีใช้งาน แผนภาพ workflow และ checklist สำหรับแอดมิน',
       'view.security.title': 'Security',
       'view.security.subtitle': 'ตรวจ session, audit และ readiness สำหรับ production',
       'view.users.title': 'User Admin',
@@ -6264,6 +6789,7 @@
       'nav.incidents': 'Incident Desk',
       'nav.pdpa': 'PDPA Consent',
       'nav.privacy': 'Privacy Guard',
+      'nav.guide': 'System Guide',
       'nav.security': 'Security',
       'nav.users': 'User Admin',
       'sidebar.footerTitle': 'Ops mode',
@@ -6337,6 +6863,8 @@
       'view.pdpa.subtitle': 'Consent register and audit trail for sensitive data',
       'view.privacy.title': 'Privacy Guard',
       'view.privacy.subtitle': 'Control sensitive access and audit logs',
+      'view.guide.title': 'System Guide',
+      'view.guide.subtitle': 'Features, how-to flow, visual workflow, and admin checklist',
       'view.security.title': 'Security',
       'view.security.subtitle': 'Review sessions, audit events, and production readiness',
       'view.users.title': 'User Admin',
@@ -6993,6 +7521,7 @@
     'nav.profiles': '客户档案',
     'nav.incidents': '事件台',
     'nav.pdpa': 'PDPA 同意',
+    'nav.guide': '系统指南',
     'sidebar.footerTitle': '运营模式',
     'sidebar.footerText': '曼谷分店，预约协助接送、医院陪同、每月透析路线。',
     'top.refresh': '刷新数据',
@@ -7022,6 +7551,8 @@
     'view.incidents.subtitle': '管理事件、严重程度与现场团队影响',
     'view.pdpa.title': 'PDPA 同意',
     'view.pdpa.subtitle': '敏感数据同意登记与审计记录',
+    'view.guide.title': '系统指南',
+    'view.guide.subtitle': '功能、使用流程、工作流图和管理员检查清单',
     'exec.title': '管理层仪表板',
     'exec.subtitle': '一眼查看今日任务、进度与风险。',
     'exec.avgProgress': '平均进度',
@@ -7151,6 +7682,7 @@
     'nav.profiles': '顧客プロフィール',
     'nav.incidents': 'インシデント',
     'nav.pdpa': 'PDPA 同意',
+    'nav.guide': 'システムガイド',
     'sidebar.footerTitle': '運用モード',
     'sidebar.footerText': 'バンコク支店、予約制付き添い送迎、病院同行、月次透析ルート。',
     'top.refresh': 'データ更新',
@@ -7179,6 +7711,8 @@
     'view.incidents.subtitle': '事象、重大度、現場チームへの影響を管理',
     'view.pdpa.title': 'PDPA 同意',
     'view.pdpa.subtitle': 'センシティブデータの同意登録と監査ログ',
+    'view.guide.title': 'システムガイド',
+    'view.guide.subtitle': '機能、利用手順、ワークフロー図、管理者チェックリスト',
     'exec.title': '経営ダッシュボード',
     'exec.subtitle': '本日の業務、進捗、リスクを一目で確認。',
     'exec.avgProgress': '平均進捗',
@@ -7296,6 +7830,7 @@
     'nav.profiles': 'ဖောက်သည်မှတ်တမ်း',
     'nav.incidents': 'ဖြစ်ရပ်စီမံမှု',
     'nav.pdpa': 'PDPA သဘောတူညီမှု',
+    'nav.guide': 'စနစ်လမ်းညွှန်',
     'sidebar.footerTitle': 'လုပ်ငန်းမုဒ်',
     'sidebar.footerText': 'ဘန်ကောက်ဌာနခွဲ၊ ကြိုတင်စာရင်းသွင်း ကူညီပို့ဆောင်မှု၊ ဆေးရုံအဖော်ဝန်ဆောင်မှု၊ လစဉ် dialysis လမ်းကြောင်းများ။',
     'top.refresh': 'ဒေတာအသစ်ပြန်တင်',
@@ -7324,6 +7859,8 @@
     'view.incidents.subtitle': 'ဖြစ်ရပ်၊ ပြင်းထန်မှုနှင့် field team သက်ရောက်မှုများကို စီမံပါ',
     'view.pdpa.title': 'PDPA သဘောတူညီမှု',
     'view.pdpa.subtitle': 'အရေးကြီးဒေတာအတွက် consent register နှင့် audit trail',
+    'view.guide.title': 'စနစ်လမ်းညွှန်',
+    'view.guide.subtitle': 'အင်္ဂါရပ်များ၊ အသုံးပြုပုံ၊ workflow ပုံနှင့် admin checklist',
     'exec.title': 'အုပ်ချုပ်ရေး Dashboard',
     'exec.subtitle': 'ယနေ့လုပ်ငန်း၊ တိုးတက်မှုနှင့် risk ကို တစ်ချက်ကြည့်မြင်နိုင်သည်။',
     'exec.avgProgress': 'ပျမ်းမျှတိုးတက်မှု',
@@ -7685,6 +8222,7 @@
     incidents: ['owner', 'super_admin', 'admin', 'branch_admin', 'dispatcher', 'coordinator', 'driver', 'care_assistant', 'hospital_companion', 'home_companion'],
     pdpa: ['owner', 'super_admin', 'admin', 'branch_admin', 'dispatcher', 'coordinator'],
     privacy: ['owner', 'super_admin', 'admin', 'branch_admin', 'dispatcher', 'coordinator'],
+    guide: ['owner', 'super_admin', 'admin', 'branch_admin', 'dispatcher', 'coordinator', 'finance', 'trainer'],
     security: ['owner', 'super_admin', 'admin'],
     users: ['owner', 'super_admin', 'admin']
   };
@@ -10044,6 +10582,7 @@
     setText('navIncidentCount', openIncidents);
     setText('navPdpaCount', state.consents.filter((consent) => !consent.consented).length);
     setText('navPrivacyCount', state.privacySummary.sensitive_access_count || 0);
+    setText('navGuideCount', 6);
     setText('navSecurityCount', Number(state.securitySummary.rotation_required || 0) + Number(state.securitySummary.locked_users || 0) + Number(state.readiness?.summary?.fail || 0));
     setText('navUsersCount', state.adminUsers.filter((user) => user.status === 'active').length);
   }
