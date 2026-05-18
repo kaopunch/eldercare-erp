@@ -89,6 +89,10 @@
       min-height: 100vh;
     }
 
+    .app.sidebar-collapsed {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
     .sidebar {
       position: sticky;
       top: 0;
@@ -99,6 +103,51 @@
       display: flex;
       flex-direction: column;
       gap: 4px;
+    }
+
+    .app.sidebar-collapsed .sidebar {
+      display: none;
+    }
+
+    .sidebar-toggle {
+      position: fixed;
+      left: 0;
+      top: 50%;
+      z-index: 60;
+      width: 28px;
+      height: 48px;
+      border: 1px solid var(--line);
+      border-left: 0;
+      border-radius: 0 var(--radius) var(--radius) 0;
+      background: rgba(255, 255, 255, .94);
+      color: var(--muted);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 10px 22px rgba(30, 67, 118, .12);
+      transform: translateY(-50%);
+      transition: background .15s ease, color .15s ease, box-shadow .15s ease, left .2s ease;
+    }
+
+    .sidebar-toggle:hover,
+    .sidebar-toggle:focus-visible {
+      background: #ffffff;
+      color: var(--accent);
+      box-shadow: 0 12px 26px rgba(30, 67, 118, .16);
+      outline: none;
+    }
+
+    .sidebar-toggle svg {
+      width: 16px;
+      height: 16px;
+      transition: transform .2s ease;
+    }
+
+    .app:not(.sidebar-collapsed) .sidebar-toggle {
+      left: calc(var(--sidebar) - 1px);
+    }
+
+    .app:not(.sidebar-collapsed) .sidebar-toggle svg {
+      transform: rotate(180deg);
     }
 
     .brand {
@@ -287,60 +336,109 @@
       top: 0;
       z-index: 10;
       min-height: 72px;
-      padding: 14px 24px;
-      background: rgba(255, 255, 255, .82);
-      backdrop-filter: blur(18px);
-      border-bottom: 1px solid var(--line);
-      box-shadow: 0 10px 28px rgba(30, 67, 118, .06);
+      padding: 14px 22px 14px 24px;
+      background:
+        linear-gradient(115deg, rgba(255, 255, 255, .94) 0%, rgba(247, 251, 255, .9) 50%, rgba(232, 241, 255, .74) 100%);
+      backdrop-filter: blur(22px) saturate(140%);
+      border-bottom: 1px solid rgba(21, 34, 58, .08);
+      box-shadow: 0 16px 34px rgba(30, 67, 118, .08);
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 16px;
+      isolation: isolate;
+    }
+
+    .topbar::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--blue) 48%, var(--amber));
+      opacity: .72;
+      pointer-events: none;
     }
 
     .page-title {
+      position: relative;
       min-width: 0;
+      padding-left: 16px;
+    }
+
+    .page-title::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 4px;
+      bottom: 3px;
+      width: 4px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--accent), var(--blue));
+      box-shadow: 0 6px 16px rgba(18, 184, 166, .2);
     }
 
     .page-title h2 {
       margin: 0;
-      font-size: 21px;
-      line-height: 1.2;
+      font-size: 22px;
+      line-height: 1.14;
       font-family: var(--font-display);
-      font-weight: 800;
+      font-weight: 850;
+      letter-spacing: 0;
     }
 
     .page-title p {
-      margin: 4px 0 0;
+      margin: 5px 0 0;
       color: var(--muted);
-      font-size: 13px;
+      font-size: 12px;
       line-height: 1.35;
+      font-weight: 650;
     }
 
     .top-actions {
       display: flex;
       align-items: center;
-      gap: 8px;
-      flex: 0 1 620px;
-      flex-wrap: wrap;
+      gap: 6px;
+      flex: 0 1 760px;
+      flex-wrap: nowrap;
       justify-content: flex-end;
-      max-width: min(620px, 100%);
+      max-width: min(760px, 100%);
+      padding: 6px;
+      border: 1px solid rgba(21, 34, 58, .08);
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, .82), rgba(255, 255, 255, .58));
+      box-shadow: 0 8px 22px rgba(30, 67, 118, .08), 0 1px 0 rgba(255, 255, 255, .9) inset;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scrollbar-width: none;
+    }
+
+    .top-actions::-webkit-scrollbar {
+      display: none;
     }
 
     .date-chip {
       min-height: 36px;
-      padding: 8px 10px;
-      border: 1px solid var(--line);
+      padding: 7px 10px;
+      border: 1px solid rgba(21, 34, 58, .08);
       border-radius: var(--radius);
-      background: #ffffff;
+      background: rgba(255, 255, 255, .88);
       color: var(--muted);
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
       white-space: nowrap;
-      font-size: 13px;
-      font-weight: 700;
-      box-shadow: 0 6px 16px rgba(30, 67, 118, .06);
+      font-size: 12px;
+      font-weight: 800;
+      box-shadow: 0 5px 12px rgba(30, 67, 118, .05);
+    }
+
+    .date-chip svg {
+      width: 16px;
+      height: 16px;
+      color: var(--accent-strong);
     }
 
     .api-chip {
@@ -349,20 +447,20 @@
     }
 
     .api-chip.online {
-      border-color: rgba(22, 166, 106, .24);
-      background: rgba(22, 166, 106, .12);
+      border-color: rgba(22, 166, 106, .22);
+      background: linear-gradient(180deg, rgba(22, 166, 106, .13), rgba(22, 166, 106, .07));
       color: var(--green);
     }
 
     .api-chip.offline {
-      border-color: rgba(228, 93, 108, .26);
-      background: rgba(228, 93, 108, .12);
+      border-color: rgba(228, 93, 108, .22);
+      background: linear-gradient(180deg, rgba(228, 93, 108, .14), rgba(228, 93, 108, .07));
       color: var(--rose);
     }
 
     .api-chip.loading {
-      border-color: rgba(74, 124, 255, .24);
-      background: rgba(74, 124, 255, .12);
+      border-color: rgba(74, 124, 255, .22);
+      background: linear-gradient(180deg, rgba(74, 124, 255, .13), rgba(74, 124, 255, .07));
       color: var(--blue);
     }
 
@@ -383,21 +481,60 @@
 
     .top-actions .select {
       width: auto;
+      min-height: 36px;
+      border-color: rgba(21, 34, 58, .08);
+      background-color: rgba(255, 255, 255, .9);
+      box-shadow: 0 5px 12px rgba(30, 67, 118, .05);
     }
 
     .top-actions #authUserSelect {
-      flex: 1 1 190px;
-      min-width: 180px;
-      max-width: 200px;
+      flex: 0 0 176px;
+      min-width: 176px;
+      max-width: 176px;
     }
 
     .top-actions #languageSelect {
-      flex: 0 0 104px;
-      min-width: 104px;
+      flex: 0 0 100px;
+      min-width: 100px;
     }
 
     .top-actions #newBookingBtn {
       flex: 0 0 auto;
+    }
+
+    .top-actions .btn {
+      min-height: 36px;
+      border-color: rgba(21, 34, 58, .08);
+      background: rgba(255, 255, 255, .88);
+      box-shadow: 0 5px 12px rgba(30, 67, 118, .05);
+    }
+
+    .top-actions .btn:hover,
+    .top-actions .btn:focus-visible {
+      background: #ffffff;
+      border-color: rgba(18, 184, 166, .24);
+      color: var(--accent-strong);
+    }
+
+    .top-actions .btn.primary {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--blue) 82%);
+      color: #ffffff;
+      box-shadow: 0 12px 22px rgba(18, 184, 166, .22);
+    }
+
+    .top-actions .btn.primary:hover,
+    .top-actions .btn.primary:focus-visible {
+      color: #ffffff;
+      border-color: transparent;
+      box-shadow: 0 14px 26px rgba(74, 124, 255, .24);
+    }
+
+    .top-actions #refreshBtn {
+      color: var(--blue);
+    }
+
+    .top-actions #publicHomeBtn {
+      color: var(--accent-strong);
     }
 
     .btn {
@@ -3142,6 +3279,24 @@
         box-shadow: 0 -12px 28px rgba(30, 67, 118, .10);
       }
 
+      .app:not(.sidebar-collapsed) .sidebar-toggle {
+        left: 0;
+      }
+
+      .sidebar-toggle {
+        top: auto;
+        bottom: 96px;
+        transform: none;
+      }
+
+      .app:not(.sidebar-collapsed) .sidebar-toggle svg {
+        transform: rotate(90deg);
+      }
+
+      .app.sidebar-collapsed .sidebar-toggle svg {
+        transform: rotate(-90deg);
+      }
+
       .brand {
         display: none;
       }
@@ -3262,67 +3417,76 @@
       .topbar {
         align-items: flex-start;
         flex-direction: column;
-        padding: 14px;
+        gap: 12px;
+        padding: 12px 14px;
       }
 
-      .top-actions,
-      .top-actions .btn.primary,
-      .date-chip {
+      .top-actions {
         width: 100%;
       }
 
       .top-actions {
-        display: grid;
+        display: flex;
         flex: none;
-        grid-template-columns: minmax(0, 1fr) 44px;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        gap: 7px;
         max-width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding-bottom: 2px;
+        scrollbar-width: none;
       }
 
-      .date-chip {
-        grid-column: 1 / -1;
+      .top-actions::-webkit-scrollbar {
+        display: none;
       }
 
-      #apiStatusChip {
-        grid-row: 2;
+      .top-actions .date-chip,
+      .top-actions .select,
+      .top-actions .input,
+      .top-actions .btn {
+        flex: 0 0 auto;
+        min-height: 38px;
+        white-space: nowrap;
       }
 
-      #languageSelect {
-        grid-column: 1 / -1;
-        grid-row: 4;
-        width: 100%;
-        max-width: none;
+      .top-actions .date-chip {
+        padding-inline: 9px;
+        max-width: 178px;
       }
 
       #authUserSelect,
+      #languageSelect,
       #authPinInput {
-        grid-column: 1 / -1;
-        width: 100%;
         max-width: none;
       }
 
       #authUserSelect {
-        grid-row: 3;
+        width: 168px;
+        min-width: 168px;
+      }
+
+      #languageSelect {
+        width: 96px;
+        min-width: 96px;
       }
 
       #authPinInput {
-        grid-row: 5;
+        width: 88px;
+        min-width: 88px;
       }
 
       #authLoginBtn,
-      #authLogoutBtn {
-        grid-column: 1 / -1;
-        grid-row: 6;
-      }
-
+      #authLogoutBtn,
+      #publicHomeBtn,
       #newBookingBtn {
-        grid-column: 1;
-        grid-row: 7;
+        width: auto;
       }
 
       #refreshBtn {
-        grid-column: 2;
-        grid-row: 7;
-        width: 44px;
+        width: 40px;
+        min-width: 40px;
       }
 
       .content {
@@ -3496,6 +3660,9 @@
   </symbol>
   <symbol id="icon-send" viewBox="0 0 24 24">
     <path d="M21 4 10 15M21 4l-6 17-5-6-7-3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+  </symbol>
+  <symbol id="icon-chevron-right" viewBox="0 0 24 24">
+    <path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
   </symbol>
 </svg>
 
@@ -3973,7 +4140,10 @@
 </section>
 
 <div class="app" id="erpApp">
-  <aside class="sidebar">
+  <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-controls="primarySidebar" aria-expanded="true" aria-label="ซ่อนเมนูด้านข้าง" title="ซ่อนเมนูด้านข้าง">
+    <svg><use href="#icon-chevron-right"/></svg>
+  </button>
+  <aside class="sidebar" id="primarySidebar">
     <div class="brand">
       <div class="brand-mark"><svg><use href="#icon-heart"/></svg></div>
       <div>
@@ -8267,6 +8437,7 @@
     publicMode: true,
     publicEntry: '',
     activeView: 'dispatch',
+    sidebarCollapsed: localStorage.getItem('eldercare.sidebarCollapsed') === 'true',
     apiOnline: false,
     apiError: '',
     apiBusy: false,
@@ -8552,6 +8723,7 @@
     publicStaffLoginBtn: document.getElementById('publicStaffLoginBtn'),
     publicStaffLoginResult: document.getElementById('publicStaffLoginResult'),
     publicHomeBtn: document.getElementById('publicHomeBtn'),
+    sidebarToggle: document.getElementById('sidebarToggle'),
     pageHeading: document.getElementById('pageHeading'),
     pageSubheading: document.getElementById('pageSubheading'),
     apiStatusChip: document.getElementById('apiStatusChip'),
@@ -11902,6 +12074,7 @@
   function renderAll() {
     renderAuthControls();
     renderPublicRegisterWizard();
+    applySidebarState();
     applyRoleUi();
     renderApiStatus();
     renderMetrics();
@@ -11924,6 +12097,21 @@
     renderPrivacy();
     renderSecurity();
     renderUserAdmin();
+  }
+
+  function applySidebarState() {
+    if (!els.erpApp || !els.sidebarToggle) return;
+    const isCollapsed = Boolean(state.sidebarCollapsed);
+    els.erpApp.classList.toggle('sidebar-collapsed', isCollapsed);
+    els.sidebarToggle.setAttribute('aria-expanded', String(!isCollapsed));
+    els.sidebarToggle.setAttribute('aria-label', isCollapsed ? 'แสดงเมนูด้านข้าง' : 'ซ่อนเมนูด้านข้าง');
+    els.sidebarToggle.title = isCollapsed ? 'แสดงเมนูด้านข้าง' : 'ซ่อนเมนูด้านข้าง';
+  }
+
+  function toggleSidebar() {
+    state.sidebarCollapsed = !state.sidebarCollapsed;
+    localStorage.setItem('eldercare.sidebarCollapsed', String(state.sidebarCollapsed));
+    applySidebarState();
   }
 
   function updateNavGroups() {
@@ -12880,6 +13068,10 @@
   document.querySelectorAll('.nav-item').forEach((button) => {
     button.addEventListener('click', () => setView(button.dataset.view));
   });
+
+  if (els.sidebarToggle) {
+    els.sidebarToggle.addEventListener('click', toggleSidebar);
+  }
 
   els.languageSelect.addEventListener('change', (event) => {
     setLocale(event.target.value);
