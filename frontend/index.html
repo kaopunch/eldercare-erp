@@ -3254,6 +3254,142 @@
       line-height: 1.6;
     }
 
+    .content-editor-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .content-editor-summary {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(135deg, rgba(223, 248, 243, .72), rgba(232, 241, 255, .68));
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .content-editor-summary strong {
+      color: var(--ink);
+      font-size: 13px;
+    }
+
+    .content-editor-list {
+      max-height: calc(100vh - 260px);
+      overflow-y: auto;
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      background: rgba(248, 251, 255, .72);
+    }
+
+    .content-editor-row {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #ffffff;
+      display: grid;
+      gap: 8px;
+      box-shadow: 0 8px 18px rgba(30, 67, 118, .05);
+      transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+    }
+
+    .content-editor-row:hover,
+    .content-editor-row.selected {
+      border-color: rgba(18, 184, 166, .34);
+      box-shadow: 0 12px 24px rgba(18, 184, 166, .08);
+    }
+
+    .content-editor-row.selected {
+      transform: translateY(-1px);
+    }
+
+    .content-editor-row.changed {
+      border-left: 4px solid var(--accent);
+    }
+
+    .content-editor-row-head {
+      display: grid;
+      gap: 5px;
+    }
+
+    .content-editor-row-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .content-editor-row-title strong {
+      min-width: 0;
+      color: var(--ink);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .content-editor-row-title span {
+      flex: 0 0 auto;
+      color: var(--accent-strong);
+      font-size: 11px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .content-editor-key {
+      color: var(--faint);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    .content-editor-row .textarea {
+      min-height: 84px;
+    }
+
+    .content-preview-stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .content-preview-card {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #ffffff;
+      display: grid;
+      gap: 6px;
+    }
+
+    .content-preview-card span {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.25;
+      font-weight: 850;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .content-preview-card strong,
+    .content-preview-card p {
+      margin: 0;
+      color: var(--ink);
+      font-size: 13px;
+      line-height: 1.55;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+
+    .content-preview-card p {
+      color: var(--muted);
+      font-weight: 650;
+    }
+
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -3323,7 +3459,8 @@
       .public-entry-grid,
       .guide-hero,
       .guide-layout,
-      .portal-shell {
+      .portal-shell,
+      .content-editor-layout {
         grid-template-columns: 1fr;
       }
 
@@ -3649,8 +3786,18 @@
       .portal-payment-layout,
       .portal-stepper,
       .portal-step-panel,
-      .portal-service-points {
+      .portal-service-points,
+      .content-editor-layout {
         grid-template-columns: 1fr;
+      }
+
+      .content-editor-summary {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .content-editor-list {
+        max-height: none;
       }
 
       .public-section-head {
@@ -3829,33 +3976,33 @@
       <a class="public-brand" href="#top" aria-label="SandyCare" data-public-home>
         <div class="brand-mark"><svg><use href="#icon-heart"/></svg></div>
         <img class="public-logo-img" src="assets/sandycare-logo.png" alt="SandyCare">
-        <span>ดูแลด้วยใจ ให้ครอบครัวอุ่นใจทุกวัน</span>
+        <span data-content-key="public.brand.tagline">ดูแลด้วยใจ ให้ครอบครัวอุ่นใจทุกวัน</span>
       </a>
       <div class="public-menu" id="publicMenu">
         <button class="btn ghost public-menu-toggle" type="button" id="publicMenuToggle" aria-expanded="false" aria-controls="publicNavMenu">
           <svg><use href="#icon-menu"/></svg>
-          <span>เมนู</span>
+          <span data-content-key="public.nav.menu">เมนู</span>
         </button>
         <nav class="public-nav" id="publicNavMenu" aria-label="Customer website navigation">
           <button class="btn ghost" type="button" data-public-scroll="#status">
             <svg><use href="#icon-calendar"/></svg>
-            <span>สถานะงาน</span>
+            <span data-content-key="public.nav.status">สถานะงาน</span>
           </button>
           <button class="btn ghost" type="button" data-public-scroll="#pricing">
             <svg><use href="#icon-shield"/></svg>
-            <span>ราคา</span>
+            <span data-content-key="public.nav.pricing">ราคา</span>
           </button>
           <button class="btn ghost" type="button" data-public-scroll="#contact">
             <svg><use href="#icon-send"/></svg>
-            <span>ติดต่อเรา</span>
+            <span data-content-key="public.nav.contact">ติดต่อเรา</span>
           </button>
           <button class="btn ghost" type="button" data-public-entry="register">
             <svg><use href="#icon-profile"/></svg>
-            <span>ลงทะเบียนลูกค้า</span>
+            <span data-content-key="public.nav.register">ลงทะเบียนลูกค้า</span>
           </button>
           <button class="btn primary" type="button" data-public-entry="login">
             <svg><use href="#icon-profile"/></svg>
-            <span>เข้าสู่ระบบ</span>
+            <span data-content-key="public.nav.login">เข้าสู่ระบบ</span>
           </button>
         </nav>
       </div>
@@ -3865,26 +4012,26 @@
   <main id="top">
     <section class="public-wrap public-hero">
       <div class="public-copy">
-        <h1>จองบริการรับส่งผู้สูงวัยแบบมีผู้ช่วยดูแล</h1>
-        <p>สำหรับครอบครัวที่ต้องการรถรับส่งนัดหมายล่วงหน้า พาไปโรงพยาบาล ฟอกไต กายภาพ หรือเดินทางประจำ พร้อมบันทึก consent และข้อมูล mobility ก่อนทีมงานรับเคส</p>
+        <h1 data-content-key="public.hero.title">จองบริการรับส่งผู้สูงวัยแบบมีผู้ช่วยดูแล</h1>
+        <p data-content-key="public.hero.subtitle">สำหรับครอบครัวที่ต้องการรถรับส่งนัดหมายล่วงหน้า พาไปโรงพยาบาล ฟอกไต กายภาพ หรือเดินทางประจำ พร้อมบันทึก consent และข้อมูล mobility ก่อนทีมงานรับเคส</p>
         <div class="public-actions">
           <button class="btn primary" type="button" data-public-entry="register">
             <svg><use href="#icon-plus"/></svg>
-            <span>ลงทะเบียนลูกค้า</span>
+            <span data-content-key="public.hero.cta">ลงทะเบียนลูกค้า</span>
           </button>
         </div>
         <div class="public-proof" aria-label="Service proof points">
           <div class="public-proof-item">
-            <strong>ไม่ใช่รถฉุกเฉิน</strong>
-            <span>รับเฉพาะงานนัดหมายล่วงหน้าและเคสที่ปลอดภัยต่อการเดินทาง</span>
+            <strong data-content-key="public.hero.proof.nonEmergencyTitle">ไม่ใช่รถฉุกเฉิน</strong>
+            <span data-content-key="public.hero.proof.nonEmergencyText">รับเฉพาะงานนัดหมายล่วงหน้าและเคสที่ปลอดภัยต่อการเดินทาง</span>
           </div>
           <div class="public-proof-item">
-            <strong>ติดตามสถานะได้</strong>
-            <span>ครอบครัวรับลิงก์ portal สำหรับดู timeline, payment และ rating</span>
+            <strong data-content-key="public.hero.proof.trackingTitle">ติดตามสถานะได้</strong>
+            <span data-content-key="public.hero.proof.trackingText">ครอบครัวรับลิงก์ portal สำหรับดู timeline, payment และ rating</span>
           </div>
           <div class="public-proof-item">
-            <strong>ข้อมูลมี consent</strong>
-            <span>แยกข้อมูลสุขภาพ รูปภาพ และตำแหน่งตามหลัก PDPA</span>
+            <strong data-content-key="public.hero.proof.consentTitle">ข้อมูลมี consent</strong>
+            <span data-content-key="public.hero.proof.consentText">แยกข้อมูลสุขภาพ รูปภาพ และตำแหน่งตามหลัก PDPA</span>
           </div>
         </div>
       </div>
@@ -3898,31 +4045,31 @@
     <section class="public-wrap public-section" id="services">
       <div class="public-section-head">
         <div class="public-section-title">
-          <span class="public-kicker">Services</span>
-          <h2>เลือกบริการให้ตรงกับระดับการดูแล</h2>
-          <p>เริ่มจากงานรับส่งพื้นฐาน ไปจนถึงงานที่ต้องมีผู้ช่วยดูแลหรือผู้ประสานงานทางการแพทย์ ทีมจะตรวจความพร้อมก่อนรับเคสทุกครั้ง</p>
+          <span class="public-kicker" data-content-key="public.services.kicker">Services</span>
+          <h2 data-content-key="public.services.title">เลือกบริการให้ตรงกับระดับการดูแล</h2>
+          <p data-content-key="public.services.subtitle">เริ่มจากงานรับส่งพื้นฐาน ไปจนถึงงานที่ต้องมีผู้ช่วยดูแลหรือผู้ประสานงานทางการแพทย์ ทีมจะตรวจความพร้อมก่อนรับเคสทุกครั้ง</p>
         </div>
       </div>
       <div class="public-service-strip">
         <article class="public-service-item">
           <svg><use href="#icon-send"/></svg>
-          <strong>รับส่งตามนัด</strong>
-          <span>เหมาะกับผู้สูงวัยที่เดินได้เองหรือมีญาติช่วยดูแลระหว่างทาง</span>
+          <strong data-content-key="public.services.basicTitle">รับส่งตามนัด</strong>
+          <span data-content-key="public.services.basicText">เหมาะกับผู้สูงวัยที่เดินได้เองหรือมีญาติช่วยดูแลระหว่างทาง</span>
         </article>
         <article class="public-service-item">
           <svg><use href="#icon-user-check"/></svg>
-          <strong>ช่วยพยุงและรถเข็น</strong>
-          <span>ทีมช่วยขึ้นลงรถ ประคองอย่างสุภาพ และตรวจความพร้อมก่อนเดินทาง</span>
+          <strong data-content-key="public.services.supportTitle">ช่วยพยุงและรถเข็น</strong>
+          <span data-content-key="public.services.supportText">ทีมช่วยขึ้นลงรถ ประคองอย่างสุภาพ และตรวจความพร้อมก่อนเดินทาง</span>
         </article>
         <article class="public-service-item">
           <svg><use href="#icon-heart"/></svg>
-          <strong>พาไปพบแพทย์</strong>
-          <span>มีผู้ช่วยดูแลไปด้วย ช่วยเช็กอิน รอคิว และอัปเดตครอบครัว</span>
+          <strong data-content-key="public.services.hospitalTitle">พาไปพบแพทย์</strong>
+          <span data-content-key="public.services.hospitalText">มีผู้ช่วยดูแลไปด้วย ช่วยเช็กอิน รอคิว และอัปเดตครอบครัว</span>
         </article>
         <article class="public-service-item">
           <svg><use href="#icon-calendar"/></svg>
-          <strong>เส้นทางประจำ</strong>
-          <span>รองรับฟอกไต กายภาพ หรือการเดินทางซ้ำตามรอบเดือน</span>
+          <strong data-content-key="public.services.monthlyTitle">เส้นทางประจำ</strong>
+          <span data-content-key="public.services.monthlyText">รองรับฟอกไต กายภาพ หรือการเดินทางซ้ำตามรอบเดือน</span>
         </article>
       </div>
     </section>
@@ -3930,30 +4077,30 @@
     <section class="public-wrap public-section" id="status">
       <div class="public-section-head">
         <div class="public-section-title">
-          <span class="public-kicker">Customer portal</span>
-          <h2>ลูกค้าตรวจสถานะงานได้จาก Booking No.</h2>
-          <p>ครอบครัวสามารถดู timeline, สถานะการชำระเงิน, ทีมหน้างาน และลิงก์ consent/rating ได้จาก portal โดยไม่ต้องโทรถามซ้ำหลายรอบ</p>
+          <span class="public-kicker" data-content-key="public.status.kicker">Customer portal</span>
+          <h2 data-content-key="public.status.title">ลูกค้าตรวจสถานะงานได้จาก Booking No.</h2>
+          <p data-content-key="public.status.subtitle">ครอบครัวสามารถดู timeline, สถานะการชำระเงิน, ทีมหน้างาน และลิงก์ consent/rating ได้จาก portal โดยไม่ต้องโทรถามซ้ำหลายรอบ</p>
         </div>
       </div>
       <div class="public-status-card">
         <form class="public-status-form" id="publicStatusLookupForm">
           <label class="field">
-            <span>Booking No.</span>
-            <input class="input" id="publicStatusBookingInput" name="booking_no" placeholder="เช่น BK-1001" autocomplete="off">
+            <span data-content-key="public.status.bookingLabel">Booking No.</span>
+            <input class="input" id="publicStatusBookingInput" name="booking_no" placeholder="เช่น BK-1001" data-content-placeholder-key="public.status.bookingPlaceholder" autocomplete="off">
           </label>
           <button class="btn primary" type="submit" id="publicStatusLookupBtn">
             <svg><use href="#icon-send"/></svg>
-            <span>เปิด Customer Portal</span>
+            <span data-content-key="public.status.openPortal">เปิด Customer Portal</span>
           </button>
           <div class="public-result" id="publicStatusLookupResult">
-            <strong>ตัวอย่างสำหรับทดลอง</strong>
-            <span>ใช้ BK-1001 เพื่อเปิดสถานะตัวอย่าง หรือใช้ booking number จริงเมื่อเชื่อม API แล้ว</span>
+            <strong data-content-key="public.status.resultTitle">ตัวอย่างสำหรับทดลอง</strong>
+            <span data-content-key="public.status.resultText">ใช้ BK-1001 เพื่อเปิดสถานะตัวอย่าง หรือใช้ booking number จริงเมื่อเชื่อม API แล้ว</span>
           </div>
         </form>
         <div class="public-status-note">
-          <span>เห็นสถานะรับงาน จัดทีม กำลังเดินทาง ถึงจุดรับ และปิดงาน</span>
-          <span>ครอบครัวดูยอด invoice/payment และหลักฐานประกอบได้ในที่เดียว</span>
-          <span>รองรับลิงก์ consent และ rating หลังจบงานสำหรับตรวจสอบย้อนหลัง</span>
+          <span data-content-key="public.status.noteTracking">เห็นสถานะรับงาน จัดทีม กำลังเดินทาง ถึงจุดรับ และปิดงาน</span>
+          <span data-content-key="public.status.notePayment">ครอบครัวดูยอด invoice/payment และหลักฐานประกอบได้ในที่เดียว</span>
+          <span data-content-key="public.status.noteConsent">รองรับลิงก์ consent และ rating หลังจบงานสำหรับตรวจสอบย้อนหลัง</span>
         </div>
       </div>
     </section>
@@ -3961,44 +4108,44 @@
     <section class="public-wrap public-section" id="pricing">
       <div class="public-section-head">
         <div class="public-section-title">
-          <span class="public-kicker">Pricing</span>
-          <h2>แพ็กเกจบริการและการประเมินราคา</h2>
-          <p>ราคาขึ้นกับระยะทาง เวลา ระดับ mobility และจำนวนผู้ช่วยดูแล ทีมจะยืนยันราคาอีกครั้งก่อนเริ่มงานจริง</p>
+          <span class="public-kicker" data-content-key="public.pricing.kicker">Pricing</span>
+          <h2 data-content-key="public.pricing.title">แพ็กเกจบริการและการประเมินราคา</h2>
+          <p data-content-key="public.pricing.subtitle">ราคาขึ้นกับระยะทาง เวลา ระดับ mobility และจำนวนผู้ช่วยดูแล ทีมจะยืนยันราคาอีกครั้งก่อนเริ่มงานจริง</p>
         </div>
         <button class="btn primary" type="button" data-public-entry="register">
           <svg><use href="#icon-plus"/></svg>
-          <span>ขอใบเสนอราคา</span>
+          <span data-content-key="public.pricing.cta">ขอใบเสนอราคา</span>
         </button>
       </div>
       <div class="public-card-grid">
         <article class="public-price-card">
           <svg><use href="#icon-send"/></svg>
-          <h3>รับส่งตามนัด</h3>
-          <span class="public-price-meta">คิดตามระยะทางและช่วงเวลา</span>
+          <h3 data-content-key="public.pricing.basicTitle">รับส่งตามนัด</h3>
+          <span class="public-price-meta" data-content-key="public.pricing.basicMeta">คิดตามระยะทางและช่วงเวลา</span>
           <ul>
-            <li>เหมาะกับผู้สูงวัยที่เดินได้เองหรือมีญาติดูแล</li>
-            <li>มีสถานะงานและแจ้งเตือนครอบครัว</li>
-            <li>ออกใบเสนอราคาก่อนยืนยัน booking</li>
+            <li data-content-key="public.pricing.basicBullet1">เหมาะกับผู้สูงวัยที่เดินได้เองหรือมีญาติดูแล</li>
+            <li data-content-key="public.pricing.basicBullet2">มีสถานะงานและแจ้งเตือนครอบครัว</li>
+            <li data-content-key="public.pricing.basicBullet3">ออกใบเสนอราคาก่อนยืนยัน booking</li>
           </ul>
         </article>
         <article class="public-price-card featured">
           <svg><use href="#icon-user-check"/></svg>
-          <h3>ช่วยพยุงและรถเข็น</h3>
-          <span class="public-price-meta">รวมการเตรียมผู้ช่วยดูแลตามเคส</span>
+          <h3 data-content-key="public.pricing.supportTitle">ช่วยพยุงและรถเข็น</h3>
+          <span class="public-price-meta" data-content-key="public.pricing.supportMeta">รวมการเตรียมผู้ช่วยดูแลตามเคส</span>
           <ul>
-            <li>ประเมิน mobility ก่อนมอบหมายทีม</li>
-            <li>ช่วยขึ้นลงรถและสื่อสารกับญาติ</li>
-            <li>เหมาะกับนัดโรงพยาบาลหรือกายภาพ</li>
+            <li data-content-key="public.pricing.supportBullet1">ประเมิน mobility ก่อนมอบหมายทีม</li>
+            <li data-content-key="public.pricing.supportBullet2">ช่วยขึ้นลงรถและสื่อสารกับญาติ</li>
+            <li data-content-key="public.pricing.supportBullet3">เหมาะกับนัดโรงพยาบาลหรือกายภาพ</li>
           </ul>
         </article>
         <article class="public-price-card">
           <svg><use href="#icon-calendar"/></svg>
-          <h3>เส้นทางประจำ</h3>
-          <span class="public-price-meta">เหมาะกับรายเดือนหรือรอบฟอกไต</span>
+          <h3 data-content-key="public.pricing.monthlyTitle">เส้นทางประจำ</h3>
+          <span class="public-price-meta" data-content-key="public.pricing.monthlyMeta">เหมาะกับรายเดือนหรือรอบฟอกไต</span>
           <ul>
-            <li>จัดตารางเดินทางล่วงหน้า</li>
-            <li>พยายามใช้ทีมเดิมเมื่อพร้อมให้บริการ</li>
-            <li>มีรายงานยอดคงเหลือและสถานะรวม</li>
+            <li data-content-key="public.pricing.monthlyBullet1">จัดตารางเดินทางล่วงหน้า</li>
+            <li data-content-key="public.pricing.monthlyBullet2">พยายามใช้ทีมเดิมเมื่อพร้อมให้บริการ</li>
+            <li data-content-key="public.pricing.monthlyBullet3">มีรายงานยอดคงเหลือและสถานะรวม</li>
           </ul>
         </article>
       </div>
@@ -4007,26 +4154,26 @@
     <section class="public-wrap public-section" id="safety">
       <div class="public-section-head">
         <div class="public-section-title">
-          <span class="public-kicker">Safety & Consent</span>
-          <h2>ความปลอดภัยและข้อมูลส่วนบุคคลมาก่อน</h2>
-          <p>เราเก็บเฉพาะข้อมูลที่จำเป็นต่อการเตรียมบริการและแยกข้อมูลสุขภาพ/ตำแหน่งตาม consent เพื่อให้ทีมทำงานได้แม่นยำและตรวจสอบได้</p>
+          <span class="public-kicker" data-content-key="public.safety.kicker">Safety & Consent</span>
+          <h2 data-content-key="public.safety.title">ความปลอดภัยและข้อมูลส่วนบุคคลมาก่อน</h2>
+          <p data-content-key="public.safety.subtitle">เราเก็บเฉพาะข้อมูลที่จำเป็นต่อการเตรียมบริการและแยกข้อมูลสุขภาพ/ตำแหน่งตาม consent เพื่อให้ทีมทำงานได้แม่นยำและตรวจสอบได้</p>
         </div>
       </div>
       <div class="public-card-grid">
         <article class="public-info-card">
           <svg><use href="#icon-alert"/></svg>
-          <strong>ไม่ใช่รถฉุกเฉิน</strong>
-          <span>รับเฉพาะงานนัดหมายล่วงหน้า หากมีอาการฉุกเฉินต้องติดต่อ 1669 หรือโรงพยาบาลใกล้ที่สุดทันที</span>
+          <strong data-content-key="public.safety.nonEmergencyTitle">ไม่ใช่รถฉุกเฉิน</strong>
+          <span data-content-key="public.safety.nonEmergencyText">รับเฉพาะงานนัดหมายล่วงหน้า หากมีอาการฉุกเฉินต้องติดต่อ 1669 หรือโรงพยาบาลใกล้ที่สุดทันที</span>
         </article>
         <article class="public-info-card">
           <svg><use href="#icon-shield"/></svg>
-          <strong>Consent แยกตามประเภทข้อมูล</strong>
-          <span>แยก consent ข้อมูลทั่วไป ข้อมูลสุขภาพ การแจ้งครอบครัว รูปภาพ และตำแหน่งระหว่างงาน</span>
+          <strong data-content-key="public.safety.consentTitle">Consent แยกตามประเภทข้อมูล</strong>
+          <span data-content-key="public.safety.consentText">แยก consent ข้อมูลทั่วไป ข้อมูลสุขภาพ การแจ้งครอบครัว รูปภาพ และตำแหน่งระหว่างงาน</span>
         </article>
         <article class="public-info-card">
           <svg><use href="#icon-user-check"/></svg>
-          <strong>ทีมงานผ่านการตรวจความพร้อม</strong>
-          <span>คนขับและผู้ช่วยดูแลถูกจัดตามความเหมาะสมของเคส mobility, เวลา, เส้นทาง และข้อควรระวัง</span>
+          <strong data-content-key="public.safety.teamTitle">ทีมงานผ่านการตรวจความพร้อม</strong>
+          <span data-content-key="public.safety.teamText">คนขับและผู้ช่วยดูแลถูกจัดตามความเหมาะสมของเคส mobility, เวลา, เส้นทาง และข้อควรระวัง</span>
         </article>
       </div>
     </section>
@@ -4034,27 +4181,27 @@
     <section class="public-wrap public-section" id="faq">
       <div class="public-section-head">
         <div class="public-section-title">
-          <span class="public-kicker">FAQ</span>
-          <h2>คำถามที่พบบ่อย</h2>
-          <p>รวมคำตอบสำหรับครอบครัวก่อนลงทะเบียนและก่อนจองงานจริง</p>
+          <span class="public-kicker" data-content-key="public.faq.kicker">FAQ</span>
+          <h2 data-content-key="public.faq.title">คำถามที่พบบ่อย</h2>
+          <p data-content-key="public.faq.subtitle">รวมคำตอบสำหรับครอบครัวก่อนลงทะเบียนและก่อนจองงานจริง</p>
         </div>
       </div>
       <div class="public-faq-list">
         <details class="public-faq-card" open>
-          <summary>ต้องจองล่วงหน้านานแค่ไหน?</summary>
-          <p>แนะนำจองล่วงหน้าอย่างน้อย 24 ชั่วโมง เพื่อให้ทีมประเมินระยะทาง mobility consent และความพร้อมของผู้ช่วยดูแลได้รอบคอบ</p>
+          <summary data-content-key="public.faq.advanceQuestion">ต้องจองล่วงหน้านานแค่ไหน?</summary>
+          <p data-content-key="public.faq.advanceAnswer">แนะนำจองล่วงหน้าอย่างน้อย 24 ชั่วโมง เพื่อให้ทีมประเมินระยะทาง mobility consent และความพร้อมของผู้ช่วยดูแลได้รอบคอบ</p>
         </details>
         <details class="public-faq-card">
-          <summary>รับเคสฉุกเฉินหรือผู้ป่วยหนักไหม?</summary>
-          <p>ไม่รับเคสฉุกเฉินหรือเคสที่ต้องใช้เครื่องมือแพทย์/ทีมกู้ชีพ บริการนี้ออกแบบสำหรับ non-emergency assisted transport แบบนัดหมายล่วงหน้า</p>
+          <summary data-content-key="public.faq.emergencyQuestion">รับเคสฉุกเฉินหรือผู้ป่วยหนักไหม?</summary>
+          <p data-content-key="public.faq.emergencyAnswer">ไม่รับเคสฉุกเฉินหรือเคสที่ต้องใช้เครื่องมือแพทย์/ทีมกู้ชีพ บริการนี้ออกแบบสำหรับ non-emergency assisted transport แบบนัดหมายล่วงหน้า</p>
         </details>
         <details class="public-faq-card">
-          <summary>ครอบครัวติดตามสถานะได้อย่างไร?</summary>
-          <p>หลังยืนยันงาน ทีมจะให้ booking number หรือ portal link สำหรับดู timeline สถานะทีมหน้างาน payment และ rating หลังจบงาน</p>
+          <summary data-content-key="public.faq.trackingQuestion">ครอบครัวติดตามสถานะได้อย่างไร?</summary>
+          <p data-content-key="public.faq.trackingAnswer">หลังยืนยันงาน ทีมจะให้ booking number หรือ portal link สำหรับดู timeline สถานะทีมหน้างาน payment และ rating หลังจบงาน</p>
         </details>
         <details class="public-faq-card">
-          <summary>ข้อมูลสุขภาพถูกใช้เพื่ออะไร?</summary>
-          <p>ใช้เพื่อเตรียมการช่วยเหลือขึ้นลงรถ การสื่อสาร และข้อควรระวังระหว่างเดินทางเท่านั้น โดยอิง consent ที่ลูกค้าให้ไว้</p>
+          <summary data-content-key="public.faq.healthQuestion">ข้อมูลสุขภาพถูกใช้เพื่ออะไร?</summary>
+          <p data-content-key="public.faq.healthAnswer">ใช้เพื่อเตรียมการช่วยเหลือขึ้นลงรถ การสื่อสาร และข้อควรระวังระหว่างเดินทางเท่านั้น โดยอิง consent ที่ลูกค้าให้ไว้</p>
         </details>
       </div>
     </section>
@@ -4062,53 +4209,53 @@
     <section class="public-wrap public-section" id="contact">
       <div class="public-section-head">
         <div class="public-section-title">
-          <span class="public-kicker">Contact us</span>
-          <h2>ติดต่อทีมประสานงาน</h2>
-          <p>ส่งข้อมูลเบื้องต้นไว้ได้ ทีมจะติดต่อกลับเพื่อประเมินเคส ราคา และเวลาที่เหมาะสมก่อนสร้าง booking จริง</p>
+          <span class="public-kicker" data-content-key="public.contact.kicker">Contact us</span>
+          <h2 data-content-key="public.contact.title">ติดต่อทีมประสานงาน</h2>
+          <p data-content-key="public.contact.subtitle">ส่งข้อมูลเบื้องต้นไว้ได้ ทีมจะติดต่อกลับเพื่อประเมินเคส ราคา และเวลาที่เหมาะสมก่อนสร้าง booking จริง</p>
         </div>
       </div>
       <div class="public-contact-layout">
         <div class="public-contact-list">
           <article class="public-contact-card">
             <svg><use href="#icon-send"/></svg>
-            <strong>LINE Official Account</strong>
-            <span>@sandycare-service สำหรับส่งรายละเอียด นัดหมาย และรูปจุดรับ</span>
+            <strong data-content-key="public.contact.lineTitle">LINE Official Account</strong>
+            <span data-content-key="public.contact.lineText">@sandycare-service สำหรับส่งรายละเอียด นัดหมาย และรูปจุดรับ</span>
           </article>
           <article class="public-contact-card">
             <svg><use href="#icon-calendar"/></svg>
-            <strong>เวลาทำการ</strong>
-            <span>ทุกวัน 08:00-18:00 สำหรับงานนัดหมายล่วงหน้าในเขตกรุงเทพฯ และปริมณฑล</span>
+            <strong data-content-key="public.contact.hoursTitle">เวลาทำการ</strong>
+            <span data-content-key="public.contact.hoursText">ทุกวัน 08:00-18:00 สำหรับงานนัดหมายล่วงหน้าในเขตกรุงเทพฯ และปริมณฑล</span>
           </article>
           <article class="public-contact-card">
             <svg><use href="#icon-alert"/></svg>
-            <strong>กรณีฉุกเฉิน</strong>
-            <span>โปรดติดต่อ 1669 หรือโรงพยาบาลโดยตรง บริการนี้ไม่ใช่รถพยาบาลฉุกเฉิน</span>
+            <strong data-content-key="public.contact.emergencyTitle">กรณีฉุกเฉิน</strong>
+            <span data-content-key="public.contact.emergencyText">โปรดติดต่อ 1669 หรือโรงพยาบาลโดยตรง บริการนี้ไม่ใช่รถพยาบาลฉุกเฉิน</span>
           </article>
         </div>
         <section class="public-panel">
           <div class="public-panel-header">
             <div>
-              <h3>ให้ทีมติดต่อกลับ</h3>
-              <p>ฝากเบอร์และเวลาที่สะดวก ทีมจะประสานรายละเอียดต่อ</p>
+              <h3 data-content-key="public.contact.callbackTitle">ให้ทีมติดต่อกลับ</h3>
+              <p data-content-key="public.contact.callbackSubtitle">ฝากเบอร์และเวลาที่สะดวก ทีมจะประสานรายละเอียดต่อ</p>
             </div>
           </div>
           <div class="public-panel-body">
             <form class="public-contact-form" id="publicContactForm">
               <label class="field">
-                <span>ชื่อผู้ติดต่อ</span>
-                <input class="input" name="name" placeholder="ชื่อ-นามสกุล" required>
+                <span data-content-key="public.contact.nameLabel">ชื่อผู้ติดต่อ</span>
+                <input class="input" name="name" placeholder="ชื่อ-นามสกุล" data-content-placeholder-key="public.contact.namePlaceholder" required>
               </label>
               <label class="field">
-                <span>เบอร์โทร / LINE</span>
-                <input class="input" name="contact" placeholder="08x-xxx-xxxx หรือ LINE ID" required>
+                <span data-content-key="public.contact.phoneLabel">เบอร์โทร / LINE</span>
+                <input class="input" name="contact" placeholder="08x-xxx-xxxx หรือ LINE ID" data-content-placeholder-key="public.contact.phonePlaceholder" required>
               </label>
               <label class="field">
-                <span>เรื่องที่ต้องการให้ช่วย</span>
-                <textarea class="textarea" name="message" rows="3" placeholder="เช่น จองไปโรงพยาบาล วันเวลา จุดรับ และ mobility"></textarea>
+                <span data-content-key="public.contact.messageLabel">เรื่องที่ต้องการให้ช่วย</span>
+                <textarea class="textarea" name="message" rows="3" placeholder="เช่น จองไปโรงพยาบาล วันเวลา จุดรับ และ mobility" data-content-placeholder-key="public.contact.messagePlaceholder"></textarea>
               </label>
               <button class="btn primary" type="submit">
                 <svg><use href="#icon-send"/></svg>
-                <span>ส่งคำขอติดต่อกลับ</span>
+                <span data-content-key="public.contact.submit">ส่งคำขอติดต่อกลับ</span>
               </button>
             </form>
             <div class="public-result" id="publicContactResult" hidden></div>
@@ -4414,6 +4561,11 @@
           <svg><use href="#icon-book"/></svg>
           <span data-i18n="nav.guide">คู่มือระบบ</span>
           <span class="nav-count" id="navGuideCount">6</span>
+        </button>
+        <button class="nav-item" data-view="content" type="button">
+          <svg><use href="#icon-book"/></svg>
+          <span data-i18n="nav.content">แก้ไขข้อความ</span>
+          <span class="nav-count" id="navContentCount">0</span>
         </button>
         <button class="nav-item" data-view="security" type="button">
           <svg><use href="#icon-shield"/></svg>
@@ -6198,6 +6350,71 @@
         </section>
       </section>
 
+      <section class="view" id="view-content">
+        <div class="content-editor-layout">
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <h3 data-i18n="contentEditor.title">แก้ไขข้อความบนหน้าเพจ</h3>
+                <p data-i18n="contentEditor.subtitle">ปรับ copy หน้าเว็บไซต์และข้อความระบบจาก layout เดิม พร้อมบันทึกไว้ใน browser นี้</p>
+              </div>
+              <button class="btn primary" type="button" id="contentEditorSaveBtn">
+                <svg><use href="#icon-shield"/></svg>
+                <span data-i18n="contentEditor.save">บันทึก</span>
+              </button>
+            </div>
+            <div class="toolbar">
+              <select class="select" id="contentEditorMode" aria-label="Content group">
+                <option value="public" data-i18n="contentEditor.publicMode">หน้าเว็บไซต์</option>
+                <option value="system" data-i18n="contentEditor.systemMode">ข้อความระบบ</option>
+              </select>
+              <select class="select" id="contentEditorSection" aria-label="Content section">
+                <option value="all" data-i18n="filter.all">ทั้งหมด</option>
+              </select>
+              <input class="input search" id="contentEditorSearch" type="search" placeholder="ค้นหาข้อความหรือ key" data-i18n-placeholder="contentEditor.searchPlaceholder">
+              <button class="btn ghost" type="button" id="contentEditorResetAllBtn">
+                <svg><use href="#icon-refresh"/></svg>
+                <span data-i18n="contentEditor.resetAll">รีเซ็ตกลุ่มนี้</span>
+              </button>
+            </div>
+            <div class="content-editor-summary">
+              <span data-i18n="contentEditor.summary">แก้ข้อความในช่อง แล้วระบบจะเก็บ draft ให้อัตโนมัติ</span>
+              <strong id="contentEditorChangedCount">0</strong>
+            </div>
+            <div class="content-editor-list" id="contentEditorList"></div>
+          </section>
+
+          <aside class="panel">
+            <div class="panel-header">
+              <div>
+                <h3 data-i18n="contentEditor.previewTitle">ตัวอย่างและคำสั่ง</h3>
+                <p data-i18n="contentEditor.previewSubtitle">ดู key, ค่าเดิม และค่าที่ใช้อยู่ตอนนี้</p>
+              </div>
+            </div>
+            <div class="panel-body content-preview-stack">
+              <div id="contentEditorSelection" class="content-preview-card">
+                <span data-i18n="contentEditor.selected">รายการที่เลือก</span>
+                <strong data-i18n="contentEditor.noSelection">ยังไม่ได้เลือกข้อความ</strong>
+              </div>
+              <div id="contentEditorPreview" class="content-preview-card">
+                <span data-i18n="contentEditor.currentText">ข้อความปัจจุบัน</span>
+                <p data-i18n="contentEditor.selectHint">เลือกข้อความจากรายการด้านซ้ายเพื่อดูรายละเอียด</p>
+              </div>
+              <div class="actions">
+                <button class="btn primary" type="button" id="contentEditorOpenPublicBtn">
+                  <svg><use href="#icon-heart"/></svg>
+                  <span data-i18n="contentEditor.openPublic">ดูหน้าเว็บไซต์</span>
+                </button>
+                <button class="btn ghost" type="button" id="contentEditorResetSelectedBtn">
+                  <svg><use href="#icon-refresh"/></svg>
+                  <span data-i18n="contentEditor.resetSelected">รีเซ็ตรายการนี้</span>
+                </button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
       <section class="view" id="view-users">
         <div class="two-col">
           <section class="panel">
@@ -6342,6 +6559,26 @@
   const API_BASES = configuredApiBase
     ? [configuredApiBase]
     : (window.location.protocol === 'file:' ? DEFAULT_LOCAL_API_BASES : ['']);
+  const CONTENT_OVERRIDES_KEY = 'eldercare.pageContentOverrides';
+  const TRANSLATION_OVERRIDES_KEY = 'eldercare.translationOverrides';
+
+  function readStoredJson(key, fallback = {}) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (error) {
+      console.warn(`Could not read ${key}`, error);
+      return fallback;
+    }
+  }
+
+  function writeStoredJson(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {
+      console.warn(`Could not save ${key}`, error);
+    }
+  }
 
   const translations = {
     th: {
@@ -6376,6 +6613,7 @@
       'nav.pdpa': 'PDPA Consent',
       'nav.privacy': 'Privacy Guard',
       'nav.guide': 'คู่มือระบบ',
+      'nav.content': 'แก้ไขข้อความ',
       'nav.security': 'Security',
       'nav.users': 'User Admin',
       'sidebar.footerTitle': 'Ops mode',
@@ -6451,10 +6689,37 @@
       'view.privacy.subtitle': 'ควบคุมการเปิดดูข้อมูลอ่อนไหวและ audit log',
       'view.guide.title': 'คู่มือระบบ',
       'view.guide.subtitle': 'อธิบายคุณสมบัติ วิธีใช้งาน แผนภาพ workflow และ checklist สำหรับแอดมิน',
+      'view.content.title': 'แก้ไขข้อความ',
+      'view.content.subtitle': 'ปรับข้อความหน้าเว็บไซต์และข้อความระบบจาก layout เดิม',
       'view.security.title': 'Security',
       'view.security.subtitle': 'ตรวจ session, audit และ readiness สำหรับ production',
       'view.users.title': 'User Admin',
       'view.users.subtitle': 'สร้างผู้ใช้จริงและดูแล PIN สำหรับ production auth',
+      'contentEditor.title': 'แก้ไขข้อความบนหน้าเพจ',
+      'contentEditor.subtitle': 'ปรับ copy หน้าเว็บไซต์และข้อความระบบจาก layout เดิม พร้อมบันทึกไว้ใน browser นี้',
+      'contentEditor.save': 'บันทึก',
+      'contentEditor.publicMode': 'หน้าเว็บไซต์',
+      'contentEditor.systemMode': 'ข้อความระบบ',
+      'contentEditor.searchPlaceholder': 'ค้นหาข้อความหรือ key',
+      'contentEditor.resetAll': 'รีเซ็ตกลุ่มนี้',
+      'contentEditor.summary': 'แก้ข้อความในช่อง แล้วระบบจะเก็บ draft ให้อัตโนมัติ',
+      'contentEditor.previewTitle': 'ตัวอย่างและคำสั่ง',
+      'contentEditor.previewSubtitle': 'ดู key, ค่าเดิม และค่าที่ใช้อยู่ตอนนี้',
+      'contentEditor.selected': 'รายการที่เลือก',
+      'contentEditor.noSelection': 'ยังไม่ได้เลือกข้อความ',
+      'contentEditor.currentText': 'ข้อความปัจจุบัน',
+      'contentEditor.defaultText': 'ข้อความเดิม',
+      'contentEditor.selectHint': 'เลือกข้อความจากรายการด้านซ้ายเพื่อดูรายละเอียด',
+      'contentEditor.openPublic': 'ดูหน้าเว็บไซต์',
+      'contentEditor.resetSelected': 'รีเซ็ตรายการนี้',
+      'contentEditor.empty': 'ไม่พบข้อความตามเงื่อนไขที่เลือก',
+      'contentEditor.changed': 'แก้ไขแล้ว {count} รายการ',
+      'contentEditor.unchanged': 'ยังไม่มีการแก้ไข',
+      'contentEditor.publicLabel': 'หน้าเว็บไซต์',
+      'contentEditor.systemLabel': 'ระบบ',
+      'toast.contentSaved': 'บันทึกข้อความแล้ว',
+      'toast.contentReset': 'รีเซ็ตข้อความแล้ว',
+      'toast.contentNoSelection': 'เลือกข้อความที่ต้องการรีเซ็ตก่อน',
       'exec.title': 'Dashboard ผู้บริหาร',
       'exec.subtitle': 'ภาพรวมงานวันนี้แบบเห็นสถานะและความเสี่ยงในแว้บเดียว',
       'exec.avgProgress': 'ความคืบหน้าเฉลี่ย',
@@ -7119,6 +7384,7 @@
       'nav.pdpa': 'PDPA Consent',
       'nav.privacy': 'Privacy Guard',
       'nav.guide': 'System Guide',
+      'nav.content': 'Content Editor',
       'nav.security': 'Security',
       'nav.users': 'User Admin',
       'sidebar.footerTitle': 'Ops mode',
@@ -7194,10 +7460,37 @@
       'view.privacy.subtitle': 'Control sensitive access and audit logs',
       'view.guide.title': 'System Guide',
       'view.guide.subtitle': 'Features, how-to flow, visual workflow, and admin checklist',
+      'view.content.title': 'Content Editor',
+      'view.content.subtitle': 'Edit website copy and system labels in the existing layout',
       'view.security.title': 'Security',
       'view.security.subtitle': 'Review sessions, audit events, and production readiness',
       'view.users.title': 'User Admin',
       'view.users.subtitle': 'Create real users and manage production PIN auth',
+      'contentEditor.title': 'Edit Page Text',
+      'contentEditor.subtitle': 'Adjust website copy and system labels from the existing layout, saved in this browser',
+      'contentEditor.save': 'Save',
+      'contentEditor.publicMode': 'Website page',
+      'contentEditor.systemMode': 'System labels',
+      'contentEditor.searchPlaceholder': 'Search text or key',
+      'contentEditor.resetAll': 'Reset this group',
+      'contentEditor.summary': 'Edit a field and the draft is saved automatically',
+      'contentEditor.previewTitle': 'Preview and actions',
+      'contentEditor.previewSubtitle': 'Review the key, default text, and current text',
+      'contentEditor.selected': 'Selected item',
+      'contentEditor.noSelection': 'No text selected',
+      'contentEditor.currentText': 'Current text',
+      'contentEditor.defaultText': 'Default text',
+      'contentEditor.selectHint': 'Select text from the list on the left to see details',
+      'contentEditor.openPublic': 'View website',
+      'contentEditor.resetSelected': 'Reset item',
+      'contentEditor.empty': 'No text matches the selected filters',
+      'contentEditor.changed': '{count} items changed',
+      'contentEditor.unchanged': 'No edits yet',
+      'contentEditor.publicLabel': 'Website',
+      'contentEditor.systemLabel': 'System',
+      'toast.contentSaved': 'Text saved',
+      'toast.contentReset': 'Text reset',
+      'toast.contentNoSelection': 'Select text to reset first',
       'exec.title': 'Executive Dashboard',
       'exec.subtitle': 'A glanceable view of today jobs, progress, and risk.',
       'exec.avgProgress': 'Avg progress',
@@ -8286,8 +8579,14 @@
     'toast.aiNotified': 'အဖွဲ့အားလုံးသို့ realtime update ပို့ပြီး'
   };
 
+  let translationOverrides = readStoredJson(TRANSLATION_OVERRIDES_KEY, {});
+
   function tr(key, vars = {}) {
-    const message = translations[currentLocale]?.[key] ?? translations.th[key] ?? translations.en[key] ?? key;
+    const message = translationOverrides[currentLocale]?.[key]
+      ?? translations[currentLocale]?.[key]
+      ?? translations.th[key]
+      ?? translations.en[key]
+      ?? key;
     return String(message).replace(/\{(\w+)\}/g, (_, name) => vars[name] ?? '');
   }
 
@@ -8552,6 +8851,7 @@
     pdpa: ['owner', 'super_admin', 'admin', 'branch_admin', 'dispatcher', 'coordinator'],
     privacy: ['owner', 'super_admin', 'admin', 'branch_admin', 'dispatcher', 'coordinator'],
     guide: ['owner', 'super_admin', 'admin', 'branch_admin', 'dispatcher', 'coordinator', 'finance', 'trainer'],
+    content: ['owner', 'super_admin', 'admin', 'branch_admin'],
     security: ['owner', 'super_admin', 'admin'],
     users: ['owner', 'super_admin', 'admin']
   };
@@ -8611,6 +8911,11 @@
     pendingEvidenceUpload: null,
     session: null,
     publicRegisterStep: 1,
+    pageContentOverrides: readStoredJson(CONTENT_OVERRIDES_KEY, {}),
+    contentEditorMode: 'public',
+    contentEditorSection: 'all',
+    contentEditorSearch: '',
+    selectedContentKey: '',
     customers: [],
     elders: [],
     leads: [],
@@ -8943,6 +9248,17 @@
     securityAuditRows: document.getElementById('securityAuditRows'),
     userCreateForm: document.getElementById('userCreateForm'),
     userRows: document.getElementById('userRows'),
+    contentEditorMode: document.getElementById('contentEditorMode'),
+    contentEditorSection: document.getElementById('contentEditorSection'),
+    contentEditorSearch: document.getElementById('contentEditorSearch'),
+    contentEditorList: document.getElementById('contentEditorList'),
+    contentEditorChangedCount: document.getElementById('contentEditorChangedCount'),
+    contentEditorSelection: document.getElementById('contentEditorSelection'),
+    contentEditorPreview: document.getElementById('contentEditorPreview'),
+    contentEditorSaveBtn: document.getElementById('contentEditorSaveBtn'),
+    contentEditorResetAllBtn: document.getElementById('contentEditorResetAllBtn'),
+    contentEditorOpenPublicBtn: document.getElementById('contentEditorOpenPublicBtn'),
+    contentEditorResetSelectedBtn: document.getElementById('contentEditorResetSelectedBtn'),
     bookingSearch: document.getElementById('bookingSearch'),
     serviceFilter: document.getElementById('serviceFilter'),
     bookingCreatePanel: document.getElementById('bookingCreatePanel'),
@@ -9287,6 +9603,311 @@
     els.toast.classList.add('show');
     window.clearTimeout(showToast.timer);
     showToast.timer = window.setTimeout(() => els.toast.classList.remove('show'), 2400);
+  }
+
+  function hasOwnValue(object, key) {
+    return Object.prototype.hasOwnProperty.call(object || {}, key);
+  }
+
+  function contentSectionFromKey(key) {
+    const section = String(key || '').split('.')[1] || 'content';
+    const labels = {
+      brand: 'Brand',
+      nav: 'Navigation',
+      hero: 'Hero',
+      services: 'Services',
+      status: 'Status',
+      pricing: 'Pricing',
+      safety: 'Safety',
+      faq: 'FAQ',
+      contact: 'Contact'
+    };
+    return labels[section] || prettifyCode(section);
+  }
+
+  function contentLabelFromKey(key) {
+    const parts = String(key || '').split('.').slice(2);
+    return parts.length ? parts.map(prettifyCode).join(' / ') : prettifyCode(key);
+  }
+
+  function registerContentDefault(node, kind) {
+    const datasetKey = kind === 'placeholder' ? 'contentDefaultPlaceholder' : 'contentDefaultText';
+    if (!node.dataset[datasetKey]) {
+      node.dataset[datasetKey] = kind === 'placeholder'
+        ? (node.getAttribute('placeholder') || '')
+        : node.textContent.trim();
+    }
+    return node.dataset[datasetKey];
+  }
+
+  function applyPageContentOverrides() {
+    document.querySelectorAll('[data-content-key]').forEach((node) => {
+      const key = node.dataset.contentKey;
+      const fallback = registerContentDefault(node, 'text');
+      node.textContent = hasOwnValue(state.pageContentOverrides, key) ? state.pageContentOverrides[key] : fallback;
+    });
+    document.querySelectorAll('[data-content-placeholder-key]').forEach((node) => {
+      const key = node.dataset.contentPlaceholderKey;
+      const fallback = registerContentDefault(node, 'placeholder');
+      node.setAttribute('placeholder', hasOwnValue(state.pageContentOverrides, key) ? state.pageContentOverrides[key] : fallback);
+    });
+  }
+
+  function getPublicContentEntries() {
+    const entries = [];
+    const seen = new Set();
+    const addEntry = (node, kind, key) => {
+      if (!key) return;
+      const id = `public:${kind}:${key}`;
+      const defaultValue = registerContentDefault(node, kind);
+      if (seen.has(id)) return;
+      seen.add(id);
+      entries.push({
+        id,
+        type: 'public',
+        kind,
+        key,
+        section: node.dataset.contentSection || contentSectionFromKey(key),
+        label: node.dataset.contentLabel || contentLabelFromKey(key),
+        defaultValue,
+        value: hasOwnValue(state.pageContentOverrides, key) ? state.pageContentOverrides[key] : defaultValue
+      });
+    };
+    document.querySelectorAll('[data-content-key], [data-content-placeholder-key]').forEach((node) => {
+      if (node.dataset.contentKey) addEntry(node, 'text', node.dataset.contentKey);
+      if (node.dataset.contentPlaceholderKey) addEntry(node, 'placeholder', node.dataset.contentPlaceholderKey);
+    });
+    return entries;
+  }
+
+  function translationDefaultFor(key) {
+    return translations[currentLocale]?.[key] ?? translations.th[key] ?? translations.en[key] ?? '';
+  }
+
+  function translationValueFor(key) {
+    return hasOwnValue(translationOverrides[currentLocale], key)
+      ? translationOverrides[currentLocale][key]
+      : translationDefaultFor(key);
+  }
+
+  function getTranslationEntries() {
+    const keys = new Set([
+      ...Object.keys(translations.th || {}),
+      ...Object.keys(translations.en || {}),
+      ...Object.keys(translations[currentLocale] || {}),
+      ...Object.keys(translationOverrides[currentLocale] || {})
+    ]);
+    return Array.from(keys).sort().map((key) => {
+      const section = String(key).split('.')[0] || 'system';
+      return {
+        id: `system:text:${key}`,
+        type: 'system',
+        kind: 'text',
+        key,
+        section: prettifyCode(section),
+        label: contentLabelFromKey(`system.${key}`),
+        defaultValue: translationDefaultFor(key),
+        value: translationValueFor(key)
+      };
+    });
+  }
+
+  function entryChanged(entry) {
+    return String(entry.value ?? '') !== String(entry.defaultValue ?? '');
+  }
+
+  function allContentEditorEntries() {
+    return state.contentEditorMode === 'system' ? getTranslationEntries() : getPublicContentEntries();
+  }
+
+  function filteredContentEditorEntries(entries) {
+    const query = String(state.contentEditorSearch || '').trim().toLowerCase();
+    const section = state.contentEditorSection || 'all';
+    return entries.filter((entry) => {
+      const matchesSection = section === 'all' || entry.section === section;
+      const haystack = `${entry.section} ${entry.label} ${entry.key} ${entry.value}`.toLowerCase();
+      return matchesSection && (!query || haystack.includes(query));
+    });
+  }
+
+  function contentEntryById(id) {
+    return allContentEditorEntries().find((entry) => entry.id === id) || null;
+  }
+
+  function updateContentChangeCount(entries = allContentEditorEntries()) {
+    const changed = entries.filter(entryChanged).length;
+    if (els.contentEditorChangedCount) {
+      els.contentEditorChangedCount.textContent = changed
+        ? tr('contentEditor.changed', { count: changed })
+        : tr('contentEditor.unchanged');
+    }
+    const navCount = document.getElementById('navContentCount');
+    if (navCount) {
+      const publicChanged = getPublicContentEntries().filter(entryChanged).length;
+      const systemChanged = Object.values(translationOverrides)
+        .reduce((total, group) => total + Object.keys(group || {}).length, 0);
+      navCount.textContent = publicChanged + systemChanged;
+    }
+  }
+
+  function renderContentSectionOptions(entries) {
+    if (!els.contentEditorSection) return;
+    const sections = Array.from(new Set(entries.map((entry) => entry.section)));
+    if (state.contentEditorSection !== 'all' && !sections.includes(state.contentEditorSection)) {
+      state.contentEditorSection = 'all';
+    }
+    els.contentEditorSection.innerHTML = [
+      `<option value="all">${escapeHtml(tr('filter.all'))}</option>`,
+      ...sections.map((section) => `<option value="${escapeHtml(section)}" ${section === state.contentEditorSection ? 'selected' : ''}>${escapeHtml(section)}</option>`)
+    ].join('');
+  }
+
+  function renderContentEditorPreview(entry) {
+    if (!els.contentEditorSelection || !els.contentEditorPreview) return;
+    if (!entry) {
+      els.contentEditorSelection.innerHTML = `
+        <span>${escapeHtml(tr('contentEditor.selected'))}</span>
+        <strong>${escapeHtml(tr('contentEditor.noSelection'))}</strong>
+      `;
+      els.contentEditorPreview.innerHTML = `
+        <span>${escapeHtml(tr('contentEditor.currentText'))}</span>
+        <p>${escapeHtml(tr('contentEditor.selectHint'))}</p>
+      `;
+      return;
+    }
+    const groupLabel = entry.type === 'public' ? tr('contentEditor.publicLabel') : tr('contentEditor.systemLabel');
+    els.contentEditorSelection.innerHTML = `
+      <span>${escapeHtml(groupLabel)} / ${escapeHtml(entry.section)}</span>
+      <strong>${escapeHtml(entry.label)}</strong>
+      <p class="content-editor-key">${escapeHtml(entry.key)}</p>
+    `;
+    els.contentEditorPreview.innerHTML = `
+      <span>${escapeHtml(tr('contentEditor.currentText'))}</span>
+      <strong>${escapeHtml(entry.value || '-')}</strong>
+      <span>${escapeHtml(tr('contentEditor.defaultText'))}</span>
+      <p>${escapeHtml(entry.defaultValue || '-')}</p>
+    `;
+  }
+
+  function renderContentEditor() {
+    if (!els.contentEditorList) return;
+    applyPageContentOverrides();
+    if (els.contentEditorMode) els.contentEditorMode.value = state.contentEditorMode;
+    if (els.contentEditorSearch) els.contentEditorSearch.value = state.contentEditorSearch;
+    const allEntries = allContentEditorEntries();
+    renderContentSectionOptions(allEntries);
+    const entries = filteredContentEditorEntries(allEntries);
+    if (!entries.some((entry) => entry.id === state.selectedContentKey)) {
+      state.selectedContentKey = entries[0]?.id || '';
+    }
+    els.contentEditorList.innerHTML = entries.length ? entries.map((entry) => `
+      <label class="content-editor-row ${entry.id === state.selectedContentKey ? 'selected' : ''} ${entryChanged(entry) ? 'changed' : ''}" data-content-entry-id="${escapeHtml(entry.id)}">
+        <span class="content-editor-row-head">
+          <span class="content-editor-row-title">
+            <strong>${escapeHtml(entry.label)}</strong>
+            <span>${escapeHtml(entry.section)}</span>
+          </span>
+          <span class="content-editor-key">${escapeHtml(entry.key)}</span>
+        </span>
+        <textarea class="textarea" data-content-edit-type="${escapeHtml(entry.type)}" data-content-edit-kind="${escapeHtml(entry.kind)}" data-content-edit-key="${escapeHtml(entry.key)}">${escapeHtml(entry.value)}</textarea>
+      </label>
+    `).join('') : `<div class="empty">${tr('contentEditor.empty')}</div>`;
+    updateContentChangeCount(allEntries);
+    renderContentEditorPreview(contentEntryById(state.selectedContentKey));
+  }
+
+  function persistContentEdit(type, kind, key, value) {
+    if (type === 'public') {
+      const entry = getPublicContentEntries().find((item) => item.key === key && item.kind === kind);
+      const defaultValue = entry?.defaultValue ?? '';
+      if (String(value) === String(defaultValue)) {
+        delete state.pageContentOverrides[key];
+      } else {
+        state.pageContentOverrides[key] = value;
+      }
+      writeStoredJson(CONTENT_OVERRIDES_KEY, state.pageContentOverrides);
+      applyPageContentOverrides();
+      return;
+    }
+
+    const defaultValue = translationDefaultFor(key);
+    const localeOverrides = { ...(translationOverrides[currentLocale] || {}) };
+    if (String(value) === String(defaultValue)) {
+      delete localeOverrides[key];
+    } else {
+      localeOverrides[key] = value;
+    }
+    if (Object.keys(localeOverrides).length) {
+      translationOverrides[currentLocale] = localeOverrides;
+    } else {
+      delete translationOverrides[currentLocale];
+    }
+    writeStoredJson(TRANSLATION_OVERRIDES_KEY, translationOverrides);
+    updateStaticTranslations();
+    updateDateLabel();
+    if (!state.publicMode) setView(state.activeView);
+  }
+
+  function saveContentEditorEdits() {
+    if (els.contentEditorList) {
+      els.contentEditorList.querySelectorAll('[data-content-edit-key]').forEach((field) => {
+        persistContentEdit(field.dataset.contentEditType, field.dataset.contentEditKind, field.dataset.contentEditKey, field.value);
+      });
+    }
+    renderAll();
+    if (!state.publicMode) setView(state.activeView);
+    showToast(tr('toast.contentSaved'));
+  }
+
+  function resetContentEntry(entry) {
+    if (!entry) {
+      showToast(tr('toast.contentNoSelection'));
+      return;
+    }
+    if (entry.type === 'public') {
+      delete state.pageContentOverrides[entry.key];
+      writeStoredJson(CONTENT_OVERRIDES_KEY, state.pageContentOverrides);
+      applyPageContentOverrides();
+    } else {
+      const localeOverrides = { ...(translationOverrides[currentLocale] || {}) };
+      delete localeOverrides[entry.key];
+      if (Object.keys(localeOverrides).length) {
+        translationOverrides[currentLocale] = localeOverrides;
+      } else {
+        delete translationOverrides[currentLocale];
+      }
+      writeStoredJson(TRANSLATION_OVERRIDES_KEY, translationOverrides);
+      updateStaticTranslations();
+      updateDateLabel();
+    }
+    renderContentEditor();
+    if (!state.publicMode) setView(state.activeView);
+    showToast(tr('toast.contentReset'));
+  }
+
+  function resetVisibleContentEntries() {
+    const entries = filteredContentEditorEntries(allContentEditorEntries());
+    entries.forEach((entry) => {
+      if (entry.type === 'public') {
+        delete state.pageContentOverrides[entry.key];
+      } else {
+        const localeOverrides = { ...(translationOverrides[currentLocale] || {}) };
+        delete localeOverrides[entry.key];
+        if (Object.keys(localeOverrides).length) {
+          translationOverrides[currentLocale] = localeOverrides;
+        } else {
+          delete translationOverrides[currentLocale];
+        }
+      }
+    });
+    writeStoredJson(CONTENT_OVERRIDES_KEY, state.pageContentOverrides);
+    writeStoredJson(TRANSLATION_OVERRIDES_KEY, translationOverrides);
+    applyPageContentOverrides();
+    updateStaticTranslations();
+    updateDateLabel();
+    renderContentEditor();
+    if (!state.publicMode) setView(state.activeView);
+    showToast(tr('toast.contentReset'));
   }
 
   function sessionHeaders() {
@@ -12232,6 +12853,7 @@
 
   function renderAll() {
     renderAuthControls();
+    applyPageContentOverrides();
     renderPublicRegisterWizard();
     applySidebarState();
     applyRoleUi();
@@ -12255,6 +12877,7 @@
     renderConsents();
     renderPrivacy();
     renderSecurity();
+    renderContentEditor();
     renderUserAdmin();
   }
 
@@ -13261,6 +13884,74 @@
   els.languageSelect.addEventListener('change', (event) => {
     setLocale(event.target.value);
   });
+
+  if (els.contentEditorMode) {
+    els.contentEditorMode.addEventListener('change', (event) => {
+      state.contentEditorMode = event.target.value === 'system' ? 'system' : 'public';
+      state.contentEditorSection = 'all';
+      state.selectedContentKey = '';
+      renderContentEditor();
+    });
+  }
+
+  if (els.contentEditorSection) {
+    els.contentEditorSection.addEventListener('change', (event) => {
+      state.contentEditorSection = event.target.value || 'all';
+      state.selectedContentKey = '';
+      renderContentEditor();
+    });
+  }
+
+  if (els.contentEditorSearch) {
+    els.contentEditorSearch.addEventListener('input', (event) => {
+      state.contentEditorSearch = event.target.value;
+      state.selectedContentKey = '';
+      renderContentEditor();
+    });
+  }
+
+  if (els.contentEditorList) {
+    els.contentEditorList.addEventListener('click', (event) => {
+      const row = event.target.closest('[data-content-entry-id]');
+      if (!row) return;
+      state.selectedContentKey = row.dataset.contentEntryId;
+      els.contentEditorList.querySelectorAll('.content-editor-row').forEach((item) => {
+        item.classList.toggle('selected', item === row);
+      });
+      renderContentEditorPreview(contentEntryById(state.selectedContentKey));
+    });
+    els.contentEditorList.addEventListener('input', (event) => {
+      const field = event.target.closest('[data-content-edit-key]');
+      if (!field) return;
+      const row = field.closest('[data-content-entry-id]');
+      if (row) state.selectedContentKey = row.dataset.contentEntryId;
+      persistContentEdit(field.dataset.contentEditType, field.dataset.contentEditKind, field.dataset.contentEditKey, field.value);
+      const entry = contentEntryById(state.selectedContentKey);
+      if (row && entry) row.classList.toggle('changed', entryChanged(entry));
+      updateContentChangeCount(allContentEditorEntries());
+      renderContentEditorPreview(entry);
+    });
+  }
+
+  if (els.contentEditorSaveBtn) {
+    els.contentEditorSaveBtn.addEventListener('click', saveContentEditorEdits);
+  }
+
+  if (els.contentEditorResetAllBtn) {
+    els.contentEditorResetAllBtn.addEventListener('click', resetVisibleContentEntries);
+  }
+
+  if (els.contentEditorOpenPublicBtn) {
+    els.contentEditorOpenPublicBtn.addEventListener('click', () => {
+      showPublicSite({ persist: true });
+    });
+  }
+
+  if (els.contentEditorResetSelectedBtn) {
+    els.contentEditorResetSelectedBtn.addEventListener('click', () => {
+      resetContentEntry(contentEntryById(state.selectedContentKey));
+    });
+  }
 
   els.authUserSelect.addEventListener('change', async (event) => {
     await switchAuthUser(event.target.value);
