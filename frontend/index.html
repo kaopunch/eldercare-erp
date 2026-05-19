@@ -612,13 +612,28 @@
       position: sticky;
       top: 0;
       z-index: 20;
-      border-bottom: 1px solid var(--line);
-      background: rgba(255, 255, 255, .86);
-      backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(21, 34, 58, .08);
+      background:
+        linear-gradient(120deg, rgba(255, 255, 255, .96) 0%, rgba(247, 251, 255, .92) 56%, rgba(223, 248, 243, .72) 100%);
+      backdrop-filter: blur(22px) saturate(150%);
+      box-shadow: 0 18px 36px rgba(30, 67, 118, .08);
+      isolation: isolate;
+    }
+
+    .public-header::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--blue) 52%, var(--amber));
+      opacity: .7;
+      pointer-events: none;
     }
 
     .public-header-inner {
-      min-height: 72px;
+      min-height: 108px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -627,50 +642,143 @@
 
     .public-brand {
       display: inline-grid;
-      grid-template-columns: 42px minmax(0, 1fr);
-      gap: 11px;
+      grid-template-columns: auto max-content;
+      gap: 8px;
       align-items: center;
       color: var(--ink);
       text-decoration: none;
+      min-width: min(520px, 58vw);
+      min-height: 108px;
+      padding: 0 8px 0 0;
+      border-radius: var(--radius);
+      transition: background .15s ease, transform .15s ease;
     }
 
-    .public-brand strong {
-      display: block;
-      font-size: 16px;
-      line-height: 1.15;
-      font-family: var(--font-display);
-      font-weight: 850;
+    .public-brand:hover,
+    .public-brand:focus-visible {
+      background: rgba(255, 255, 255, .64);
+      outline: none;
+      transform: translateY(-1px);
     }
 
-    .public-brand span {
+    .public-brand .brand-mark {
+      display: none;
+    }
+
+    .public-logo-img {
       display: block;
-      margin-top: 3px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.3;
-      font-weight: 650;
+      width: auto;
+      max-width: 100%;
+      height: 100px;
+      object-fit: contain;
+      object-position: left center;
+      filter: drop-shadow(0 10px 18px rgba(18, 184, 166, .14));
+    }
+
+    .public-brand > span {
+      display: block;
+      width: max-content;
+      max-width: none;
+      margin-top: 0;
+      margin-left: 0;
+      padding: 6px 12px;
+      border-left: 3px solid rgba(18, 184, 166, .38);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      background: linear-gradient(90deg, rgba(223, 248, 243, .78), rgba(255, 255, 255, 0));
+      color: var(--accent-strong);
+      font-size: 14px;
+      line-height: 1.35;
+      font-weight: 800;
+      letter-spacing: 0;
+      text-transform: none;
+      white-space: nowrap;
+    }
+
+    .public-menu {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex: 0 0 auto;
+    }
+
+    .public-menu-toggle {
+      min-height: 44px;
+      padding: 10px 14px;
+      gap: 8px;
+      border-color: rgba(18, 184, 166, .18);
+      background: rgba(255, 255, 255, .82);
+      color: var(--ink);
+      box-shadow: 0 14px 28px rgba(30, 67, 118, .1);
+    }
+
+    .public-menu-toggle svg {
+      width: 18px;
+      height: 18px;
     }
 
     .public-nav {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 8px;
-      flex-wrap: wrap;
+      position: absolute;
+      top: calc(100% + 12px);
+      right: 0;
+      z-index: 30;
+      display: grid;
+      gap: 6px;
+      width: min(280px, calc(100vw - 32px));
+      padding: 8px;
+      border: 1px solid rgba(21, 34, 58, .08);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .96);
+      box-shadow: 0 24px 52px rgba(30, 67, 118, .18), 0 1px 0 rgba(255, 255, 255, .92) inset;
+      backdrop-filter: blur(18px) saturate(150%);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateY(-6px) scale(.98);
+      transform-origin: top right;
+      transition: opacity .16s ease, transform .16s ease, visibility .16s ease;
     }
 
-    .public-login-actions {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 8px;
-      flex-wrap: wrap;
-      padding-left: 10px;
-      border-left: 1px solid var(--line);
+    .public-menu.open .public-nav {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
     }
 
-    .public-login-actions .btn {
+    .public-nav .btn {
+      min-height: 42px;
+      width: 100%;
+      justify-content: flex-start;
+      padding: 10px 12px;
+      border-color: transparent;
+      background: transparent;
+      color: var(--muted);
+      box-shadow: none;
+      flex: none;
       white-space: nowrap;
+    }
+
+    .public-nav .btn:hover,
+    .public-nav .btn:focus-visible {
+      background: #ffffff;
+      border-color: rgba(18, 184, 166, .18);
+      color: var(--accent-strong);
+      box-shadow: 0 8px 18px rgba(30, 67, 118, .08);
+    }
+
+    .public-nav .btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .public-nav .btn.primary {
+      margin-top: 4px;
+      justify-content: center;
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--accent), var(--blue));
+      color: #ffffff;
+      box-shadow: 0 14px 26px rgba(18, 184, 166, .22);
     }
 
     .public-section {
@@ -3242,6 +3350,19 @@
         grid-template-columns: 1fr;
       }
 
+      .public-header-inner {
+        flex-wrap: wrap;
+      }
+
+      .public-brand {
+        min-width: 0;
+        flex: 1 1 100%;
+      }
+
+      .public-nav {
+        max-width: none;
+      }
+
       .guide-map-node::after {
         display: none;
       }
@@ -3552,25 +3673,58 @@
       }
 
       .public-header-inner {
-        align-items: flex-start;
-        flex-direction: column;
-        padding: 12px 0;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 0;
+        min-height: 0;
       }
 
-      .public-nav,
-      .public-login-actions,
+      .public-brand {
+        grid-column: 1 / -1;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 4px;
+        min-width: 0;
+        min-height: 0;
+        width: 100%;
+        padding: 2px 4px 4px 0;
+      }
+
+      .public-logo-img {
+        width: min(390px, 100%);
+        height: auto;
+        max-height: 86px;
+      }
+
+      .public-brand > span {
+        width: fit-content;
+        max-width: calc(100vw - 66px);
+        margin-top: -2px;
+        margin-left: 34px;
+        padding: 3px 10px;
+        font-size: clamp(11px, 3vw, 12px);
+        white-space: nowrap;
+      }
+
+      .public-menu {
+        grid-column: 2;
+        grid-row: 2;
+        align-self: end;
+      }
+
+      .public-menu-toggle {
+        min-height: 42px;
+        padding-inline: 12px;
+      }
+
       .public-actions {
         width: 100%;
       }
 
-      .public-nav,
-      .public-login-actions {
-        justify-content: flex-start;
-      }
-
-      .public-login-actions {
-        padding-left: 0;
-        border-left: 0;
+      .public-nav {
+        right: 0;
+        width: min(260px, calc(100vw - 32px));
       }
 
       .public-copy h1 {
@@ -3664,6 +3818,9 @@
   <symbol id="icon-chevron-right" viewBox="0 0 24 24">
     <path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
   </symbol>
+  <symbol id="icon-menu" viewBox="0 0 24 24">
+    <path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  </symbol>
 </svg>
 
 <section class="public-site" id="publicSite">
@@ -3671,34 +3828,36 @@
     <div class="public-wrap public-header-inner">
       <a class="public-brand" href="#top" aria-label="SandyCare" data-public-home>
         <div class="brand-mark"><svg><use href="#icon-heart"/></svg></div>
-        <span>
-          <strong>SandyCare</strong>
-          <span>Assisted non-emergency elder transport</span>
-        </span>
+        <img class="public-logo-img" src="assets/sandycare-logo.png" alt="SandyCare">
+        <span>ดูแลด้วยใจ ให้ครอบครัวอุ่นใจทุกวัน</span>
       </a>
-      <nav class="public-nav" aria-label="Customer website navigation">
-        <button class="btn ghost" type="button" data-public-scroll="#status">
-          <svg><use href="#icon-calendar"/></svg>
-          <span>สถานะงาน</span>
+      <div class="public-menu" id="publicMenu">
+        <button class="btn ghost public-menu-toggle" type="button" id="publicMenuToggle" aria-expanded="false" aria-controls="publicNavMenu">
+          <svg><use href="#icon-menu"/></svg>
+          <span>เมนู</span>
         </button>
-        <button class="btn ghost" type="button" data-public-scroll="#pricing">
-          <svg><use href="#icon-shield"/></svg>
-          <span>ราคา</span>
-        </button>
-        <button class="btn ghost" type="button" data-public-scroll="#contact">
-          <svg><use href="#icon-send"/></svg>
-          <span>ติดต่อเรา</span>
-        </button>
-        <button class="btn ghost" type="button" data-public-entry="register">
-          <svg><use href="#icon-profile"/></svg>
-          <span>ลงทะเบียนลูกค้า</span>
-        </button>
-      </nav>
-      <div class="public-login-actions" aria-label="เข้าสู่ระบบ">
-        <button class="btn primary" type="button" data-public-entry="login">
-          <svg><use href="#icon-profile"/></svg>
-          <span>เข้าสู่ระบบ</span>
-        </button>
+        <nav class="public-nav" id="publicNavMenu" aria-label="Customer website navigation">
+          <button class="btn ghost" type="button" data-public-scroll="#status">
+            <svg><use href="#icon-calendar"/></svg>
+            <span>สถานะงาน</span>
+          </button>
+          <button class="btn ghost" type="button" data-public-scroll="#pricing">
+            <svg><use href="#icon-shield"/></svg>
+            <span>ราคา</span>
+          </button>
+          <button class="btn ghost" type="button" data-public-scroll="#contact">
+            <svg><use href="#icon-send"/></svg>
+            <span>ติดต่อเรา</span>
+          </button>
+          <button class="btn ghost" type="button" data-public-entry="register">
+            <svg><use href="#icon-profile"/></svg>
+            <span>ลงทะเบียนลูกค้า</span>
+          </button>
+          <button class="btn primary" type="button" data-public-entry="login">
+            <svg><use href="#icon-profile"/></svg>
+            <span>เข้าสู่ระบบ</span>
+          </button>
+        </nav>
       </div>
     </div>
   </header>
@@ -12938,16 +13097,41 @@
     });
   }
 
+  const publicMenu = document.getElementById('publicMenu');
+  const publicMenuToggle = document.getElementById('publicMenuToggle');
+
+  function setPublicMenuOpen(open) {
+    if (!publicMenu || !publicMenuToggle) return;
+    publicMenu.classList.toggle('open', Boolean(open));
+    publicMenuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+
+  publicMenuToggle?.addEventListener('click', (event) => {
+    event.stopPropagation();
+    setPublicMenuOpen(!publicMenu?.classList.contains('open'));
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!publicMenu?.classList.contains('open')) return;
+    if (!publicMenu.contains(event.target)) setPublicMenuOpen(false);
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') setPublicMenuOpen(false);
+  });
+
   document.querySelectorAll('[data-public-scroll]').forEach((button) => {
     button.addEventListener('click', () => {
       const target = document.querySelector(button.dataset.publicScroll);
       if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setPublicMenuOpen(false);
     });
   });
 
   document.querySelectorAll('[data-public-entry]').forEach((button) => {
     button.addEventListener('click', () => {
       showPublicEntry(button.dataset.publicEntry);
+      setPublicMenuOpen(false);
     });
   });
 
@@ -12955,6 +13139,7 @@
     button.addEventListener('click', (event) => {
       event.preventDefault();
       showPublicSite({ persist: true });
+      setPublicMenuOpen(false);
     });
   });
 
