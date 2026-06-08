@@ -5395,22 +5395,22 @@
         <div class="public-panel-header">
           <div>
             <h3>ทีมงานเข้าใช้งาน ERP</h3>
-            <p>ใช้อีเมลผู้ใช้และ PIN เพื่อเข้า dispatch, portal, finance, reports และ user admin ตามสิทธิ์</p>
+            <p>ใช้ user และ password เพื่อเข้า dispatch, portal, finance, reports และ user admin ตามสิทธิ์</p>
           </div>
         </div>
         <div class="public-panel-body">
           <form class="public-login-stack" id="publicStaffLoginForm">
             <label class="field wide public-login-email-field" id="publicStaffEmailField">
-              <span>อีเมลผู้ใช้</span>
-              <input class="input" id="publicStaffEmailInput" name="email" type="email" inputmode="email" autocomplete="username" placeholder="เช่น admin@example.com">
+              <span>User / Email</span>
+              <input class="input" id="publicStaffEmailInput" name="username" type="text" autocomplete="username" placeholder="เช่น admin@example.com">
             </label>
             <label class="field wide public-login-directory-field" id="publicStaffDirectoryField">
               <span>ผู้ใช้ / บทบาท</span>
               <select class="select" id="publicStaffUserSelect" name="user"></select>
             </label>
             <label class="field wide" id="publicStaffPinField">
-              <span>PIN / รหัสผ่าน</span>
-              <input class="input" id="publicStaffPinInput" name="pin" type="password" inputmode="numeric" autocomplete="current-password" placeholder="กรอก PIN">
+              <span>Password</span>
+              <input class="input" id="publicStaffPinInput" name="password" type="password" autocomplete="current-password" placeholder="กรอกรหัสผ่าน">
             </label>
             <button class="btn primary" type="submit" id="publicStaffLoginBtn">
               <svg><use href="#icon-shield"/></svg>
@@ -5581,7 +5581,7 @@
         <select class="select lang-select" id="authUserSelect" aria-label="User role" data-i18n-aria="aria.userRole">
           <option value="">Loading user</option>
         </select>
-        <input class="input auth-pin-input" id="authPinInput" type="password" inputmode="numeric" autocomplete="current-password" placeholder="PIN" data-i18n-placeholder="auth.pin" hidden>
+        <input class="input auth-pin-input" id="authPinInput" type="password" autocomplete="current-password" placeholder="Password" data-i18n-placeholder="auth.pin" hidden>
         <button class="btn primary auth-action" type="button" id="authLoginBtn" data-i18n="auth.login" hidden>Login</button>
         <button class="btn ghost auth-action" type="button" id="authLogoutBtn" data-i18n="auth.logout" hidden>Logout</button>
         <select class="select lang-select" id="languageSelect" aria-label="Language" data-i18n-aria="aria.language">
@@ -6989,7 +6989,7 @@
             <strong id="securityActiveUsers">0</strong>
           </div>
           <div class="score-card">
-            <span data-i18n="security.rotationRequired">PIN rotation</span>
+            <span data-i18n="security.rotationRequired">Password rotation</span>
             <strong id="securityRotationUsers">0</strong>
           </div>
           <div class="score-card">
@@ -6997,7 +6997,7 @@
             <strong id="securityLockedUsers">0</strong>
           </div>
           <div class="score-card">
-            <span data-i18n="security.failedAttempts">Failed PIN</span>
+            <span data-i18n="security.failedAttempts">Failed password</span>
             <strong id="securityFailedAttempts">0</strong>
           </div>
         </div>
@@ -7007,7 +7007,7 @@
             <div class="panel-header">
               <div>
                 <h3 data-i18n="security.readinessTitle">Production Readiness</h3>
-                <p data-i18n="security.readinessSubtitle">PIN, storage, audit และ session control</p>
+                <p data-i18n="security.readinessSubtitle">Password, storage, audit และ session control</p>
               </div>
             </div>
             <div class="table-wrap">
@@ -7050,7 +7050,7 @@
           <div class="panel-header">
             <div>
               <h3 data-i18n="security.auditTitle">Security Audit</h3>
-              <p data-i18n="security.auditSubtitle">Login, PIN, user และ session events</p>
+              <p data-i18n="security.auditSubtitle">Login, password, user และ session events</p>
             </div>
           </div>
           <div class="table-wrap">
@@ -7132,7 +7132,7 @@
               <article class="guide-feature">
                 <svg><use href="#icon-shield"/></svg>
                 <strong>Governance &amp; Security</strong>
-                <span>จัดการ consent, privacy audit, session, readiness, role และ PIN เพื่อพร้อมใช้งาน production</span>
+                <span>จัดการ consent, privacy audit, session, readiness, role และ password เพื่อพร้อมใช้งาน production</span>
               </article>
             </div>
           </div>
@@ -7447,8 +7447,8 @@
                   </select>
                 </label>
                 <label class="field">
-                  <span data-i18n="users.pin">PIN</span>
-                  <input class="input" name="pin" type="password" inputmode="numeric" autocomplete="new-password" placeholder="582914" required>
+                  <span data-i18n="users.pin">Password</span>
+                  <input class="input" name="password" type="password" autocomplete="new-password" placeholder="ตั้งรหัสผ่าน" required>
                 </label>
                 <div class="wide">
                   <button class="btn primary" type="submit">
@@ -7464,7 +7464,7 @@
             <div class="panel-header">
               <div>
                 <h3 data-i18n="users.title">User Admin</h3>
-                <p data-i18n="users.subtitle">จัดการ role, status, PIN และ lockout</p>
+                <p data-i18n="users.subtitle">จัดการ role, status, password และ lockout</p>
               </div>
             </div>
             <div class="table-wrap">
@@ -7493,28 +7493,28 @@
   <section class="modal-card" aria-labelledby="pinRotateTitle">
     <div class="panel-header">
       <div>
-        <h3 id="pinRotateTitle" data-i18n="auth.pinRotateTitle">เปลี่ยน PIN</h3>
-        <p data-i18n="auth.pinRotateSubtitle">ตั้ง PIN ใหม่ก่อนเข้าใช้งานระบบต่อ</p>
+        <h3 id="pinRotateTitle" data-i18n="auth.pinRotateTitle">เปลี่ยนรหัสผ่าน</h3>
+        <p data-i18n="auth.pinRotateSubtitle">ตั้งรหัสผ่านใหม่ก่อนเข้าใช้งานระบบต่อ</p>
       </div>
     </div>
     <div class="panel-body">
       <form class="form-grid" id="pinRotateForm">
         <label class="field wide">
-          <span data-i18n="auth.currentPin">PIN ปัจจุบัน</span>
-          <input class="input" id="pinRotateCurrent" name="current_pin" type="password" inputmode="numeric" autocomplete="current-password" required>
+          <span data-i18n="auth.currentPin">รหัสผ่านปัจจุบัน</span>
+          <input class="input" id="pinRotateCurrent" name="current_password" type="password" autocomplete="current-password" required>
         </label>
         <label class="field wide">
-          <span data-i18n="auth.newPin">PIN ใหม่</span>
-          <input class="input" id="pinRotateNew" name="new_pin" type="password" inputmode="numeric" autocomplete="new-password" required>
+          <span data-i18n="auth.newPin">รหัสผ่านใหม่</span>
+          <input class="input" id="pinRotateNew" name="new_password" type="password" autocomplete="new-password" required>
         </label>
         <label class="field wide">
-          <span data-i18n="auth.confirmPin">ยืนยัน PIN ใหม่</span>
-          <input class="input" name="confirm_pin" type="password" inputmode="numeric" autocomplete="new-password" required>
+          <span data-i18n="auth.confirmPin">ยืนยันรหัสผ่านใหม่</span>
+          <input class="input" name="confirm_password" type="password" autocomplete="new-password" required>
         </label>
         <div class="wide actions">
           <button class="btn primary" type="submit">
             <svg><use href="#icon-shield"/></svg>
-            <span data-i18n="auth.changePin">เปลี่ยน PIN</span>
+            <span data-i18n="auth.changePin">เปลี่ยนรหัสผ่าน</span>
           </button>
           <button class="btn ghost" type="button" id="pinRotateLogoutBtn" data-i18n="auth.logout">ออก</button>
         </div>
@@ -7607,22 +7607,22 @@
       'auth.demoFallback': 'ใช้ demo session ชั่วคราว',
       'auth.login': 'เข้าสู่ระบบ',
       'auth.logout': 'ออก',
-      'auth.pin': 'PIN',
-      'auth.loginRequired': 'กรุณากรอกอีเมลผู้ใช้หรือเลือกผู้ใช้ และกรอก PIN',
+      'auth.pin': 'Password',
+      'auth.loginRequired': 'กรุณากรอก user และ password',
       'auth.loggedIn': 'เข้าสู่ระบบเป็น {role} แล้ว',
       'auth.loggedOut': 'ออกจากระบบแล้ว',
       'auth.sessionExpired': 'Session หมดอายุ กรุณาเข้าสู่ระบบใหม่',
       'auth.switched': 'สลับสิทธิ์เป็น {role} แล้ว',
       'auth.viewBlocked': 'สิทธิ์นี้เข้าเมนูนั้นไม่ได้',
-      'auth.pinRotateRequired': 'ต้องเปลี่ยน PIN ก่อนใช้งานต่อ',
-      'auth.pinRotateTitle': 'เปลี่ยน PIN',
-      'auth.pinRotateSubtitle': 'ตั้ง PIN ใหม่ก่อนเข้าใช้งานระบบต่อ',
-      'auth.currentPin': 'PIN ปัจจุบัน',
-      'auth.newPin': 'PIN ใหม่',
-      'auth.confirmPin': 'ยืนยัน PIN ใหม่',
-      'auth.changePin': 'เปลี่ยน PIN',
-      'auth.pinMismatch': 'PIN ใหม่ไม่ตรงกัน',
-      'auth.pinChanged': 'เปลี่ยน PIN แล้ว',
+      'auth.pinRotateRequired': 'ต้องเปลี่ยนรหัสผ่านก่อนใช้งานต่อ',
+      'auth.pinRotateTitle': 'เปลี่ยนรหัสผ่าน',
+      'auth.pinRotateSubtitle': 'ตั้งรหัสผ่านใหม่ก่อนเข้าใช้งานระบบต่อ',
+      'auth.currentPin': 'รหัสผ่านปัจจุบัน',
+      'auth.newPin': 'รหัสผ่านใหม่',
+      'auth.confirmPin': 'ยืนยันรหัสผ่านใหม่',
+      'auth.changePin': 'เปลี่ยนรหัสผ่าน',
+      'auth.pinMismatch': 'รหัสผ่านใหม่ไม่ตรงกัน',
+      'auth.pinChanged': 'เปลี่ยนรหัสผ่านแล้ว',
       'common.loading': 'รอข้อมูล',
       'common.completed': 'completed',
       'common.pending': 'pending',
@@ -7677,7 +7677,7 @@
       'view.security.title': 'Security',
       'view.security.subtitle': 'ตรวจ session, audit และ readiness สำหรับ production',
       'view.users.title': 'User Admin',
-      'view.users.subtitle': 'สร้างผู้ใช้จริงและดูแล PIN สำหรับ production auth',
+      'view.users.subtitle': 'สร้างผู้ใช้จริงและดูแล password สำหรับ production auth',
       'contentEditor.title': 'แก้ไขข้อความบนหน้าเพจ',
       'contentEditor.subtitle': 'ปรับ copy หน้าเว็บไซต์และข้อความระบบจาก layout เดิม พร้อมบันทึกไว้ใน browser นี้',
       'contentEditor.save': 'บันทึก',
@@ -8106,15 +8106,15 @@
       'privacy.actor': 'Actor',
       'privacy.empty': 'ยังไม่มี audit log',
       'security.activeUsers': 'Active users',
-      'security.rotationRequired': 'PIN rotation',
+      'security.rotationRequired': 'Password rotation',
       'security.lockedUsers': 'Locked users',
-      'security.failedAttempts': 'Failed PIN',
+      'security.failedAttempts': 'Failed password',
       'security.readinessTitle': 'Production Readiness',
-      'security.readinessSubtitle': 'PIN, storage, audit และ session control',
+      'security.readinessSubtitle': 'Password, storage, audit และ session control',
       'security.sessionTitle': 'Session Control',
       'security.sessionSubtitle': 'Logout และ revoke session จาก backend',
       'security.auditTitle': 'Security Audit',
-      'security.auditSubtitle': 'Login, PIN, user และ session events',
+      'security.auditSubtitle': 'Login, password, user และ session events',
       'security.check': 'Check',
       'security.detail': 'Detail',
       'security.reason': 'Reason',
@@ -8126,7 +8126,7 @@
       'security.emptyReadiness': 'ยังไม่มี readiness check',
       'security.emptySessions': 'ยังไม่มี session revocation',
       'users.title': 'User Admin',
-      'users.subtitle': 'จัดการ role, status, PIN และ lockout',
+      'users.subtitle': 'จัดการ role, status, password และ lockout',
       'users.createTitle': 'Create App User',
       'users.createSubtitle': 'เพิ่มผู้ใช้สำหรับ role หน้างานและการเงิน',
       'users.fullName': 'ชื่อผู้ใช้',
@@ -8134,24 +8134,24 @@
       'users.phone': 'โทร',
       'users.role': 'Role',
       'users.status': 'Status',
-      'users.pin': 'PIN',
+      'users.pin': 'Password',
       'users.create': 'สร้างผู้ใช้',
       'users.user': 'User',
       'users.login': 'Login',
       'users.lastLogin': 'Last login',
       'users.actions': 'Actions',
-      'users.pinConfigured': 'PIN พร้อม',
-      'users.pinMissing': 'ยังไม่มี PIN',
-      'users.mustRotate': 'ต้องเปลี่ยน PIN',
+      'users.pinConfigured': 'Password พร้อม',
+      'users.pinMissing': 'ยังไม่มี password',
+      'users.mustRotate': 'ต้องเปลี่ยน password',
       'users.locked': 'ล็อกอยู่',
       'users.failed': 'ผิด {count} ครั้ง',
-      'users.resetPin': 'Reset PIN',
+      'users.resetPin': 'Reset password',
       'users.unlock': 'Unlock',
       'users.activate': 'Activate',
       'users.suspend': 'Suspend',
       'users.revokeSessions': 'Revoke sessions',
       'users.empty': 'ยังไม่มีผู้ใช้',
-      'users.resetPinPrompt': 'ใส่ PIN ใหม่ 4-12 ตัวเลข',
+      'users.resetPinPrompt': 'ใส่ password ใหม่',
       'status.confirmed': 'รอจัดสรร',
       'status.assigned': 'มอบหมายแล้ว',
       'status.arrived': 'ถึงจุดรับ',
@@ -8224,7 +8224,7 @@
       'toast.privacyLogged': 'บันทึก privacy audit แล้ว',
       'toast.privacyPreviewLoaded': 'โหลดข้อมูลตามสิทธิ์แล้ว',
       'toast.userCreated': 'สร้างผู้ใช้ {name} แล้ว',
-      'toast.userPinReset': 'Reset PIN แล้ว',
+      'toast.userPinReset': 'Reset password แล้ว',
       'toast.userUnlocked': 'ปลดล็อกผู้ใช้แล้ว',
       'toast.userStatusUpdated': 'อัปเดตสถานะผู้ใช้แล้ว',
       'toast.userSessionsRevoked': 'Revoke session ผู้ใช้แล้ว',
@@ -8378,22 +8378,22 @@
       'auth.demoFallback': 'Using a temporary demo session',
       'auth.login': 'Login',
       'auth.logout': 'Logout',
-      'auth.pin': 'PIN',
-      'auth.loginRequired': 'Enter user email or select a user, then enter PIN',
+      'auth.pin': 'Password',
+      'auth.loginRequired': 'Enter user and password',
       'auth.loggedIn': 'Logged in as {role}',
       'auth.loggedOut': 'Logged out',
       'auth.sessionExpired': 'Session expired. Please log in again',
       'auth.switched': 'Switched to {role}',
       'auth.viewBlocked': 'This role cannot open that view',
-      'auth.pinRotateRequired': 'Change your PIN before continuing',
-      'auth.pinRotateTitle': 'Change PIN',
-      'auth.pinRotateSubtitle': 'Set a new PIN before continuing to the system',
-      'auth.currentPin': 'Current PIN',
-      'auth.newPin': 'New PIN',
-      'auth.confirmPin': 'Confirm new PIN',
-      'auth.changePin': 'Change PIN',
-      'auth.pinMismatch': 'New PINs do not match',
-      'auth.pinChanged': 'PIN changed',
+      'auth.pinRotateRequired': 'Change your password before continuing',
+      'auth.pinRotateTitle': 'Change password',
+      'auth.pinRotateSubtitle': 'Set a new password before continuing to the system',
+      'auth.currentPin': 'Current password',
+      'auth.newPin': 'New password',
+      'auth.confirmPin': 'Confirm new password',
+      'auth.changePin': 'Change password',
+      'auth.pinMismatch': 'New passwords do not match',
+      'auth.pinChanged': 'Password changed',
       'common.loading': 'Loading',
       'common.completed': 'completed',
       'common.pending': 'pending',
@@ -8448,7 +8448,7 @@
       'view.security.title': 'Security',
       'view.security.subtitle': 'Review sessions, audit events, and production readiness',
       'view.users.title': 'User Admin',
-      'view.users.subtitle': 'Create real users and manage production PIN auth',
+      'view.users.subtitle': 'Create real users and manage production password auth',
       'contentEditor.title': 'Edit Page Text',
       'contentEditor.subtitle': 'Adjust website copy and system labels from the existing layout, saved in this browser',
       'contentEditor.save': 'Save',
@@ -8877,15 +8877,15 @@
       'privacy.actor': 'Actor',
       'privacy.empty': 'No audit logs yet',
       'security.activeUsers': 'Active users',
-      'security.rotationRequired': 'PIN rotation',
+      'security.rotationRequired': 'Password rotation',
       'security.lockedUsers': 'Locked users',
-      'security.failedAttempts': 'Failed PIN',
+      'security.failedAttempts': 'Failed password',
       'security.readinessTitle': 'Production Readiness',
-      'security.readinessSubtitle': 'PIN, storage, audit, and session control',
+      'security.readinessSubtitle': 'Password, storage, audit, and session control',
       'security.sessionTitle': 'Session Control',
       'security.sessionSubtitle': 'Backend logout and admin session revocation',
       'security.auditTitle': 'Security Audit',
-      'security.auditSubtitle': 'Login, PIN, user, and session events',
+      'security.auditSubtitle': 'Login, password, user, and session events',
       'security.check': 'Check',
       'security.detail': 'Detail',
       'security.reason': 'Reason',
@@ -8897,7 +8897,7 @@
       'security.emptyReadiness': 'No readiness checks',
       'security.emptySessions': 'No session revocations',
       'users.title': 'User Admin',
-      'users.subtitle': 'Manage roles, status, PINs, and lockouts',
+      'users.subtitle': 'Manage roles, status, passwords, and lockouts',
       'users.createTitle': 'Create App User',
       'users.createSubtitle': 'Add users for field, dispatch, and finance roles',
       'users.fullName': 'Full name',
@@ -8905,24 +8905,24 @@
       'users.phone': 'Phone',
       'users.role': 'Role',
       'users.status': 'Status',
-      'users.pin': 'PIN',
+      'users.pin': 'Password',
       'users.create': 'Create user',
       'users.user': 'User',
       'users.login': 'Login',
       'users.lastLogin': 'Last login',
       'users.actions': 'Actions',
-      'users.pinConfigured': 'PIN ready',
-      'users.pinMissing': 'No PIN',
-      'users.mustRotate': 'Must change PIN',
+      'users.pinConfigured': 'Password ready',
+      'users.pinMissing': 'No password',
+      'users.mustRotate': 'Must change password',
       'users.locked': 'Locked',
       'users.failed': '{count} failed',
-      'users.resetPin': 'Reset PIN',
+      'users.resetPin': 'Reset password',
       'users.unlock': 'Unlock',
       'users.activate': 'Activate',
       'users.suspend': 'Suspend',
       'users.revokeSessions': 'Revoke sessions',
       'users.empty': 'No users yet',
-      'users.resetPinPrompt': 'Enter a new 4-12 digit PIN',
+      'users.resetPinPrompt': 'Enter a new password',
       'status.confirmed': 'Waiting',
       'status.assigned': 'Assigned',
       'status.arrived': 'Arrived',
@@ -8995,7 +8995,7 @@
       'toast.privacyLogged': 'Privacy audit logged',
       'toast.privacyPreviewLoaded': 'Allowed profile loaded',
       'toast.userCreated': 'User {name} created',
-      'toast.userPinReset': 'PIN reset',
+      'toast.userPinReset': 'Password reset',
       'toast.userUnlocked': 'User unlocked',
       'toast.userStatusUpdated': 'User status updated',
       'toast.userSessionsRevoked': 'User sessions revoked',
@@ -10334,6 +10334,14 @@
     });
   }
 
+  function schedulePublicEntryFocus({ smooth = false } = {}) {
+    focusPublicEntry({ smooth });
+    if (state.publicEntry !== 'staff') return;
+    [250, 900].forEach((delay) => {
+      window.setTimeout(() => focusPublicEntry({ smooth: false }), delay);
+    });
+  }
+
   function showPublicEntry(entry) {
     const nextEntry = entry === 'staff' ? 'staff' : entry === 'login' ? 'login' : 'register';
     state.publicMode = true;
@@ -10346,7 +10354,7 @@
       renderPublicServiceDescription();
     }
     renderAuthControls();
-    focusPublicEntry();
+    schedulePublicEntryFocus({ smooth: true });
   }
 
   async function enterErpShell({ persist = true, load = true } = {}) {
@@ -10397,7 +10405,7 @@
     if (els.publicStaffLoginResult) {
       const text = state.session
         ? `พร้อมเข้า ERP เป็น ${ROLE_LABELS[state.session.role] || state.session.role}`
-        : (pinMode ? 'กรอกอีเมลผู้ใช้และ PIN เพื่อเข้า ERP' : 'เลือกผู้ใช้เพื่อเข้า ERP');
+        : (pinMode ? 'กรอก user และ password เพื่อเข้า ERP' : 'เลือกผู้ใช้เพื่อเข้า ERP');
       els.publicStaffLoginResult.innerHTML = `<strong>สถานะ</strong><span>${escapeHtml(text)}</span>`;
     }
   }
@@ -10414,22 +10422,22 @@
 
   async function loginWithPublicStaffForm(form, button) {
     const user = selectedPublicStaffUser();
-    const email = String(els.publicStaffEmailInput?.value || '').trim();
-    const pin = String(els.publicStaffPinInput?.value || '').trim();
+    const username = String(els.publicStaffEmailInput?.value || '').trim();
+    const password = String(els.publicStaffPinInput?.value || '').trim();
     if (state.session && (!user || user.id === state.session.id || user.role === state.session.role)) {
       await enterErpShell({ persist: true, load: true });
       return;
     }
     const pinMode = Boolean(state.authConfig.pin_required);
-    const needsPin = Boolean(pinMode && (email || user?.id));
-    if ((pinMode && (!email || !pin)) || (!pinMode && !user)) {
+    const needsPassword = Boolean(pinMode && (username || user?.id));
+    if ((pinMode && (!username || !password)) || (!pinMode && !user)) {
       showToast(tr('auth.loginRequired'));
       return;
     }
     setButtonBusy(button, true);
     try {
       const body = pinMode
-        ? { email, ...(needsPin ? { pin } : {}) }
+        ? { username, ...(needsPassword ? { password } : {}) }
         : (user.id ? { user_id: user.id } : { role: user.role });
       const sessionResult = await apiPost('/api/auth/session', body, { skipAuth: true });
       state.session = sessionResult.session || user;
@@ -11897,7 +11905,7 @@
       ? state.authUsers.map((user) => {
         const value = user.id || user.role;
         const role = ROLE_LABELS[user.role] || prettifyCode(user.role);
-        const suffix = user.pin_configured === false && state.authConfig.pin_required ? ' - PIN' : '';
+        const suffix = user.pin_configured === false && state.authConfig.pin_required ? ' - password' : '';
         return `<option value="${escapeHtml(value)}" ${value === selected ? 'selected' : ''}>${escapeHtml(user.full_name)} / ${escapeHtml(role)}${suffix}</option>`;
       }).join('')
       : `<option value="">${tr('auth.noUsers')}</option>`;
@@ -12045,14 +12053,14 @@
   async function loginWithPin() {
     const value = els.authUserSelect.value;
     const user = state.authUsers.find((item) => item.id === value);
-    const pin = els.authPinInput.value.trim();
-    if (!user || !pin) {
+    const password = els.authPinInput.value.trim();
+    if (!user || !password) {
       showToast(tr('auth.loginRequired'));
       return;
     }
     setButtonBusy(els.authLoginBtn, true);
     try {
-      const sessionResult = await apiPost('/api/auth/session', { user_id: user.id, pin }, { skipAuth: true });
+      const sessionResult = await apiPost('/api/auth/session', { user_id: user.id, password }, { skipAuth: true });
       state.session = sessionResult.session || user;
       state.pendingAuthUserValue = '';
       localStorage.setItem('eldercare.sessionUserId', state.session.id);
@@ -12096,18 +12104,18 @@
 
   async function changeRequiredPin(form, button) {
     const input = new FormData(form);
-    const currentPin = String(input.get('current_pin') || '').trim();
-    const newPin = String(input.get('new_pin') || '').trim();
-    const confirmPin = String(input.get('confirm_pin') || '').trim();
-    if (!currentPin || !newPin || newPin !== confirmPin) {
+    const currentPassword = String(input.get('current_password') || input.get('current_pin') || '').trim();
+    const newPassword = String(input.get('new_password') || input.get('new_pin') || '').trim();
+    const confirmPassword = String(input.get('confirm_password') || input.get('confirm_pin') || '').trim();
+    if (!currentPassword || !newPassword || newPassword !== confirmPassword) {
       showToast(tr('auth.pinMismatch'));
       return;
     }
 
     await withSaveToast(button, async () => {
-      const result = await apiPost('/api/auth/pin', {
-        current_pin: currentPin,
-        new_pin: newPin
+      const result = await apiPost('/api/auth/password', {
+        current_password: currentPassword,
+        new_password: newPassword
       });
       state.session = result.session || { ...state.session, must_rotate_pin: false };
       if (state.session?.id) localStorage.setItem('eldercare.sessionUserId', state.session.id);
@@ -14717,7 +14725,7 @@
       phone: input.get('phone'),
       role: input.get('role'),
       status: input.get('status') || 'active',
-      pin: input.get('pin')
+      password: input.get('password')
     };
     await withSaveToast(button, async () => {
       const result = await apiPost('/api/users', payload);
@@ -14728,10 +14736,10 @@
   }
 
   async function resetAdminUserPin(user, button) {
-    const pin = window.prompt(tr('users.resetPinPrompt'), '');
-    if (!pin) return;
+    const password = window.prompt(tr('users.resetPinPrompt'), '');
+    if (!password) return;
     await withSaveToast(button, async () => {
-      await apiPost(`/api/users/${encodeURIComponent(user.id)}/pin`, { pin });
+      await apiPost(`/api/users/${encodeURIComponent(user.id)}/password`, { password });
       await refreshUserAdminState();
       renderAll();
       showToast(tr('toast.userPinReset'));
@@ -15421,7 +15429,7 @@
   });
 
   syncShellMode();
-  focusPublicEntry({ smooth: false });
+  schedulePublicEntryFocus({ smooth: false });
 
   initializeAuth().then(() => {
     setLocale(currentLocale);
@@ -15429,7 +15437,7 @@
     if (state.publicMode) {
       setApiStatus(state.session ? 'online' : 'offline', state.session ? 'status.connected' : 'auth.loginRequired');
       renderAll();
-      focusPublicEntry({ smooth: false });
+      schedulePublicEntryFocus({ smooth: false });
       return null;
     }
     if (!state.session && state.authConfig.pin_required) {

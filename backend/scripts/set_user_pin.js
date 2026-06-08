@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const { getSupabase, requireServiceRoleKey } = require('../src/db/supabase');
-const { hashPin } = require('../src/lib/session');
+const { hashPassword } = require('../src/lib/session');
 
 function argValue(name) {
   const index = process.argv.indexOf(`--${name}`);
@@ -9,15 +9,15 @@ function argValue(name) {
 }
 
 function usage() {
-  console.error('Usage: node scripts/set_user_pin.js --email user@example.com --pin 123456');
-  console.error('   or: node scripts/set_user_pin.js --user-id <uuid> --pin 123456');
+  console.error('Usage: node scripts/set_user_pin.js --email user@example.com --password "new-password"');
+  console.error('   or: node scripts/set_user_pin.js --user-id <uuid> --password "new-password"');
 }
 
 async function main() {
   const email = argValue('email');
   const userId = argValue('user-id');
-  const pin = argValue('pin') || process.env.ELDERCARE_SET_PIN;
-  if ((!email && !userId) || !pin) {
+  const password = argValue('password') || argValue('pin') || process.env.ELDERCARE_SET_PASSWORD || process.env.ELDERCARE_SET_PIN;
+  if ((!email && !userId) || !password) {
     usage();
     process.exit(1);
   }
@@ -29,12 +29,12 @@ async function main() {
   const { data: user, error: userError } = await query.single();
   if (userError) throw userError;
   if (user.status !== 'active') {
-    throw new Error(`Cannot set PIN for ${user.full_name}: status is ${user.status}`);
+    throw new Error(`Cannot set password for ${user.full_name}: status is ${user.status}`);
   }
 
   const { error } = await sb.from('app_user_credentials').upsert({
     user_id: user.id,
-    login_pin_hash: hashPin(pin),
+    login_pin_hash: hashPassword(password),
     must_rotate_pin: false,
     failed_attempts: 0,
     locked_until: null,
@@ -43,7 +43,7 @@ async function main() {
   }, { onConflict: 'user_id' });
   if (error) throw error;
 
-  console.log(`PIN set for ${user.full_name} (${user.role})`);
+  console.log(`Password set for ${user.full_name} (${user.role})`);
 }
 
 main().catch((error) => {

@@ -6,10 +6,10 @@ const {
   bearerToken,
   createSessionToken,
   demoAuthAllowed,
-  hashPin,
+  hashPassword,
   pinAuthRequired,
   sessionHours,
-  verifyPin,
+  verifyPassword,
   verifySessionToken
 } = require('../lib/session');
 const { revokeToken } = require('../lib/revocations');
@@ -45,6 +45,7 @@ function publicUser(user) {
     role: user.role,
     status: user.status || 'active',
     demo: Boolean(user.demo),
+    password_configured: Boolean(user.pin_configured),
     pin_configured: Boolean(user.pin_configured),
     login_enabled: user.login_enabled !== false,
     must_rotate_pin: Boolean(user.must_rotate_pin)
@@ -75,6 +76,7 @@ function authConfig() {
   return {
     mode: authMode(),
     demo_allowed: demoAuthAllowed(),
+    password_required: pinAuthRequired(),
     pin_required: pinAuthRequired(),
     session_hours: sessionHours(),
     max_failed_attempts: MAX_FAILED_ATTEMPTS,
@@ -97,16 +99,17 @@ async function activeUsers(sb) {
   return data || [];
 }
 
-async function findActiveUserByEmail(sb, email) {
-  const normalized = String(email || '').trim().toLowerCase();
+async function findActiveUserByLogin(sb, login) {
+  const raw = String(login || '').trim();
+  const normalized = raw.toLowerCase();
   if (!normalized) return null;
-  const { data, error } = await sb.from('app_users')
-    .select('id,company_id,branch_id,full_name,phone,email,role,status')
-    .ilike('email', normalized)
-    .eq('status', 'active')
-    .maybeSingle();
-  if (error) throw error;
-  return data || null;
+  const users = await activeUsers(sb);
+  const matches = users.filter((user) => {
+    const email = String(user.email || '').trim().toLowerCase();
+    const phone = String(user.phone || '').trim();
+    return email === normalized || phone === raw;
+  });
+  return matches.length === 1 ? matches[0] : null;
 }
 
 async function credentialMap(sb, userIds) {
@@ -166,10 +169,10 @@ async function markLoginSuccess(sb, userId) {
   });
 }
 
-async function verifyCredentialLogin(sb, user, pin) {
+async function verifyCredentialLogin(sb, user, password) {
   const credential = await credentialForUser(sb, user.id);
   if (credential === undefined) {
-    const error = new Error('PIN login schema is missing. Run database/003_app_user_login.sql in Supabase SQL Editor.');
+    const error = new Error('Password login schema is missing. Run database/003_app_user_login.sql in Supabase SQL Editor.');
     error.statusCode = 500;
     error.code = 'AUTH_SCHEMA_MISSING';
     throw error;
@@ -177,9 +180,9 @@ async function verifyCredentialLogin(sb, user, pin) {
 
   if (!credential) {
     if (pinAuthRequired()) {
-      const error = new Error('PIN has not been configured for this user');
+      const error = new Error('Password has not been configured for this user');
       error.statusCode = 403;
-      error.code = 'PIN_NOT_SET';
+      error.code = 'PASSWORD_NOT_SET';
       throw error;
     }
     return;
@@ -193,11 +196,11 @@ async function verifyCredentialLogin(sb, user, pin) {
     throw error;
   }
 
-  if (!pin || !verifyPin(pin, credential.login_pin_hash)) {
+  if (!password || !verifyPassword(password, credential.login_pin_hash)) {
     await markLoginFailure(sb, credential);
-    const error = new Error('invalid PIN');
+    const error = new Error('invalid username or password');
     error.statusCode = 401;
-    error.code = 'PIN_INVALID';
+    error.code = 'PASSWORD_INVALID';
     throw error;
   }
 
@@ -205,12 +208,12 @@ async function verifyCredentialLogin(sb, user, pin) {
   return credential;
 }
 
-function validatePinInput(pin, field = 'PIN') {
-  const value = String(pin || '').trim();
-  if (!/^\d{4,12}$/.test(value)) {
-    const error = new Error(`${field} must be 4-12 digits`);
+function validatePasswordInput(password, field = 'password') {
+  const value = String(password || '').trim();
+  if (value.length < 4 || value.length > 128) {
+    const error = new Error(`${field} must be 4-128 characters`);
     error.statusCode = 422;
-    error.code = 'PIN_FORMAT_INVALID';
+    error.code = 'PASSWORD_FORMAT_INVALID';
     throw error;
   }
   return value;
@@ -250,10 +253,12 @@ router.get('/users', async (_, res, next) => {
 router.post('/session', async (req, res, next) => {
   try {
     const sb = getSupabase();
-    if (req.body.user_id || req.body.email) {
+    const loginName = req.body.username || req.body.user || req.body.email;
+    const password = req.body.password || req.body.pin;
+    if (req.body.user_id || loginName) {
       const user = req.body.user_id
         ? await findUser(sb, req.body.user_id)
-        : await findActiveUserByEmail(sb, req.body.email);
+        : await findActiveUserByLogin(sb, loginName);
       if (!user) {
         const err = new Error('valid login credentials are required');
         err.statusCode = 401;
@@ -267,8 +272,8 @@ router.post('/session', async (req, res, next) => {
         throw err;
       }
       let credential = null;
-      if (pinAuthRequired() || req.body.pin) {
-        credential = await verifyCredentialLogin(sb, user, req.body.pin);
+      if (pinAuthRequired() || password) {
+        credential = await verifyCredentialLogin(sb, user, password);
       }
       const sessionUser = {
         ...user,
@@ -298,7 +303,7 @@ router.post('/session', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
-router.post('/pin', async (req, res, next) => {
+async function changePassword(req, res, next) {
   try {
     const sb = getSupabase();
     const actor = await resolveActor(req);
@@ -309,13 +314,13 @@ router.post('/pin', async (req, res, next) => {
       throw error;
     }
 
-    const currentPin = validatePinInput(req.body.current_pin, 'current PIN');
-    const newPin = validatePinInput(req.body.new_pin, 'new PIN');
+    const currentPassword = validatePasswordInput(req.body.current_password || req.body.current_pin, 'current password');
+    const newPassword = validatePasswordInput(req.body.new_password || req.body.new_pin, 'new password');
     const credential = await credentialForUser(sb, actor.id);
     if (!credential) {
-      const error = new Error('PIN has not been configured for this user');
+      const error = new Error('Password has not been configured for this user');
       error.statusCode = 403;
-      error.code = 'PIN_NOT_SET';
+      error.code = 'PASSWORD_NOT_SET';
       throw error;
     }
 
@@ -327,25 +332,25 @@ router.post('/pin', async (req, res, next) => {
       throw error;
     }
 
-    if (!verifyPin(currentPin, credential.login_pin_hash)) {
+    if (!verifyPassword(currentPassword, credential.login_pin_hash)) {
       await markLoginFailure(sb, credential);
-      const error = new Error('invalid current PIN');
+      const error = new Error('invalid current password');
       error.statusCode = 401;
-      error.code = 'PIN_INVALID';
+      error.code = 'PASSWORD_INVALID';
       throw error;
     }
 
-    if (verifyPin(newPin, credential.login_pin_hash)) {
-      const error = new Error('new PIN must be different from current PIN');
+    if (verifyPassword(newPassword, credential.login_pin_hash)) {
+      const error = new Error('new password must be different from current password');
       error.statusCode = 422;
-      error.code = 'PIN_REUSED';
+      error.code = 'PASSWORD_REUSED';
       throw error;
     }
 
     const now = new Date().toISOString();
     const { error: updateError } = await sb.from('app_user_credentials')
       .update({
-        login_pin_hash: hashPin(newPin),
+        login_pin_hash: hashPassword(newPassword),
         must_rotate_pin: false,
         failed_attempts: 0,
         locked_until: null,
@@ -358,7 +363,7 @@ router.post('/pin', async (req, res, next) => {
     await sb.from('audit_logs').insert({
       company_id: actor.company_id || null,
       actor_user_id: actor.id,
-      action: 'auth.pin_changed',
+      action: 'auth.password_changed',
       entity_type: 'app_user',
       entity_id: actor.id,
       payload: { self_service: true }
@@ -369,7 +374,10 @@ router.post('/pin', async (req, res, next) => {
     const session = createSessionToken(sessionUser);
     res.json({ ok: true, session: publicSession(sessionUser, session) });
   } catch (e) { next(e); }
-});
+}
+
+router.post('/password', changePassword);
+router.post('/pin', changePassword);
 
 router.post('/logout', async (req, res, next) => {
   try {

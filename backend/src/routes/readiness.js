@@ -49,7 +49,7 @@ router.get('/', async (_, res, next) => {
     const regularFont = path.join(fontDir, 'NotoSansThai-Regular.ttf');
     const boldFont = path.join(fontDir, 'NotoSansThai-Bold.ttf');
 
-    checks.push(readinessCheck('auth.mode', 'PIN auth mode', authMode() === 'pin' ? 'pass' : 'fail', {
+    checks.push(readinessCheck('auth.mode', 'Password auth mode', authMode() === 'pin' ? 'pass' : 'fail', {
       mode: authMode()
     }));
     checks.push(readinessCheck('auth.demo', 'Demo auth disabled', demoAuthAllowed() ? 'fail' : 'pass', {
@@ -76,19 +76,19 @@ router.get('/', async (_, res, next) => {
     try {
       const { users, credentials } = await activeUsersAndCredentials(sb);
       const credentialUserIds = new Set(credentials.map((credential) => credential.user_id));
-      checks.push(readinessCheck('schema.credentials', 'PIN credential schema', 'pass', {
+      checks.push(readinessCheck('schema.credentials', 'Password credential schema', 'pass', {
         active_users: users.length,
         credentials: credentials.length
       }));
-      checks.push(readinessCheck('users.pin_coverage', 'Active user PIN coverage', users.every((user) => credentialUserIds.has(user.id)) ? 'pass' : 'fail', {
+      checks.push(readinessCheck('users.pin_coverage', 'Active user password coverage', users.every((user) => credentialUserIds.has(user.id)) ? 'pass' : 'fail', {
         active_users: users.length,
         pin_configured: credentialUserIds.size
       }));
-      checks.push(readinessCheck('users.pin_rotation', 'Temporary PIN rotation cleared', credentials.some((credential) => credential.must_rotate_pin) ? 'warn' : 'pass', {
+      checks.push(readinessCheck('users.pin_rotation', 'Temporary password rotation cleared', credentials.some((credential) => credential.must_rotate_pin) ? 'warn' : 'pass', {
         rotation_required: credentials.filter((credential) => credential.must_rotate_pin).length
       }));
     } catch (error) {
-      checks.push(readinessCheck('schema.credentials', 'PIN credential schema', 'fail', {
+      checks.push(readinessCheck('schema.credentials', 'Password credential schema', 'fail', {
         code: error.code || null,
         message: error.message
       }));

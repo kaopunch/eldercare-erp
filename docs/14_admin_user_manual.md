@@ -64,7 +64,7 @@ flowchart TD
 | PDPA Consent | ตรวจ consent รายผู้สูงวัย | ใช้ข้อมูลตามสิทธิ์ที่ได้รับ |
 | Privacy Guard | ดู audit การเปิดข้อมูลอ่อนไหว | ตรวจย้อนหลังได้ |
 | Security | ตรวจ session, readiness และ security | พร้อมใช้งาน production |
-| User Admin | สร้างผู้ใช้และจัดการ PIN | ทีมเข้าใช้งานตามสิทธิ์ |
+| User Admin | สร้างผู้ใช้และจัดการ password | ทีมเข้าใช้งานตามสิทธิ์ |
 | คู่มือระบบ | อ่านภาพรวมและวิธีใช้ระบบ | แอดมินเข้าใจ flow ทั้งระบบ |
 
 ## Checklist ประจำวันสำหรับแอดมิน

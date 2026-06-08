@@ -2,7 +2,7 @@ const express = require('express');
 const { z } = require('zod');
 const { getSupabase } = require('../db/supabase');
 const { INTERNAL_ROLES } = require('../middleware/auth');
-const { hashPin } = require('../lib/session');
+const { hashPassword } = require('../lib/session');
 const { listSessionRevocations, revokeUserSessions } = require('../lib/revocations');
 
 const router = express.Router();
@@ -25,7 +25,7 @@ function emptyToUndefined(value) {
 const NullableUuid = z.preprocess(emptyToNull, z.string().uuid().nullable());
 const NullableText = z.preprocess(emptyToNull, z.string().nullable());
 const NullableEmail = z.preprocess(emptyToNull, z.string().email().nullable());
-const PinSchema = z.preprocess(emptyToUndefined, z.string().regex(/^\d{4,12}$/, 'PIN must be 4-12 digits').optional());
+const PasswordSchema = z.preprocess(emptyToUndefined, z.string().trim().min(4).max(128).optional());
 
 const UserCreateSchema = z.object({
   company_id: NullableUuid.optional(),
@@ -35,7 +35,8 @@ const UserCreateSchema = z.object({
   email: NullableEmail.optional(),
   role: z.enum(ROLE_VALUES),
   status: z.enum(STATUS_VALUES).default('active'),
-  pin: PinSchema,
+  password: PasswordSchema,
+  pin: PasswordSchema,
   must_rotate_pin: z.boolean().optional().default(true)
 });
 
@@ -49,10 +50,11 @@ const UserUpdateSchema = z.object({
   status: z.enum(STATUS_VALUES).optional()
 }).refine((value) => Object.keys(value).length > 0, 'at least one field is required');
 
-const PinUpdateSchema = z.object({
-  pin: z.string().regex(/^\d{4,12}$/, 'PIN must be 4-12 digits'),
+const PasswordUpdateSchema = z.object({
+  password: z.string().trim().min(4).max(128).optional(),
+  pin: z.string().trim().min(4).max(128).optional(),
   must_rotate_pin: z.boolean().optional().default(true)
-});
+}).refine((value) => value.password || value.pin, 'password is required');
 
 const SessionRevokeSchema = z.object({
   reason: z.string().trim().max(200).optional().default('admin_manual_revoke')
@@ -61,10 +63,12 @@ const SessionRevokeSchema = z.object({
 const SECURITY_AUDIT_ACTIONS = [
   'auth.login',
   'auth.logout',
+  'auth.password_changed',
   'auth.pin_changed',
   'auth.sessions_revoked',
   'user.created',
   'user.updated',
+  'user.password_reset',
   'user.pin_reset',
   'user.unlocked'
 ];
@@ -83,6 +87,7 @@ function publicUser(user, credential = null) {
     role: user.role,
     status: user.status || 'active',
     created_at: user.created_at || null,
+    password_configured: Boolean(credential),
     pin_configured: Boolean(credential),
     login_enabled: Boolean(credential) && user.status === 'active',
     must_rotate_pin: Boolean(credential?.must_rotate_pin),
@@ -242,17 +247,18 @@ router.post('/', async (req, res, next) => {
   try {
     const input = UserCreateSchema.parse(req.body);
     const sb = getSupabase();
-    const { pin, must_rotate_pin, ...userInput } = input;
+    const { password, pin, must_rotate_pin, ...userInput } = input;
+    const loginPassword = password || pin;
     const { data: user, error } = await sb.from('app_users')
       .insert(userInput)
       .select('id,company_id,branch_id,full_name,phone,email,role,status,created_at,companies(name),branches(name)')
       .single();
     if (error) throw normalizeSupabaseError(error);
 
-    if (pin) {
+    if (loginPassword) {
       const { error: pinError } = await sb.from('app_user_credentials').upsert({
         user_id: user.id,
-        login_pin_hash: hashPin(pin),
+        login_pin_hash: hashPassword(loginPassword),
         must_rotate_pin,
         failed_attempts: 0,
         locked_until: null,
@@ -262,7 +268,12 @@ router.post('/', async (req, res, next) => {
       if (pinError) throw pinError;
     }
 
-    await auditUserAction(sb, req, 'user.created', user, { pin_configured: Boolean(pin), must_rotate_pin: Boolean(pin && must_rotate_pin), status: user.status });
+    await auditUserAction(sb, req, 'user.created', user, {
+      password_configured: Boolean(loginPassword),
+      pin_configured: Boolean(loginPassword),
+      must_rotate_pin: Boolean(loginPassword && must_rotate_pin),
+      status: user.status
+    });
     const publicRecord = await findPublicUser(sb, user.id);
     res.status(201).json({ ok: true, user: publicRecord });
   } catch (e) { next(e); }
@@ -293,14 +304,15 @@ router.patch('/:id', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
-router.post('/:id/pin', async (req, res, next) => {
+async function resetUserPassword(req, res, next) {
   try {
-    const input = PinUpdateSchema.parse(req.body);
+    const input = PasswordUpdateSchema.parse(req.body);
+    const loginPassword = input.password || input.pin;
     const sb = getSupabase();
     const user = await findPublicUser(sb, req.params.id);
     const { error } = await sb.from('app_user_credentials').upsert({
       user_id: user.id,
-      login_pin_hash: hashPin(input.pin),
+      login_pin_hash: hashPassword(loginPassword),
       must_rotate_pin: input.must_rotate_pin,
       failed_attempts: 0,
       locked_until: null,
@@ -309,11 +321,14 @@ router.post('/:id/pin', async (req, res, next) => {
     }, { onConflict: 'user_id' });
     if (error) throw error;
 
-    await auditUserAction(sb, req, 'user.pin_reset', user, { must_rotate_pin: input.must_rotate_pin });
+    await auditUserAction(sb, req, 'user.password_reset', user, { must_rotate_pin: input.must_rotate_pin });
     const publicRecord = await findPublicUser(sb, user.id);
     res.json({ ok: true, user: publicRecord });
   } catch (e) { next(e); }
-});
+}
+
+router.post('/:id/password', resetUserPassword);
+router.post('/:id/pin', resetUserPassword);
 
 router.post('/:id/unlock', async (req, res, next) => {
   try {

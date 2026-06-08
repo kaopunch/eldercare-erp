@@ -110,12 +110,12 @@ function sessionSignature(token) {
   return parts.length === 3 ? parts[2] : null;
 }
 
-function hashPin(pin) {
-  const normalized = String(pin || '').trim();
+function hashPassword(password) {
+  const normalized = String(password || '').trim();
   if (normalized.length < 4) {
-    const error = new Error('PIN must be at least 4 characters');
+    const error = new Error('Password must be at least 4 characters');
     error.statusCode = 422;
-    error.code = 'PIN_TOO_SHORT';
+    error.code = 'PASSWORD_TOO_SHORT';
     throw error;
   }
   const salt = crypto.randomBytes(16).toString('base64url');
@@ -123,8 +123,8 @@ function hashPin(pin) {
   return `${PIN_HASH_PREFIX}$${PIN_HASH_ITERATIONS}$${salt}$${hash}`;
 }
 
-function verifyPin(pin, storedHash) {
-  const normalized = String(pin || '').trim();
+function verifyPassword(password, storedHash) {
+  const normalized = String(password || '').trim();
   const [prefix, iterations, salt, hash] = String(storedHash || '').split('$');
   if (prefix !== PIN_HASH_PREFIX || !iterations || !salt || !hash) return false;
   const actual = crypto.pbkdf2Sync(normalized, salt, Number(iterations), PIN_HASH_KEY_LENGTH, HASH_ALGORITHM).toString('base64url');
@@ -133,15 +133,20 @@ function verifyPin(pin, storedHash) {
   return actualBuffer.length === expectedBuffer.length && crypto.timingSafeEqual(actualBuffer, expectedBuffer);
 }
 
+const hashPin = hashPassword;
+const verifyPin = verifyPassword;
+
 module.exports = {
   authMode,
   bearerToken,
   createSessionToken,
   demoAuthAllowed,
+  hashPassword,
   hashPin,
   pinAuthRequired,
   sessionSignature,
   sessionHours,
+  verifyPassword,
   verifyPin,
   verifySessionToken
 };
