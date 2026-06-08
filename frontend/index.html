@@ -475,6 +475,11 @@
       font-weight: 750;
     }
 
+    .public-login-email-field,
+    .public-login-directory-field {
+      margin: 0;
+    }
+
     .auth-action {
       min-width: 78px;
     }
@@ -3516,43 +3521,61 @@
       .sidebar {
         position: fixed;
         left: 0;
-        right: 0;
+        right: auto;
         bottom: 0;
-        top: auto;
-        z-index: 40;
-        height: auto;
-        padding: 8px;
-        padding-bottom: max(8px, env(safe-area-inset-bottom));
-        width: 100%;
+        top: 0;
+        z-index: 70;
+        height: 100dvh;
+        padding: 18px 12px 22px;
+        padding-top: max(18px, env(safe-area-inset-top));
+        padding-bottom: max(22px, env(safe-area-inset-bottom));
+        width: min(316px, calc(100vw - 58px));
         min-width: 0;
-        overflow-x: auto;
-        overflow-y: hidden;
-        flex-direction: row;
+        overflow-x: hidden;
+        overflow-y: auto;
+        flex-direction: column;
         align-items: stretch;
-        gap: 2px;
-        border-right: 0;
-        border-top: 1px solid var(--line);
+        gap: 4px;
+        border-right: 1px solid var(--line);
+        border-top: 0;
         background: rgba(255, 255, 255, .92);
         backdrop-filter: blur(20px);
-        box-shadow: 0 -12px 28px rgba(30, 67, 118, .10);
+        box-shadow: 22px 0 44px rgba(30, 67, 118, .18);
+        transform: translateX(0);
+        transition: transform .2s ease;
+      }
+
+      .app.sidebar-collapsed .sidebar {
+        display: flex;
+        transform: translateX(calc(-100% - 8px));
       }
 
       .app:not(.sidebar-collapsed) .sidebar-toggle {
-        left: 0;
+        left: auto;
+        right: 14px;
       }
 
       .sidebar-toggle {
-        top: auto;
-        bottom: 96px;
+        top: max(14px, env(safe-area-inset-top));
+        right: 14px;
+        left: auto;
+        bottom: auto;
+        width: 44px;
+        height: 44px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
         transform: none;
+        background: rgba(255, 255, 255, .96);
+        color: var(--ink);
+        z-index: 80;
       }
 
       .app:not(.sidebar-collapsed) .sidebar-toggle svg {
-        transform: rotate(90deg);
+        transform: rotate(180deg);
       }
 
       .app.sidebar-collapsed .sidebar-toggle svg {
-        transform: rotate(-90deg);
+        transform: rotate(0deg);
       }
 
       .brand {
@@ -3560,28 +3583,20 @@
       }
 
       .nav {
-        display: flex;
-        flex: 0 0 auto;
-        gap: 6px;
-        width: max-content;
+        display: grid;
+        flex: 1 1 auto;
+        gap: 5px;
+        width: 100%;
         min-width: 0;
-        max-width: none;
-        overflow-x: auto;
-        overflow-y: hidden;
+        max-width: 100%;
+        overflow: visible;
         padding: 0;
-        scrollbar-width: none;
-      }
-
-      .nav::-webkit-scrollbar {
-        display: none;
       }
 
       .nav-group {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        flex: 0 0 auto;
-        min-width: max-content;
+        display: grid;
+        gap: 5px;
+        min-width: 0;
       }
 
       .nav-group + .nav-group {
@@ -3596,16 +3611,15 @@
 
       .nav-item {
         position: relative;
-        width: auto;
-        min-width: 68px;
-        min-height: 56px;
-        flex: 0 0 auto;
-        flex-direction: column;
-        justify-content: center;
-        gap: 3px;
-        padding: 7px 8px;
-        text-align: center;
-        font-size: 10px;
+        width: 100%;
+        min-width: 0;
+        min-height: 42px;
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 8px;
+        padding: 9px 10px;
+        text-align: left;
+        font-size: 12px;
       }
 
       .nav-item svg {
@@ -3614,10 +3628,10 @@
       }
 
       .nav-item > span:not(.nav-count) {
-        width: 100%;
+        width: auto;
         flex: 0 1 auto;
-        white-space: normal;
-        line-height: 1.1;
+        white-space: nowrap;
+        line-height: 1.25;
       }
 
       .nav-item.active {
@@ -3653,13 +3667,15 @@
       }
 
       .topbar {
-        position: static;
+        position: sticky;
+        top: 0;
+        padding-right: 70px;
       }
 
       .main-shell {
         width: 100%;
         min-width: 0;
-        padding-bottom: 88px;
+        padding-bottom: 0;
       }
 
       .metrics {
@@ -3687,7 +3703,7 @@
         display: flex;
         flex: none;
         flex-wrap: nowrap;
-        justify-content: flex-start;
+        justify-content: flex-end;
         gap: 7px;
         max-width: 100%;
         overflow-x: auto;
@@ -5379,17 +5395,21 @@
         <div class="public-panel-header">
           <div>
             <h3>ทีมงานเข้าใช้งาน ERP</h3>
-            <p>ใช้บัญชีทีมงานเพื่อเข้า dispatch, portal, finance, reports และ user admin ตามสิทธิ์</p>
+            <p>ใช้อีเมลผู้ใช้และ PIN เพื่อเข้า dispatch, portal, finance, reports และ user admin ตามสิทธิ์</p>
           </div>
         </div>
         <div class="public-panel-body">
           <form class="public-login-stack" id="publicStaffLoginForm">
-            <label class="field wide">
+            <label class="field wide public-login-email-field" id="publicStaffEmailField">
+              <span>อีเมลผู้ใช้</span>
+              <input class="input" id="publicStaffEmailInput" name="email" type="email" inputmode="email" autocomplete="username" placeholder="เช่น admin@example.com">
+            </label>
+            <label class="field wide public-login-directory-field" id="publicStaffDirectoryField">
               <span>ผู้ใช้ / บทบาท</span>
               <select class="select" id="publicStaffUserSelect" name="user"></select>
             </label>
             <label class="field wide" id="publicStaffPinField">
-              <span>PIN</span>
+              <span>PIN / รหัสผ่าน</span>
               <input class="input" id="publicStaffPinInput" name="pin" type="password" inputmode="numeric" autocomplete="current-password" placeholder="กรอก PIN">
             </label>
             <button class="btn primary" type="submit" id="publicStaffLoginBtn">
@@ -7588,7 +7608,7 @@
       'auth.login': 'เข้าสู่ระบบ',
       'auth.logout': 'ออก',
       'auth.pin': 'PIN',
-      'auth.loginRequired': 'กรุณาเลือกผู้ใช้และกรอก PIN',
+      'auth.loginRequired': 'กรุณากรอกอีเมลผู้ใช้หรือเลือกผู้ใช้ และกรอก PIN',
       'auth.loggedIn': 'เข้าสู่ระบบเป็น {role} แล้ว',
       'auth.loggedOut': 'ออกจากระบบแล้ว',
       'auth.sessionExpired': 'Session หมดอายุ กรุณาเข้าสู่ระบบใหม่',
@@ -8359,7 +8379,7 @@
       'auth.login': 'Login',
       'auth.logout': 'Logout',
       'auth.pin': 'PIN',
-      'auth.loginRequired': 'Select a user and enter PIN',
+      'auth.loginRequired': 'Enter user email or select a user, then enter PIN',
       'auth.loggedIn': 'Logged in as {role}',
       'auth.loggedOut': 'Logged out',
       'auth.sessionExpired': 'Session expired. Please log in again',
@@ -9860,6 +9880,7 @@
     publicEntry: '',
     activeView: 'dispatch',
     sidebarCollapsed: localStorage.getItem('eldercare.sidebarCollapsed') === 'true',
+    mobileSidebarInitialized: false,
     apiOnline: false,
     apiError: '',
     apiBusy: false,
@@ -10144,6 +10165,9 @@
     publicStepBack: document.getElementById('publicStepBack'),
     publicStepNext: document.getElementById('publicStepNext'),
     publicStaffLoginForm: document.getElementById('publicStaffLoginForm'),
+    publicStaffEmailField: document.getElementById('publicStaffEmailField'),
+    publicStaffEmailInput: document.getElementById('publicStaffEmailInput'),
+    publicStaffDirectoryField: document.getElementById('publicStaffDirectoryField'),
     publicStaffUserSelect: document.getElementById('publicStaffUserSelect'),
     publicStaffPinField: document.getElementById('publicStaffPinField'),
     publicStaffPinInput: document.getElementById('publicStaffPinInput'),
@@ -10296,9 +10320,22 @@
     window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
   }
 
+  function focusPublicEntry({ smooth = true } = {}) {
+    if (!state.publicMode || !state.publicEntry) return;
+    const target = document.querySelector(state.publicEntry === 'staff' ? '#staff-login' : '.public-entry-grid');
+    window.requestAnimationFrame(() => {
+      if (target) target.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' });
+      if (state.publicEntry === 'staff') {
+        const focusTarget = !els.publicStaffEmailInput?.disabled && !els.publicStaffEmailField?.hidden
+          ? els.publicStaffEmailInput
+          : els.publicStaffUserSelect;
+        focusTarget?.focus?.({ preventScroll: true });
+      }
+    });
+  }
+
   function showPublicEntry(entry) {
     const nextEntry = entry === 'staff' ? 'staff' : entry === 'login' ? 'login' : 'register';
-    const target = document.querySelector(nextEntry === 'staff' ? '#staff-login' : '.public-entry-grid');
     state.publicMode = true;
     state.publicEntry = nextEntry;
     localStorage.removeItem('eldercare.shell');
@@ -10309,9 +10346,7 @@
       renderPublicServiceDescription();
     }
     renderAuthControls();
-    window.requestAnimationFrame(() => {
-      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
+    focusPublicEntry();
   }
 
   async function enterErpShell({ persist = true, load = true } = {}) {
@@ -10348,6 +10383,12 @@
   function renderPublicStaffLoginControls() {
     renderPublicStaffSelect();
     const pinMode = Boolean(state.authConfig.pin_required && !state.session);
+    if (els.publicStaffEmailField) els.publicStaffEmailField.hidden = !pinMode;
+    if (els.publicStaffEmailInput) {
+      els.publicStaffEmailInput.disabled = !pinMode;
+      els.publicStaffEmailInput.required = pinMode;
+    }
+    if (els.publicStaffDirectoryField) els.publicStaffDirectoryField.hidden = pinMode;
     if (els.publicStaffPinField) els.publicStaffPinField.hidden = !pinMode;
     if (els.publicStaffPinInput) {
       els.publicStaffPinInput.disabled = !pinMode;
@@ -10356,7 +10397,7 @@
     if (els.publicStaffLoginResult) {
       const text = state.session
         ? `พร้อมเข้า ERP เป็น ${ROLE_LABELS[state.session.role] || state.session.role}`
-        : (pinMode ? 'เลือกผู้ใช้และกรอก PIN เพื่อเข้า ERP' : 'เลือกผู้ใช้เพื่อเข้า ERP');
+        : (pinMode ? 'กรอกอีเมลผู้ใช้และ PIN เพื่อเข้า ERP' : 'เลือกผู้ใช้เพื่อเข้า ERP');
       els.publicStaffLoginResult.innerHTML = `<strong>สถานะ</strong><span>${escapeHtml(text)}</span>`;
     }
   }
@@ -10373,25 +10414,30 @@
 
   async function loginWithPublicStaffForm(form, button) {
     const user = selectedPublicStaffUser();
+    const email = String(els.publicStaffEmailInput?.value || '').trim();
     const pin = String(els.publicStaffPinInput?.value || '').trim();
     if (state.session && (!user || user.id === state.session.id || user.role === state.session.role)) {
       await enterErpShell({ persist: true, load: true });
       return;
     }
-    const needsPin = Boolean(state.authConfig.pin_required && user?.id);
-    if (!user || (needsPin && !pin)) {
+    const pinMode = Boolean(state.authConfig.pin_required);
+    const needsPin = Boolean(pinMode && (email || user?.id));
+    if ((pinMode && (!email || !pin)) || (!pinMode && !user)) {
       showToast(tr('auth.loginRequired'));
       return;
     }
     setButtonBusy(button, true);
     try {
-      const body = user.id ? { user_id: user.id, ...(needsPin ? { pin } : {}) } : { role: user.role };
+      const body = pinMode
+        ? { email, ...(needsPin ? { pin } : {}) }
+        : (user.id ? { user_id: user.id } : { role: user.role });
       const sessionResult = await apiPost('/api/auth/session', body, { skipAuth: true });
       state.session = sessionResult.session || user;
       state.pendingAuthUserValue = '';
       if (state.session?.id) localStorage.setItem('eldercare.sessionUserId', state.session.id);
       if (state.session?.token) localStorage.setItem('eldercare.sessionToken', state.session.token);
       if (els.publicStaffPinInput) els.publicStaffPinInput.value = '';
+      if (els.publicStaffEmailInput) els.publicStaffEmailInput.value = '';
       renderAuthControls();
       await enterErpShell({ persist: true, load: false });
       if (state.session.must_rotate_pin) {
@@ -11887,14 +11933,27 @@
     }
   }
 
+  function activateDemoAuthFallback() {
+    state.session = { id: null, role: 'admin', full_name: 'admin demo', demo: true };
+    state.authUsers = [state.session];
+    state.authConfig = { ...state.authConfig, pin_required: false, demo_allowed: true };
+    renderAuthControls();
+    syncPostAuthView();
+    showToast(tr('auth.demoFallback'));
+  }
+
+  function showAuthUnavailable() {
+    state.session = null;
+    state.authUsers = [];
+    state.pendingAuthUserValue = '';
+    renderAuthControls();
+    setApiStatus('offline', 'auth.loginRequired');
+  }
+
   async function initializeAuth() {
     try {
-      const [configResult, result] = await Promise.all([
-        apiGet('/api/auth/config', { skipAuth: true }),
-        apiGet('/api/auth/users', { skipAuth: true })
-      ]);
-      state.authConfig = configResult.config || result.config || state.authConfig;
-      state.authUsers = result.users || [];
+      const configResult = await apiGet('/api/auth/config', { skipAuth: true });
+      state.authConfig = configResult.config || state.authConfig;
       const saved = localStorage.getItem('eldercare.sessionUserId');
       const savedToken = localStorage.getItem('eldercare.sessionToken');
       if (savedToken) {
@@ -11914,14 +11973,31 @@
           showToast(tr('auth.sessionExpired'));
         }
       }
+      try {
+        const result = await apiGet('/api/auth/users', { skipAuth: true });
+        state.authConfig = result.config || state.authConfig;
+        state.authUsers = result.users || [];
+      } catch (error) {
+        state.authUsers = [];
+        if (state.authConfig.pin_required) {
+          showAuthUnavailable();
+          return;
+        }
+        if (state.authConfig.demo_allowed) {
+          activateDemoAuthFallback();
+        } else {
+          showAuthUnavailable();
+        }
+        return;
+      }
       const preferred = state.authUsers.find((user) => user.id && user.id === saved)
         || state.authUsers.find((user) => ['owner', 'admin'].includes(user.role))
         || state.authUsers.find((user) => user.role === 'dispatcher')
         || state.authUsers[0]
         || { role: 'admin' };
-      if (state.authConfig.pin_required && preferred.id) {
+      if (state.authConfig.pin_required) {
         state.session = null;
-        state.pendingAuthUserValue = preferred.id;
+        state.pendingAuthUserValue = preferred.id || '';
         renderAuthControls();
         return;
       }
@@ -11933,12 +12009,11 @@
       renderAuthControls();
       syncPostAuthView();
     } catch (error) {
-      state.session = { id: null, role: 'admin', full_name: 'admin demo', demo: true };
-      state.authUsers = [state.session];
-      state.authConfig = { ...state.authConfig, pin_required: false, demo_allowed: true };
-      renderAuthControls();
-      syncPostAuthView();
-      showToast(tr('auth.demoFallback'));
+      if (state.authConfig.demo_allowed) {
+        activateDemoAuthFallback();
+      } else {
+        showAuthUnavailable();
+      }
     }
   }
 
@@ -13846,6 +13921,13 @@
 
   function applySidebarState() {
     if (!els.erpApp || !els.sidebarToggle) return;
+    const isMobileShell = window.matchMedia && window.matchMedia('(max-width: 980px)').matches;
+    if (isMobileShell && !state.mobileSidebarInitialized) {
+      state.sidebarCollapsed = true;
+      state.mobileSidebarInitialized = true;
+    } else if (!isMobileShell) {
+      state.mobileSidebarInitialized = false;
+    }
     const isCollapsed = Boolean(state.sidebarCollapsed);
     els.erpApp.classList.toggle('sidebar-collapsed', isCollapsed);
     els.sidebarToggle.setAttribute('aria-expanded', String(!isCollapsed));
@@ -15339,6 +15421,7 @@
   });
 
   syncShellMode();
+  focusPublicEntry({ smooth: false });
 
   initializeAuth().then(() => {
     setLocale(currentLocale);
@@ -15346,6 +15429,7 @@
     if (state.publicMode) {
       setApiStatus(state.session ? 'online' : 'offline', state.session ? 'status.connected' : 'auth.loginRequired');
       renderAll();
+      focusPublicEntry({ smooth: false });
       return null;
     }
     if (!state.session && state.authConfig.pin_required) {

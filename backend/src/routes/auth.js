@@ -97,6 +97,18 @@ async function activeUsers(sb) {
   return data || [];
 }
 
+async function findActiveUserByEmail(sb, email) {
+  const normalized = String(email || '').trim().toLowerCase();
+  if (!normalized) return null;
+  const { data, error } = await sb.from('app_users')
+    .select('id,company_id,branch_id,full_name,phone,email,role,status')
+    .ilike('email', normalized)
+    .eq('status', 'active')
+    .maybeSingle();
+  if (error) throw error;
+  return data || null;
+}
+
 async function credentialMap(sb, userIds) {
   if (!userIds.length) return new Map();
   const { data, error } = await sb.from('app_user_credentials')
@@ -238,8 +250,16 @@ router.get('/users', async (_, res, next) => {
 router.post('/session', async (req, res, next) => {
   try {
     const sb = getSupabase();
-    if (req.body.user_id) {
-      const user = await findUser(sb, req.body.user_id);
+    if (req.body.user_id || req.body.email) {
+      const user = req.body.user_id
+        ? await findUser(sb, req.body.user_id)
+        : await findActiveUserByEmail(sb, req.body.email);
+      if (!user) {
+        const err = new Error('valid login credentials are required');
+        err.statusCode = 401;
+        err.code = 'SESSION_INPUT_INVALID';
+        throw err;
+      }
       if (user.status !== 'active') {
         const err = new Error('user account is not active');
         err.statusCode = 403;
