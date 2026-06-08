@@ -278,3 +278,4 @@ Agent ต้องอัปเดตส่วนนี้เมื่อทำ�
 | 2026-06-08 | P0.2 runtime readiness tooling | Done | Added `npm run verify:runtime` to check Supabase DNS/schema/storage plus Render health/auth/readiness without printing secrets; current Supabase host still fails DNS in this environment |
 | 2026-06-08 | P1 UAT playbook | Done | Added `docs/16_uat_playbook.md` covering lead, profile, consent, booking, assignment, trip, completion, finance, portal, rating, readiness, and sign-off |
 | 2026-06-08 | P3 operations monitoring pass 1 | Done | Added operations health builder, `/api/dashboard/operations-health`, tests, and `docs/17_operations_monitoring_runbook.md` for daily pilot monitoring |
+| 2026-06-08 | Render runtime env checklist | Done | Added public base URL/CORS values and `docs/18_render_runtime_env_checklist.md` so required secret/public env setup is explicit before pilot |

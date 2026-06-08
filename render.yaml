@@ -30,7 +30,9 @@ services:
       - key: PORTAL_TOKEN_SECRET
         sync: false
       - key: ELDERCARE_CORS_ORIGINS
-        sync: false
+        value: https://eldercare-erp.onrender.com
+      - key: ELDERCARE_PUBLIC_BASE_URL
+        value: https://eldercare-erp.onrender.com
       - key: ELDERCARE_API_RATE_LIMIT_MAX
         value: "600"
       - key: ELDERCARE_AUTH_RATE_LIMIT_MAX
