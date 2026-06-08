@@ -28,20 +28,54 @@ const ai = require('./routes/ai');
 const aiWebhooks = require('./routes/aiWebhooks');
 const aiStream = require('./routes/aiStream');
 const { attachActor, requireRoles } = require('./middleware/auth');
+const {
+  createCorsOptions,
+  createRateLimiter,
+  createSecurityHeaders,
+  safeLogUrl
+} = require('./middleware/security');
 
 const app = express();
-app.use(cors());
+app.set('trust proxy', 1);
+app.disable('x-powered-by');
+
+morgan.token('safe-url', safeLogUrl);
+
+const apiRateLimit = createRateLimiter({
+  max: Number(process.env.ELDERCARE_API_RATE_LIMIT_MAX || 600),
+  keyPrefix: 'api',
+  message: 'Too many API requests'
+});
+const authRateLimit = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: Number(process.env.ELDERCARE_AUTH_RATE_LIMIT_MAX || 30),
+  keyPrefix: 'auth',
+  message: 'Too many authentication requests'
+});
+const portalRateLimit = createRateLimiter({
+  max: Number(process.env.ELDERCARE_PORTAL_RATE_LIMIT_MAX || 240),
+  keyPrefix: 'portal',
+  message: 'Too many portal requests'
+});
+const aiInboundRateLimit = createRateLimiter({
+  max: Number(process.env.ELDERCARE_AI_INBOUND_RATE_LIMIT_MAX || 180),
+  keyPrefix: 'ai-inbound',
+  message: 'Too many AI inbound requests'
+});
+
+app.use(createSecurityHeaders());
+app.use(cors(createCorsOptions()));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: false, limit: '1mb' }));
-app.use(morgan('dev'));
+app.use(morgan(':method :safe-url :status :response-time ms - :res[content-length]'));
 
 app.get('/health', (_, res) => res.json({ ok: true, service: 'eldercare-erp', version: '2.0.0' }));
 app.use(express.static(path.join(__dirname, '../../frontend')));
 
-app.use('/api/auth', auth);
-app.use('/api/portal', portal);
-app.use('/api/ai/inbound', aiWebhooks);
-app.use('/api', attachActor);
+app.use('/api/auth', authRateLimit, auth);
+app.use('/api/portal', portalRateLimit, portal);
+app.use('/api/ai/inbound', aiInboundRateLimit, aiWebhooks);
+app.use('/api', apiRateLimit, attachActor);
 app.use('/api/customers', requireRoles(['owner', 'super_admin', 'admin', 'branch_admin', 'dispatcher', 'coordinator']), customers);
 app.use('/api/elders', requireRoles(['owner', 'super_admin', 'admin', 'branch_admin', 'dispatcher', 'coordinator', 'care_assistant', 'hospital_companion', 'home_companion']), elders);
 app.use('/api/consents', requireRoles(['owner', 'super_admin', 'admin', 'branch_admin', 'dispatcher', 'coordinator']), consents);

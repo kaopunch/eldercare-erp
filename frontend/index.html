@@ -4771,27 +4771,67 @@
 
     @media (max-width: 680px) {
       .public-wrap {
-        width: min(100% - 28px, 1200px);
+        width: min(100% - 24px, 1200px);
+      }
+
+      .public-header {
+        min-height: 56px;
       }
 
       .public-header-inner {
-        grid-template-columns: minmax(0, 1fr) auto;
-        min-height: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        min-height: 56px;
+        padding: 6px 0;
       }
 
       .public-brand {
+        grid-column: auto;
+        grid-row: auto;
+        grid-template-columns: minmax(0, max-content);
+        flex: 1 1 auto;
+        width: auto;
+        min-width: 0;
+        max-width: min(156px, 48vw);
         min-height: 0;
+        padding: 0;
       }
 
       .public-logo-img {
+        width: min(148px, 46vw);
         height: auto;
-        max-height: 68px;
+        max-height: 42px;
       }
 
       .public-brand > span {
-        margin-left: 0;
-        max-width: 100%;
-        white-space: normal;
+        display: none;
+      }
+
+      .public-menu {
+        grid-column: auto;
+        grid-row: auto;
+        display: flex;
+        flex: 0 0 auto;
+        align-self: center;
+        margin-left: auto;
+      }
+
+      .public-menu-toggle {
+        min-height: 36px;
+        padding: 7px 10px;
+        gap: 6px;
+      }
+
+      .public-menu-toggle svg {
+        width: 17px;
+        height: 17px;
+      }
+
+      .public-nav {
+        top: calc(100% + 8px);
+        width: min(248px, calc(100vw - 24px));
       }
 
       .public-copy h1 {
@@ -4811,7 +4851,7 @@
       }
 
       .public-hero {
-        padding: 36px 0 28px;
+        padding: 28px 0 28px;
         gap: 24px;
       }
 

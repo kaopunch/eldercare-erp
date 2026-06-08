@@ -6,6 +6,7 @@ const { authMode, demoAuthAllowed, sessionHours } = require('../lib/session');
 const { paymentEvidenceBucket } = require('../lib/storage');
 const { isMissingRevocationSchema } = require('../lib/revocations');
 const { configured: aiAnalysisConfigured } = require('../lib/aiAnalysisProvider');
+const { configuredCorsOrigins } = require('../middleware/security');
 
 const router = express.Router();
 
@@ -57,6 +58,13 @@ router.get('/', async (_, res, next) => {
     checks.push(readinessCheck('session.secret', 'Dedicated session secret', process.env.ELDERCARE_SESSION_SECRET ? 'pass' : 'warn', {
       configured: Boolean(process.env.ELDERCARE_SESSION_SECRET),
       session_hours: sessionHours()
+    }));
+    checks.push(readinessCheck('portal.token_secret', 'Dedicated portal token secret', process.env.PORTAL_TOKEN_SECRET ? 'pass' : 'warn', {
+      configured: Boolean(process.env.PORTAL_TOKEN_SECRET)
+    }));
+    checks.push(readinessCheck('cors.origins', 'Production CORS origins', process.env.NODE_ENV === 'production' && !configuredCorsOrigins().length ? 'warn' : 'pass', {
+      configured_count: configuredCorsOrigins().length,
+      node_env: process.env.NODE_ENV || 'development'
     }));
     checks.push(readinessCheck('supabase.url', 'Supabase URL configured', process.env.SUPABASE_URL ? 'pass' : 'fail', {
       configured: Boolean(process.env.SUPABASE_URL)

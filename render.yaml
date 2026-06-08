@@ -27,6 +27,18 @@ services:
         sync: false
       - key: ELDERCARE_SESSION_SECRET
         sync: false
+      - key: PORTAL_TOKEN_SECRET
+        sync: false
+      - key: ELDERCARE_CORS_ORIGINS
+        sync: false
+      - key: ELDERCARE_API_RATE_LIMIT_MAX
+        value: "600"
+      - key: ELDERCARE_AUTH_RATE_LIMIT_MAX
+        value: "30"
+      - key: ELDERCARE_PORTAL_RATE_LIMIT_MAX
+        value: "240"
+      - key: ELDERCARE_AI_INBOUND_RATE_LIMIT_MAX
+        value: "180"
       - key: ELDERCARE_AI_WEBHOOK_SECRET
         sync: false
       - key: ELDERCARE_AI_ANALYSIS_URL
