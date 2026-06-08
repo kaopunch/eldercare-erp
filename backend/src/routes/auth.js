@@ -107,7 +107,8 @@ async function findActiveUserByLogin(sb, login) {
   const matches = users.filter((user) => {
     const email = String(user.email || '').trim().toLowerCase();
     const phone = String(user.phone || '').trim();
-    return email === normalized || phone === raw;
+    const role = String(user.role || '').trim().toLowerCase();
+    return email === normalized || phone === raw || role === normalized;
   });
   return matches.length === 1 ? matches[0] : null;
 }
