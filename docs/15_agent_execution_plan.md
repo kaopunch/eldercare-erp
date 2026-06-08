@@ -279,3 +279,4 @@ Agent ต้องอัปเดตส่วนนี้เมื่อทำ�
 | 2026-06-08 | P1 UAT playbook | Done | Added `docs/16_uat_playbook.md` covering lead, profile, consent, booking, assignment, trip, completion, finance, portal, rating, readiness, and sign-off |
 | 2026-06-08 | P3 operations monitoring pass 1 | Done | Added operations health builder, `/api/dashboard/operations-health`, tests, and `docs/17_operations_monitoring_runbook.md` for daily pilot monitoring |
 | 2026-06-08 | Render runtime env checklist | Done | Added public base URL/CORS values and `docs/18_render_runtime_env_checklist.md` so required secret/public env setup is explicit before pilot |
+| 2026-06-08 | Render deploy verification | Partial | Live `/health` is healthy after deploy; Render did not expose `Access-Control-Allow-Origin` for `https://eldercare-erp.onrender.com`, so existing service likely still needs `ELDERCARE_CORS_ORIGINS` set in Render Dashboard; Supabase DNS remains the only hard P0.2 blocker |
