@@ -13,6 +13,12 @@
 | `ELDERCARE_DEMO_AUTH` | `false` |
 | `ELDERCARE_SESSION_HOURS` | `12` |
 | `ELDERCARE_PAYMENT_EVIDENCE_BUCKET` | `payment-evidence` |
+| `ELDERCARE_PROMPTPAY_ID` | PromptPay ID สำหรับแสดงใน Customer Portal |
+| `ELDERCARE_PROMPTPAY_QR_URL` | URL รูป QR PromptPay ถ้ามี |
+| `ELDERCARE_PAYMENT_BANK_NAME` | ชื่อธนาคารสำหรับรับโอน ถ้าใช้บัญชี |
+| `ELDERCARE_PAYMENT_ACCOUNT_NO` | เลขบัญชีสำหรับรับโอน ถ้าใช้บัญชี |
+| `ELDERCARE_PAYMENT_ACCOUNT_NAME` | ชื่อบัญชีรับเงิน |
+| `ELDERCARE_PAYMENT_NOTE` | หมายเหตุสั้น ๆ ที่แสดงใน Customer Portal |
 | `ELDERCARE_CORS_ORIGINS` | `https://eldercare-erp.onrender.com` หรือ custom domain |
 | `ELDERCARE_PUBLIC_BASE_URL` | `https://eldercare-erp.onrender.com` หรือ custom domain |
 | `ELDERCARE_API_RATE_LIMIT_MAX` | `600` |

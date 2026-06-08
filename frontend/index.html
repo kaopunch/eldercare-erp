@@ -1106,11 +1106,35 @@
       display: grid;
     }
 
-    .public-site[data-public-entry="register"] .public-entry-grid,
     .public-site[data-public-entry="staff"] .public-entry-grid {
       display: grid;
       grid-template-columns: minmax(0, 760px);
       justify-content: center;
+    }
+
+    .public-site[data-public-entry="register"] .public-entry-grid {
+      position: fixed;
+      inset: 0;
+      z-index: 45;
+      display: grid;
+      place-items: center;
+      grid-template-columns: minmax(0, 860px);
+      padding: 18px;
+      background: rgba(15, 23, 42, .34);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      overflow: auto;
+    }
+
+    .public-site[data-public-entry="register"] #customer-register {
+      width: min(860px, 100%);
+      max-height: calc(100vh - 36px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .public-site[data-public-entry="register"] #customer-register .public-panel-body {
+      overflow: auto;
     }
 
     .public-site[data-public-entry="staff"] .public-entry-grid {
@@ -1148,6 +1172,41 @@
       font-weight: 850;
     }
 
+    .public-panel-title-row {
+      width: 100%;
+      min-width: 0;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .public-modal-close {
+      width: 38px;
+      height: 38px;
+      flex: 0 0 auto;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: #ffffff;
+      color: var(--muted);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+    }
+
+    .public-modal-close:hover,
+    .public-modal-close:focus-visible {
+      color: var(--ink);
+      border-color: rgba(18, 184, 166, .32);
+      outline: none;
+    }
+
+    .public-modal-close svg {
+      width: 18px;
+      height: 18px;
+      transform: rotate(45deg);
+    }
+
     .public-panel-header p {
       margin: 5px 0 0;
       color: var(--muted);
@@ -1159,6 +1218,37 @@
       padding: 18px;
       display: grid;
       gap: 14px;
+    }
+
+    .public-register-status {
+      min-height: 0;
+    }
+
+    .public-register-status .public-result {
+      display: grid;
+      gap: 6px;
+    }
+
+    .public-register-status .public-result[data-status="saving"] {
+      border-color: rgba(74, 124, 255, .24);
+      background: rgba(74, 124, 255, .08);
+    }
+
+    .public-register-status .public-result[data-status="success"] {
+      border-color: rgba(18, 184, 166, .28);
+      background: rgba(18, 184, 166, .10);
+    }
+
+    .public-register-status .public-result[data-status="error"] {
+      border-color: rgba(228, 93, 108, .30);
+      background: rgba(228, 93, 108, .09);
+    }
+
+    .public-result-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
     }
 
     .public-form-grid {
@@ -3014,6 +3104,38 @@
       gap: 12px;
       align-items: start;
       margin-top: 14px;
+    }
+
+    .portal-payment-panel {
+      padding: 12px;
+      border: 1px solid rgba(21, 34, 58, .08);
+      border-radius: var(--radius-sm);
+      background: #ffffff;
+      box-shadow: 0 8px 20px rgba(30, 67, 118, .05);
+      display: grid;
+      gap: 10px;
+    }
+
+    .portal-payment-form {
+      display: grid;
+      gap: 10px;
+    }
+
+    .portal-payment-qr {
+      width: min(160px, 100%);
+      aspect-ratio: 1;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      object-fit: contain;
+      background: #ffffff;
+      justify-self: start;
+    }
+
+    .portal-payment-note {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.35;
+      font-weight: 800;
     }
 
     .portal-recovery-card {
@@ -5246,9 +5368,14 @@
     <section class="public-wrap public-entry-grid">
       <section class="public-panel" id="customer-register">
         <div class="public-panel-header">
-          <div>
-            <h2>ลงทะเบียนลูกค้า</h2>
-            <p>สร้างโปรไฟล์ผู้จอง ผู้สูงวัย และ consent เริ่มต้นให้ทีมงานตรวจต่อใน ERP</p>
+          <div class="public-panel-title-row">
+            <div>
+              <h2>ลงทะเบียนลูกค้า</h2>
+              <p>สร้างโปรไฟล์ผู้จอง ผู้สูงวัย และ consent เริ่มต้นให้ทีมงานตรวจต่อใน ERP</p>
+            </div>
+            <button class="public-modal-close" type="button" data-public-close aria-label="ปิดหน้าลงทะเบียน">
+              <svg><use href="#icon-plus"/></svg>
+            </button>
           </div>
         </div>
         <div class="public-panel-body">
@@ -5387,7 +5514,7 @@
               </button>
             </div>
           </form>
-          <div id="publicRegisterResult"></div>
+          <div class="public-register-status" id="publicRegisterResult" role="status" aria-live="polite"></div>
         </div>
       </section>
 
@@ -7899,6 +8026,19 @@
       'portal.timeline': 'Timeline',
       'portal.fieldTeam': 'ทีมหน้างาน',
       'portal.payment': 'Payment',
+      'portal.paymentInstruction': 'วิธีชำระเงิน',
+      'portal.paymentPromptPay': 'PromptPay',
+      'portal.paymentAccount': 'บัญชีรับเงิน',
+      'portal.paymentBank': 'ธนาคาร',
+      'portal.paymentAccountName': 'ชื่อบัญชี',
+      'portal.paymentAmount': 'ยอดที่โอน',
+      'portal.paymentReference': 'เลขอ้างอิง/เวลาที่โอน',
+      'portal.paymentEvidence': 'สลิปหรือหลักฐาน',
+      'portal.uploadSlip': 'ส่งหลักฐานชำระเงิน',
+      'portal.paymentConfiguredMissing': 'รอทีมการเงินยืนยันช่องทางรับเงิน',
+      'portal.paymentUploadHint': 'รองรับ PDF, PNG, JPEG หรือ WebP ขนาดไม่เกิน 6 MB',
+      'portal.paymentTokenRequired': 'เปิดจากลิงก์ portal ที่ระบบส่งให้เพื่อส่งหลักฐานชำระเงิน',
+      'portal.paymentNoBalance': 'ไม่มียอดคงเหลือ',
       'portal.rateTrip': 'ให้คะแนนบริการ',
       'portal.submitRating': 'ส่ง rating',
       'portal.noStatus': 'ยังไม่มีข้อมูล portal',
@@ -8222,6 +8362,7 @@
       'toast.qualityReviewCreated': 'เปิด quality review แล้ว',
       'toast.portalLoaded': 'โหลด portal {id} แล้ว',
       'toast.portalRatingSaved': 'ส่ง rating ให้ booking {id} แล้ว',
+      'toast.portalEvidenceUploaded': 'ส่งหลักฐานชำระเงินสำหรับ booking {id} แล้ว',
       'toast.portalBookingCreated': 'สร้าง booking จาก portal {id} แล้ว',
       'toast.portalConsentSaved': 'บันทึก portal consent แล้ว',
       'toast.bookingConfirmed': 'อนุมัติและยืนยัน {id} แล้ว',
@@ -8671,6 +8812,19 @@
       'portal.timeline': 'Timeline',
       'portal.fieldTeam': 'Field team',
       'portal.payment': 'Payment',
+      'portal.paymentInstruction': 'Payment instructions',
+      'portal.paymentPromptPay': 'PromptPay',
+      'portal.paymentAccount': 'Receiving account',
+      'portal.paymentBank': 'Bank',
+      'portal.paymentAccountName': 'Account name',
+      'portal.paymentAmount': 'Transferred amount',
+      'portal.paymentReference': 'Reference / transfer time',
+      'portal.paymentEvidence': 'Slip or evidence',
+      'portal.uploadSlip': 'Submit payment evidence',
+      'portal.paymentConfiguredMissing': 'Finance team will confirm the payment channel',
+      'portal.paymentUploadHint': 'PDF, PNG, JPEG, or WebP up to 6 MB',
+      'portal.paymentTokenRequired': 'Open the secure portal link from the team to submit payment evidence',
+      'portal.paymentNoBalance': 'No remaining balance',
       'portal.rateTrip': 'Rate service',
       'portal.submitRating': 'Submit rating',
       'portal.noStatus': 'No portal data yet',
@@ -8994,6 +9148,7 @@
       'toast.qualityReviewCreated': 'Quality review opened',
       'toast.portalLoaded': 'Portal {id} loaded',
       'toast.portalRatingSaved': 'Rating sent for booking {id}',
+      'toast.portalEvidenceUploaded': 'Payment evidence submitted for booking {id}',
       'toast.portalBookingCreated': 'Portal booking {id} created',
       'toast.portalConsentSaved': 'Portal consent saved',
       'toast.bookingConfirmed': '{id} approved and confirmed',
@@ -10132,6 +10287,14 @@
     );
   }
 
+  function applyPortalDeepLinkView() {
+    if (!hasPortalDeepLink()) return false;
+    state.publicMode = false;
+    state.publicEntry = '';
+    state.activeView = 'portal';
+    return true;
+  }
+
   function getPublicEntryFromPath() {
     if (window.location.hash === '#login') return 'login';
     if (/^\/login\/?$/i.test(window.location.pathname)) return 'login';
@@ -10152,6 +10315,7 @@
 
   state.publicMode = !shouldStartInErp();
   state.publicEntry = state.publicMode ? getPublicEntryFromPath() : '';
+  applyPortalDeepLinkView();
 
   function syncPostAuthView() {
     if (!state.session) return;
@@ -10339,6 +10503,8 @@
           ? els.publicStaffEmailInput
           : els.publicStaffUserSelect;
         focusTarget?.focus?.({ preventScroll: true });
+      } else if (state.publicEntry === 'register') {
+        els.publicRegisterForm?.elements?.customer_full_name?.focus?.({ preventScroll: true });
       }
     });
   }
@@ -10349,6 +10515,28 @@
     [250, 900].forEach((delay) => {
       window.setTimeout(() => focusPublicEntry({ smooth: false }), delay);
     });
+  }
+
+  function setPublicRegisterStatus(status, title, lines = [], actions = '') {
+    if (!els.publicRegisterResult) return;
+    const content = Array.isArray(lines) ? lines : [lines];
+    els.publicRegisterResult.innerHTML = `
+      <div class="public-result" data-status="${escapeHtml(status)}">
+        <strong>${escapeHtml(title)}</strong>
+        ${content.filter(Boolean).map((line) => `<span>${escapeHtml(line)}</span>`).join('')}
+        ${actions ? `<div class="public-result-actions">${actions}</div>` : ''}
+      </div>
+    `;
+  }
+
+  function clearPublicRegisterStatus() {
+    if (els.publicRegisterResult) els.publicRegisterResult.innerHTML = '';
+  }
+
+  function closePublicRegisterModal() {
+    if (state.publicEntry !== 'register') return;
+    clearPublicRegisterStatus();
+    showPublicSite({ persist: true });
   }
 
   function showPublicEntry(entry) {
@@ -10362,6 +10550,7 @@
       setPublicRegisterStep(Number(state.publicRegisterStep || 1));
       renderPublicServiceDescription();
     }
+    if (nextEntry === 'register') clearPublicRegisterStatus();
     renderAuthControls();
     schedulePublicEntryFocus({ smooth: true });
   }
@@ -10477,6 +10666,25 @@
     return input.get(key) === 'on';
   }
 
+  function publicRegisterErrorMessage(error) {
+    const issues = Array.isArray(error?.details) ? error.details : [];
+    const firstIssue = issues[0] || null;
+    const field = Array.isArray(firstIssue?.path) ? firstIssue.path.join('.') : '';
+    const fieldMessages = {
+      customer_full_name: 'กรุณากรอกชื่อผู้ติดต่ออย่างน้อย 2 ตัวอักษร',
+      phone: 'กรุณากรอกเบอร์โทรอย่างน้อย 6 หลัก',
+      email: 'รูปแบบอีเมลไม่ถูกต้อง',
+      elder_full_name: 'กรุณากรอกชื่อผู้สูงวัยอย่างน้อย 2 ตัวอักษร',
+      mobility_level: 'กรุณาเลือกการเคลื่อนไหวของผู้สูงวัย',
+      general_service: 'กรุณายินยอมให้ใช้ข้อมูลเพื่อเตรียมบริการ',
+      accept_non_emergency: 'กรุณารับทราบว่าบริการนี้ไม่ใช่รถพยาบาลฉุกเฉิน'
+    };
+    if (fieldMessages[field]) return fieldMessages[field];
+    if (firstIssue?.message && !String(firstIssue.message).startsWith('[')) return firstIssue.message;
+    if (error?.code === 'ZodError') return 'กรุณาตรวจสอบข้อมูลที่จำเป็นในแบบฟอร์ม';
+    return error?.message || 'ไม่สามารถลงทะเบียนได้ในขณะนี้';
+  }
+
   async function registerPublicCustomer(form, button) {
     if (!form.checkValidity()) {
       form.reportValidity();
@@ -10500,7 +10708,14 @@
       location_tracking: formBool(input, 'location_tracking'),
       accept_non_emergency: formBool(input, 'accept_non_emergency')
     };
+    const submitLabel = button?.querySelector('span');
+    const originalSubmitText = submitLabel?.textContent || '';
     setButtonBusy(button, true);
+    if (submitLabel) submitLabel.textContent = 'กำลังบันทึก...';
+    setPublicRegisterStatus('saving', 'กำลังบันทึกข้อมูล', [
+      'ระบบกำลังสร้างโปรไฟล์ลูกค้า ผู้สูงวัย และ consent เริ่มต้น',
+      'กรุณารอสักครู่ อย่าปิดหน้าต่างนี้'
+    ]);
     try {
       const result = await apiPost('/api/portal/register', payload, { skipAuth: true });
       const registration = result.registration || {};
@@ -10508,16 +10723,20 @@
       const elder = registration.elder || {};
       state.apiOnline = true;
       setApiStatus('online', 'status.connected');
-      if (els.publicRegisterResult) {
-        els.publicRegisterResult.innerHTML = `
-          <div class="public-result">
-            <strong>ลงทะเบียนสำเร็จ</strong>
-            <span>ลูกค้า: ${escapeHtml(customer.full_name || payload.customer_full_name)} / ${escapeHtml(customer.phone || payload.phone)}</span>
-            <span>ผู้สูงวัย: ${escapeHtml(elder.full_name || payload.elder_full_name)} / ${mobilityLabel(elder.mobility_level || payload.mobility_level)}</span>
-            <span>ทีมงานสามารถเปิดข้อมูลนี้ใน ERP เพื่อประเมินและสร้าง booking ต่อได้</span>
-          </div>
-        `;
-      }
+      setPublicRegisterStatus('success', 'ลงทะเบียนสำเร็จ', [
+        `ลูกค้า: ${customer.full_name || payload.customer_full_name} / ${customer.phone || payload.phone}`,
+        `ผู้สูงวัย: ${elder.full_name || payload.elder_full_name} / ${mobilityLabel(elder.mobility_level || payload.mobility_level)}`,
+        'ทีมงานสามารถเปิดข้อมูลนี้ใน ERP เพื่อประเมินและสร้าง booking ต่อได้'
+      ], `
+        <button class="btn primary" type="button" data-public-close>
+          <svg><use href="#icon-shield"/></svg>
+          <span>รับทราบ</span>
+        </button>
+        <button class="btn ghost" type="button" data-public-register-again>
+          <svg><use href="#icon-plus"/></svg>
+          <span>ลงทะเบียนเพิ่ม</span>
+        </button>
+      `);
       form.reset();
       ['general_service', 'sensitive_health', 'family_notification', 'location_tracking', 'accept_non_emergency'].forEach((name) => {
         const field = form.elements[name];
@@ -10527,17 +10746,15 @@
       renderPublicServiceDescription();
       showToast('ลงทะเบียนลูกค้าแล้ว');
     } catch (error) {
-      if (els.publicRegisterResult) {
-        els.publicRegisterResult.innerHTML = `
-          <div class="public-result">
-            <strong>ลงทะเบียนไม่สำเร็จ</strong>
-            <span>${escapeHtml(error.message)}</span>
-          </div>
-        `;
-      }
+      const friendlyError = publicRegisterErrorMessage(error);
+      setPublicRegisterStatus('error', 'ลงทะเบียนไม่สำเร็จ', [
+        friendlyError,
+        'ยังไม่มีการบันทึกข้อมูล กรุณาตรวจข้อมูลแล้วกดบันทึกอีกครั้ง'
+      ]);
       setApiStatus('offline', 'status.offline');
-      showToast(tr('toast.saveFailed', { message: error.message }));
+      showToast(tr('toast.saveFailed', { message: friendlyError }));
     } finally {
+      if (submitLabel) submitLabel.textContent = originalSubmitText || 'ส่งข้อมูลลงทะเบียน';
       setButtonBusy(button, false);
     }
   }
@@ -11019,6 +11236,50 @@
 
   function apiPatch(path, body) {
     return apiRequest(path, { method: 'PATCH', body: JSON.stringify(body) });
+  }
+
+  async function loadPortalPublicData({ silent = false } = {}) {
+    let loaded = false;
+    state.apiBusy = true;
+    setApiStatus('loading', 'status.syncing');
+    try {
+      const optionsPayload = await apiGet('/api/portal/options', { skipAuth: true }).catch(() => null);
+      if (optionsPayload?.options) state.portalOptions = optionsPayload.options;
+
+      if (state.portalStatusToken || state.portalBookingNo) {
+        const portalPayload = state.portalStatusToken
+          ? await apiGet(`/api/portal/status-token/${encodeURIComponent(state.portalStatusToken)}`, { skipAuth: true })
+          : await apiGet(`/api/portal/status/${encodeURIComponent(state.portalBookingNo)}`, { skipAuth: true });
+        state.portalStatus = portalPayload.portal || null;
+        if (portalPayload.portal?.booking?.booking_no) state.portalBookingNo = portalPayload.portal.booking.booking_no;
+        loaded = true;
+      }
+
+      if (state.portalConsentToken || state.portalConsentElderId) {
+        const consentPayload = state.portalConsentToken
+          ? await apiGet(`/api/portal/consent-token/${encodeURIComponent(state.portalConsentToken)}`, { skipAuth: true })
+          : await apiGet(`/api/portal/consent/${encodeURIComponent(state.portalConsentElderId)}`, { skipAuth: true });
+        state.portalConsentProfile = consentPayload.consent_profile || null;
+        if (consentPayload.consent_profile?.elder?.id) state.portalConsentElderId = consentPayload.consent_profile.elder.id;
+        loaded = true;
+      }
+
+      state.apiOnline = loaded || Boolean(optionsPayload?.options);
+      state.apiError = '';
+      setApiStatus(state.apiOnline ? 'online' : 'offline', state.apiOnline ? 'status.connected' : 'status.offline');
+    } catch (error) {
+      state.apiOnline = false;
+      state.apiError = error.message;
+      state.portalStatus = null;
+      setApiStatus('offline', 'status.offline');
+      if (!silent) showToast(tr('toast.apiOffline'));
+    } finally {
+      state.apiBusy = false;
+      applyPortalDeepLinkView();
+      syncShellMode();
+      renderAll();
+      if (hasPortalDeepLink()) setView('portal');
+    }
   }
 
   function booleanFromForm(value) {
@@ -12285,7 +12546,10 @@
     }
 
     startAiRealtimeStream();
+    applyPortalDeepLinkView();
+    syncShellMode();
     renderAll();
+    if (hasPortalDeepLink()) setView('portal');
     if (!silent) showToast(tr('toast.apiLoaded'));
   }
 
@@ -13298,6 +13562,66 @@
         <span class="status ${safeClass(payment.payment_status)}">${statusLabel(payment.payment_status)}</span>
       </div>
     `).join('') : `<div class="empty">${tr('finance.noPayments')}</div>`;
+    const paymentInstruction = finance.payment_instruction || {};
+    const portalBalance = Math.max(0, Number(finance.balance || 0));
+    const canUploadPortalEvidence = portalBalance > 0 && Boolean(state.portalStatusToken);
+    const paymentInputValue = portalBalance > 0 ? portalBalance.toFixed(2) : '0.00';
+    const instructionItems = [
+      { label: tr('portal.paymentPromptPay'), value: paymentInstruction.promptpay_id },
+      { label: tr('portal.paymentBank'), value: paymentInstruction.bank_name },
+      { label: tr('portal.paymentAccount'), value: paymentInstruction.account_no },
+      { label: tr('portal.paymentAccountName'), value: paymentInstruction.account_name }
+    ].filter((item) => item.value);
+    const paymentInstructionRows = instructionItems.length
+      ? instructionItems.map((item) => `
+        <div class="detail-item"><span>${escapeHtml(item.label)}</span><strong>${escapeHtml(item.value)}</strong></div>
+      `).join('')
+      : `<div class="detail-item" style="grid-column:1/-1"><span>${tr('portal.paymentInstruction')}</span><strong>${tr('portal.paymentConfiguredMissing')}</strong></div>`;
+    const portalPaymentPanel = portalBalance > 0 ? `
+      <form class="portal-payment-panel portal-payment-form" id="portalPaymentEvidenceForm">
+        <div class="portal-card-head">
+          <div>
+            <span>${tr('portal.paymentInstruction')}</span>
+            <strong>${formatCurrency(portalBalance)}</strong>
+          </div>
+          <span class="status ${paymentInstruction.configured ? 'paid' : 'pending'}">${paymentInstruction.configured ? 'PromptPay' : tr('common.pending')}</span>
+        </div>
+        ${paymentInstruction.qr_url ? `<img class="portal-payment-qr" src="${escapeHtml(paymentInstruction.qr_url)}" alt="PromptPay QR"/>` : ''}
+        <div class="detail-grid">
+          ${paymentInstructionRows}
+        </div>
+        ${paymentInstruction.note ? `<div class="portal-payment-note">${escapeHtml(paymentInstruction.note)}</div>` : ''}
+        <div class="form-grid">
+          <label class="field">
+            <span>${tr('portal.paymentAmount')}</span>
+            <input class="input" name="amount" type="number" min="0.01" step="0.01" max="${escapeHtml(paymentInputValue)}" value="${escapeHtml(paymentInputValue)}" required ${canUploadPortalEvidence ? '' : 'disabled'}/>
+          </label>
+          <label class="field">
+            <span>${tr('portal.paymentReference')}</span>
+            <input class="input" name="transaction_ref" placeholder="PromptPay / bank ref" ${canUploadPortalEvidence ? '' : 'disabled'}/>
+          </label>
+          <label class="field wide">
+            <span>${tr('portal.paymentEvidence')}</span>
+            <input class="input" name="evidence" type="file" accept="image/png,image/jpeg,image/webp,application/pdf" required ${canUploadPortalEvidence ? '' : 'disabled'}/>
+          </label>
+        </div>
+        <button class="btn primary" type="submit" ${canUploadPortalEvidence ? '' : 'disabled'}>
+          <svg><use href="#icon-send"/></svg>
+          ${tr('portal.uploadSlip')}
+        </button>
+        <small class="portal-payment-note">${canUploadPortalEvidence ? tr('portal.paymentUploadHint') : tr('portal.paymentTokenRequired')}</small>
+      </form>
+    ` : `
+      <div class="portal-payment-panel">
+        <div class="portal-card-head">
+          <div>
+            <span>${tr('portal.payment')}</span>
+            <strong>${tr('portal.paymentNoBalance')}</strong>
+          </div>
+          <span class="status paid">${statusLabel('paid')}</span>
+        </div>
+      </div>
+    `;
 
     els.portalDetail.innerHTML = `
       ${hasRecovery ? `
@@ -13342,10 +13666,7 @@
           <strong>${tr('portal.payment')}</strong>
           ${payments}
         </div>
-        <div class="portal-next-action">
-          <span>${escapeHtml(primaryNextAction)}</span>
-          <strong>${escapeHtml(primaryNextActionDetail)}</strong>
-        </div>
+        ${portalPaymentPanel}
       </div>
       <section class="portal-care-card">
         <div class="portal-card-head">
@@ -14598,6 +14919,39 @@
     });
   }
 
+  async function submitPortalPaymentEvidence(form, button) {
+    if (!state.portalStatus?.booking?.booking_no) return;
+    const token = state.portalStatusToken || state.portalRatingToken || '';
+    if (!token) {
+      showToast(tr('portal.paymentTokenRequired'));
+      return;
+    }
+    const input = new FormData(form);
+    const file = input.get('evidence');
+    if (!file || !file.size) {
+      showToast(tr('portal.paymentEvidence'));
+      return;
+    }
+    const bookingNo = state.portalStatus.booking.booking_no;
+    await withSaveToast(button, async () => {
+      const dataUrl = await readFileAsDataUrl(file);
+      await apiPost(`/api/portal/status-token/${encodeURIComponent(token)}/payment-evidence`, {
+        amount: Number(input.get('amount') || state.portalStatus?.finance?.balance || 0),
+        transaction_ref: input.get('transaction_ref') || null,
+        file_name: file.name,
+        content_type: file.type || 'application/octet-stream',
+        data_url: dataUrl
+      });
+      const payload = await apiGet(`/api/portal/status-token/${encodeURIComponent(token)}`);
+      state.portalStatus = payload.portal || null;
+      state.portalBookingNo = bookingNo;
+      if (state.session) await loadApiData({ silent: true });
+      if (payload.portal) state.portalStatus = payload.portal;
+      renderAll();
+      showToast(tr('toast.portalEvidenceUploaded', { id: bookingNo }));
+    });
+  }
+
   async function submitPortalBooking(form, button) {
     const input = new FormData(form);
     const payload = {
@@ -14797,11 +15151,33 @@
   });
 
   document.addEventListener('click', (event) => {
+    const closeButton = event.target.closest('[data-public-close]');
+    if (closeButton) {
+      event.preventDefault();
+      closePublicRegisterModal();
+      setPublicMenuOpen(false);
+      return;
+    }
+    const registerAgainButton = event.target.closest('[data-public-register-again]');
+    if (registerAgainButton) {
+      event.preventDefault();
+      clearPublicRegisterStatus();
+      setPublicRegisterStep(1, { focus: true });
+      return;
+    }
+    if (state.publicEntry === 'register' && event.target.classList?.contains('public-entry-grid')) {
+      closePublicRegisterModal();
+      return;
+    }
     if (!publicMenu?.classList.contains('open')) return;
     if (!publicMenu.contains(event.target)) setPublicMenuOpen(false);
   });
 
   document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && state.publicEntry === 'register') {
+      closePublicRegisterModal();
+      return;
+    }
     if (event.key === 'Escape') setPublicMenuOpen(false);
   });
 
@@ -15189,9 +15565,14 @@
   });
 
   els.portalDetail.addEventListener('submit', async (event) => {
-    if (event.target.id !== 'portalRatingForm') return;
-    event.preventDefault();
-    await submitPortalRating(event.target, event.submitter);
+    if (event.target.id === 'portalRatingForm') {
+      event.preventDefault();
+      await submitPortalRating(event.target, event.submitter);
+    }
+    if (event.target.id === 'portalPaymentEvidenceForm') {
+      event.preventDefault();
+      await submitPortalPaymentEvidence(event.target, event.submitter);
+    }
   });
 
   els.portalBookForm.addEventListener('submit', async (event) => {
@@ -15437,6 +15818,7 @@
     loadApiData();
   });
 
+  applyPortalDeepLinkView();
   syncShellMode();
   schedulePublicEntryFocus({ smooth: false });
 
@@ -15450,6 +15832,7 @@
       return null;
     }
     if (!state.session && state.authConfig.pin_required) {
+      if (hasPortalDeepLink()) return loadPortalPublicData({ silent: true });
       setApiStatus('offline', 'auth.loginRequired');
       renderAll();
       return null;

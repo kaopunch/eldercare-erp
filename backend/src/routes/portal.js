@@ -12,6 +12,11 @@ const {
 const { queueCustomerNotification, queueNotification } = require('../lib/notifications');
 const { configured: lineConfigured } = require('../lib/line');
 const {
+  decodeUploadBody,
+  signedEvidenceUrl,
+  uploadPaymentEvidence
+} = require('../lib/storage');
+const {
   buildCareSummary,
   buildCustomerJourney,
   buildLineExperience,
@@ -53,6 +58,15 @@ const PortalConsentSchema = z.object({
 
 const emptyToNull = (value) => (value === '' ? null : value);
 
+const PortalPaymentEvidenceSchema = z.object({
+  amount: z.preprocess(emptyToNull, z.coerce.number().finite().positive().optional().nullable()),
+  transaction_ref: z.preprocess(emptyToNull, z.string().trim().max(120).optional().nullable()),
+  file_name: z.preprocess(emptyToNull, z.string().trim().max(180).optional().nullable()),
+  content_type: z.string().trim().max(120).optional(),
+  data_url: z.string().optional(),
+  data_base64: z.string().optional()
+});
+
 const PortalRegistrationSchema = z.object({
   customer_full_name: z.string().min(2),
   phone: z.string().min(6),
@@ -83,6 +97,26 @@ function firstRelation(value) {
 function numeric(value) {
   const number = Number(value || 0);
   return Number.isFinite(number) ? number : 0;
+}
+
+function paymentInstruction(balance = 0) {
+  const promptpayId = process.env.ELDERCARE_PROMPTPAY_ID || process.env.PROMPTPAY_ID || '';
+  const accountNo = process.env.ELDERCARE_PAYMENT_ACCOUNT_NO || '';
+  const accountName = process.env.ELDERCARE_PAYMENT_ACCOUNT_NAME || process.env.ELDERCARE_PAYMENT_PAYEE_NAME || '';
+  const bankName = process.env.ELDERCARE_PAYMENT_BANK_NAME || '';
+  const qrUrl = process.env.ELDERCARE_PROMPTPAY_QR_URL || process.env.ELDERCARE_PAYMENT_QR_URL || '';
+  return {
+    method: 'promptpay',
+    currency: 'THB',
+    amount: numeric(balance),
+    configured: Boolean(promptpayId || accountNo || qrUrl),
+    promptpay_id: promptpayId || null,
+    account_no: accountNo || null,
+    account_name: accountName || null,
+    bank_name: bankName || null,
+    qr_url: qrUrl || null,
+    note: process.env.ELDERCARE_PAYMENT_NOTE || null
+  };
 }
 
 function bookingNo() {
@@ -406,6 +440,113 @@ async function getPortalBooking(sb, bookingNo) {
   return data;
 }
 
+async function portalPaymentBalance(sb, bookingNo) {
+  const booking = await getPortalBooking(sb, bookingNo);
+  const [payments, refunds] = await Promise.all([
+    sb.from('payments').select('amount,payment_status').eq('booking_id', booking.id),
+    sb.from('refunds').select('amount,status').eq('booking_id', booking.id)
+  ]);
+  if (payments.error) throw payments.error;
+  if (refunds.error) throw refunds.error;
+
+  const total = numeric(booking.final_price || booking.quoted_price);
+  const paid = (payments.data || [])
+    .filter((payment) => !['refunded', 'partial_refunded'].includes(payment.payment_status))
+    .reduce((sum, payment) => sum + numeric(payment.amount), 0);
+  const refunded = (refunds.data || [])
+    .filter((refund) => ['approved', 'paid'].includes(refund.status))
+    .reduce((sum, refund) => sum + numeric(refund.amount), 0);
+  const netPaid = Math.max(0, paid - refunded);
+  const balance = Math.max(0, Math.round((total - netPaid) * 100) / 100);
+  return { booking, total, paid, refunded, netPaid, balance };
+}
+
+async function savePortalPaymentEvidence(sb, bookingNo, body, req) {
+  const input = PortalPaymentEvidenceSchema.parse(body);
+  const current = await portalPaymentBalance(sb, bookingNo);
+  if (current.balance <= 0) {
+    const error = new Error('booking has no remaining payment balance');
+    error.statusCode = 422;
+    error.code = 'PAYMENT_BALANCE_CLOSED';
+    throw error;
+  }
+
+  const requestedAmount = numeric(input.amount == null ? current.balance : input.amount);
+  if (requestedAmount <= 0 || requestedAmount - current.balance > 0.01) {
+    const error = new Error(`payment amount must be between 0 and remaining balance ${current.balance}`);
+    error.statusCode = 422;
+    error.code = 'PAYMENT_AMOUNT_INVALID';
+    error.details = { requestedAmount, remainingBalance: current.balance };
+    throw error;
+  }
+
+  const { buffer, contentType } = decodeUploadBody(input);
+  const uploaded = await uploadPaymentEvidence(sb, {
+    bookingId: current.booking.id,
+    fileName: input.file_name || 'portal-payment-evidence',
+    contentType,
+    buffer
+  });
+  const nextPaymentStatus = Math.abs(requestedAmount - current.balance) <= 0.01
+    ? 'paid'
+    : 'deposit_paid';
+  const { data: payment, error: paymentError } = await sb.from('payments').insert({
+    booking_id: current.booking.id,
+    payment_method: 'promptpay',
+    amount: requestedAmount,
+    payment_status: nextPaymentStatus,
+    paid_at: new Date().toISOString(),
+    transaction_ref: input.transaction_ref || null,
+    evidence_url: uploaded.ref
+  }).select('*').single();
+  if (paymentError) throw paymentError;
+
+  await sb.from('bookings').update({ payment_status: payment.payment_status }).eq('id', current.booking.id);
+  if (payment.payment_status === 'paid') {
+    await sb.from('invoices').update({ status: 'paid' }).eq('booking_id', current.booking.id).neq('status', 'void');
+  }
+
+  await sb.from('audit_logs').insert({
+    company_id: current.booking.company_id || null,
+    action: 'portal_payment_evidence_submitted',
+    entity_type: 'payment',
+    entity_id: payment.id,
+    payload: {
+      booking_id: current.booking.id,
+      booking_no: current.booking.booking_no,
+      amount: payment.amount,
+      payment_status: payment.payment_status,
+      transaction_ref: payment.transaction_ref,
+      storage_path: uploaded.path,
+      ip_address: req.ip || null,
+      user_agent: req.get('user-agent') || null,
+      source: 'customer_portal'
+    }
+  });
+
+  await queueCustomerNotification(sb, current.booking, 'payment_received', {
+    payment_id: payment.id,
+    amount: payment.amount,
+    payment_method: payment.payment_method,
+    payment_status: payment.payment_status,
+    transaction_ref: payment.transaction_ref,
+    evidence_attached: true,
+    source: 'customer_portal'
+  });
+
+  const signed = await signedEvidenceUrl(sb, uploaded.ref);
+  return {
+    payment,
+    evidence: {
+      payment_id: payment.id,
+      booking_id: current.booking.id,
+      evidence_url: uploaded.ref,
+      signed_url: signed.url,
+      expires_in: signed.expires_in
+    }
+  };
+}
+
 async function portalPayload(sb, bookingNo, req = null) {
   const booking = await getPortalBooking(sb, bookingNo);
   const [assignments, events, invoices, payments, refunds, ratings, summaries, familyUpdates, locations, consentState] = await Promise.all([
@@ -478,6 +619,7 @@ async function portalPayload(sb, bookingNo, req = null) {
     payments: payments.data || [],
     refunds: refunds.data || []
   };
+  finance.payment_instruction = paymentInstruction(finance.balance);
   const rating = {
     can_rate: booking.status === 'completed',
     latest: (ratings.data || [])[0] || null
@@ -933,6 +1075,15 @@ router.post('/status-token/:token/rating', async (req, res, next) => {
     const token = verifyPortalToken(req.params.token, 'booking_rating');
     const sb = getSupabase();
     const result = await savePortalRating(sb, token.value, req.body);
+    res.status(201).json({ ok: true, ...result });
+  } catch (e) { next(e); }
+});
+
+router.post('/status-token/:token/payment-evidence', async (req, res, next) => {
+  try {
+    const token = verifyPortalToken(req.params.token, ['booking_status', 'booking_rating']);
+    const sb = getSupabase();
+    const result = await savePortalPaymentEvidence(sb, token.value, req.body, req);
     res.status(201).json({ ok: true, ...result });
   } catch (e) { next(e); }
 });

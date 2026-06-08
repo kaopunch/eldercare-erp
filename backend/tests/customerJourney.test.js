@@ -74,9 +74,33 @@ class FakeQuery {
 }
 
 function fakeSupabase(rows) {
+  const storage = {
+    buckets: {},
+    objects: [],
+    async getBucket(bucket) {
+      return { data: this.buckets[bucket] || null, error: null };
+    },
+    async createBucket(bucket, options) {
+      this.buckets[bucket] = { id: bucket, name: bucket, ...options };
+      return { data: this.buckets[bucket], error: null };
+    },
+    from(bucket) {
+      return {
+        upload: async (objectPath, buffer, options) => {
+          storage.objects.push({ bucket, path: objectPath, buffer, options });
+          return { data: { path: objectPath }, error: null };
+        },
+        createSignedUrl: async (objectPath, expiresIn) => ({
+          data: { signedUrl: `https://signed.example/${bucket}/${objectPath}?expires=${expiresIn}` },
+          error: null
+        })
+      };
+    }
+  };
   return {
     rows,
     writes: [],
+    storage,
     from(table) {
       return new FakeQuery(this, table);
     }
@@ -214,6 +238,58 @@ test('portal status exposes customer journey, trust, next action, and care summa
   assert.ok(response.body.portal.trust, 'portal.trust should expose field-team and safety reassurance details');
   assert.ok(response.body.portal.next_action, 'portal.next_action should tell the family what happens next');
   assert.ok(response.body.portal.care_summary, 'portal.care_summary should expose approved/family-safe care context');
+});
+
+test('portal token payment evidence upload creates payment with private storage reference', async () => {
+  process.env.PORTAL_TOKEN_SECRET = 'test-portal-secret';
+  const sb = fakeSupabase({
+    bookings: [baseBooking()],
+    payments: [],
+    refunds: [],
+    invoices: [{ id: 'invoice-1', booking_id: 'booking-1', status: 'issued' }],
+    notifications: [],
+    audit_logs: []
+  });
+
+  const tokenResponse = await requestRoute('../src/routes/portal', sb, 'GET', '/token/booking/BK-CJ-1');
+  assert.equal(tokenResponse.status, 200, JSON.stringify(tokenResponse.body));
+  const token = tokenResponse.body.links.status.split('/').pop();
+
+  const response = await requestRoute('../src/routes/portal', sb, 'POST', `/status-token/${token}/payment-evidence`, {
+    amount: 2500,
+    transaction_ref: 'BANK-REF-1',
+    file_name: 'slip.png',
+    content_type: 'image/png',
+    data_base64: Buffer.from('fake png evidence').toString('base64')
+  });
+
+  assert.equal(response.status, 201, JSON.stringify(response.body));
+  assert.equal(response.body.ok, true);
+  assert.equal(response.body.payment.booking_id, 'booking-1');
+  assert.equal(response.body.payment.amount, 2500);
+  assert.equal(response.body.payment.payment_status, 'paid');
+  assert.match(response.body.payment.evidence_url, /^storage:\/\/payment-evidence\/payments\/booking-1\/pending\//);
+  assert.match(response.body.evidence.signed_url, /^https:\/\/signed\.example\/payment-evidence\//);
+
+  const paymentWrite = sb.writes.find((write) => write.table === 'payments' && write.type === 'insert');
+  assert.equal(paymentWrite.payload.payment_method, 'promptpay');
+  assert.equal(paymentWrite.payload.transaction_ref, 'BANK-REF-1');
+  assert.equal(sb.storage.objects.length, 1);
+  assert.equal(sb.storage.objects[0].bucket, 'payment-evidence');
+
+  const bookingPaid = sb.writes.find((write) => write.table === 'bookings' && write.type === 'update' && write.payload.payment_status === 'paid');
+  assert.ok(bookingPaid, 'booking should be marked paid after full portal payment');
+
+  const invoicePaid = sb.writes.find((write) => write.table === 'invoices' && write.type === 'update' && write.payload.status === 'paid');
+  assert.ok(invoicePaid, 'issued invoice should be marked paid');
+
+  const audit = sb.writes.find((write) => write.table === 'audit_logs' && write.type === 'insert');
+  assert.equal(audit.payload.action, 'portal_payment_evidence_submitted');
+
+  const notification = sb.writes.find((write) => write.table === 'notifications' && write.type === 'insert');
+  assert.equal(notification.payload.notification_type, 'payment_received');
+  assert.equal(notification.payload.payload.source, 'customer_portal');
+  assert.equal(notification.payload.payload.evidence_attached, true);
 });
 
 test('trip events queue customer-family notification payloads with event context', async () => {
