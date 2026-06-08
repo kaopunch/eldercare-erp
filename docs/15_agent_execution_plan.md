@@ -260,6 +260,7 @@ Go/no-go criteria:
 cd backend
 npm test
 npm audit --omit=dev --audit-level=moderate
+npm run verify:runtime -- --base-url=https://eldercare-erp.onrender.com
 npm run check:supabase-key
 PORT=18080 npm start
 curl -s http://127.0.0.1:18080/health
@@ -274,3 +275,6 @@ Agent ต้องอัปเดตส่วนนี้เมื่อทำ�
 | 2026-06-08 | Baseline readiness review | Done | Tests passed 35/35; Supabase DNS failed; audit found qs/ws moderate vulnerabilities |
 | 2026-06-08 | P0.1 dependency audit fix | Done | `npm audit fix` updated `qs` to 6.15.2 and `ws` to 8.21.0; `npm audit --omit=dev --audit-level=moderate` found 0 vulnerabilities |
 | 2026-06-08 | P0.3 server hardening pass 1 | Done | Added CORS allowlist support, basic security headers, API/auth/portal/AI inbound rate limits, safe URL logging, dedicated portal secret config, and readiness checks; `npm test` passed 40/40 |
+| 2026-06-08 | P0.2 runtime readiness tooling | Done | Added `npm run verify:runtime` to check Supabase DNS/schema/storage plus Render health/auth/readiness without printing secrets; current Supabase host still fails DNS in this environment |
+| 2026-06-08 | P1 UAT playbook | Done | Added `docs/16_uat_playbook.md` covering lead, profile, consent, booking, assignment, trip, completion, finance, portal, rating, readiness, and sign-off |
+| 2026-06-08 | P3 operations monitoring pass 1 | Done | Added operations health builder, `/api/dashboard/operations-health`, tests, and `docs/17_operations_monitoring_runbook.md` for daily pilot monitoring |

@@ -2,6 +2,7 @@
 const express = require('express');
 const { getSupabase } = require('../db/supabase');
 const { buildExecutiveDashboard } = require('../lib/executiveDashboard');
+const { buildOperationsHealth } = require('../lib/operationsHealth');
 const router = express.Router();
 
 router.get('/summary', async (_, res, next) => {
@@ -44,6 +45,38 @@ router.get('/summary', async (_, res, next) => {
         aiTasks: aiTasks.error ? [] : aiTasks.data || [],
         verificationChecks: verificationChecks.error ? [] : verificationChecks.data || [],
         realtimeEvents: realtimeEvents.error ? [] : realtimeEvents.data || []
+      })
+    });
+  } catch (e) { next(e); }
+});
+
+router.get('/operations-health', async (_, res, next) => {
+  try {
+    const sb = getSupabase();
+    const [bookings, incidents, notifications, realtimeEvents, aiTasks] = await Promise.all([
+      sb.from('bookings')
+        .select('id,booking_no,status,risk_level,service_type,pickup_at,final_price,quoted_price,payment_status,visit_summaries(status,approved_at)')
+        .order('pickup_at', { ascending: true })
+        .limit(500),
+      sb.from('incidents').select('id,booking_id,severity,status,created_at'),
+      sb.from('notifications').select('id,booking_id,status,delivery_status,created_at').order('created_at', { ascending: false }).limit(300),
+      sb.from('realtime_events').select('id,booking_id,event_type,delivery_status,created_at').order('created_at', { ascending: false }).limit(300),
+      sb.from('ai_admin_tasks').select('id,booking_id,risk_level,approval_status,status').order('created_at', { ascending: false }).limit(300)
+    ]);
+    if (bookings.error) throw bookings.error;
+    if (incidents.error) throw incidents.error;
+    if (notifications.error) throw notifications.error;
+    if (realtimeEvents.error && !['42P01', 'PGRST205'].includes(realtimeEvents.error.code)) throw realtimeEvents.error;
+    if (aiTasks.error && !['42P01', 'PGRST205'].includes(aiTasks.error.code)) throw aiTasks.error;
+
+    res.json({
+      ok: true,
+      operations_health: buildOperationsHealth({
+        bookings: bookings.data || [],
+        incidents: incidents.data || [],
+        notifications: notifications.data || [],
+        realtimeEvents: realtimeEvents.error ? [] : realtimeEvents.data || [],
+        aiTasks: aiTasks.error ? [] : aiTasks.data || []
       })
     });
   } catch (e) { next(e); }
