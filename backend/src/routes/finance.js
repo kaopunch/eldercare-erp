@@ -322,9 +322,22 @@ router.post('/invoices', async (req, res, next) => {
       .single();
     if (bookingError) throw bookingError;
 
-    const subtotal = Number(req.body.subtotal ?? booking.final_price ?? booking.quoted_price ?? 0);
-    const tax = Number(req.body.tax ?? Math.round(subtotal * 0.07 * 100) / 100);
-    const total = Number(req.body.total ?? subtotal + tax);
+    // booking.final_price/quoted_price already include 7% VAT (see calculateQuote),
+    // so when no explicit breakdown is given, derive subtotal/tax from that VAT-inclusive total
+    // instead of adding VAT on top of it again.
+    const taxRate = Number(req.body.tax_rate ?? 0.07);
+    let subtotal = req.body.subtotal;
+    let tax = req.body.tax;
+    let total = req.body.total;
+    if (subtotal === undefined && tax === undefined && total === undefined) {
+      total = Number(booking.final_price ?? booking.quoted_price ?? 0);
+      subtotal = Math.round((total / (1 + taxRate)) * 100) / 100;
+      tax = Math.round((total - subtotal) * 100) / 100;
+    } else {
+      subtotal = Number(subtotal ?? 0);
+      tax = Number(tax ?? Math.round(subtotal * taxRate * 100) / 100);
+      total = Number(total ?? subtotal + tax);
+    }
     const { data, error } = await sb.from('invoices').insert({
       booking_id: booking.id,
       invoice_no: req.body.invoice_no || invoiceNo(),
