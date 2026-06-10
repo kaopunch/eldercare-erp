@@ -211,6 +211,7 @@ router.post('/', async (req, res, next) => {
 router.post('/:id/accept', async (req, res, next) => {
   try {
     const sb = getSupabase();
+    const body = req.body || {};
     const { data, error } = await sb.from('assignments').update({
       status: 'accepted',
       accepted_at: new Date().toISOString()
@@ -220,8 +221,8 @@ router.post('/:id/accept', async (req, res, next) => {
       booking_id: data.booking_id,
       assignment_id: data.id,
       event_type: 'driver_accepted',
-      created_by: req.body.created_by || null,
-      event_payload: { accepted_source: req.body.accepted_source || 'driver_app' }
+      created_by: body.created_by || null,
+      event_payload: { accepted_source: body.accepted_source || 'driver_app' }
     });
     res.json({ ok: true, assignment: data });
   } catch (e) { next(e); }
@@ -230,9 +231,10 @@ router.post('/:id/accept', async (req, res, next) => {
 router.post('/:id/reject', async (req, res, next) => {
   try {
     const sb = getSupabase();
+    const body = req.body || {};
     const { data, error } = await sb.from('assignments').update({
       status: 'rejected',
-      rejected_reason: req.body.rejected_reason || 'not specified'
+      rejected_reason: body.rejected_reason || 'not specified'
     }).eq('id', req.params.id).select('*').single();
     if (error) throw error;
     await sb.from('notifications').insert({

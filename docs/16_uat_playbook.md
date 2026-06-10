@@ -288,6 +288,41 @@ Pass/Fail:
 | UAT 8 Portal/Rating | Customer success | Pending |  |  |  |
 | UAT 9 Security | Admin | Pending |  |  |  |
 
+## UAT Run Results (2026-06-10)
+
+ดำเนินการ UAT 1-9 แบบ end-to-end บน local server (`PORT=18080`) กับ Supabase project `wmzaqpueifmlcereluxy` โดยใช้ demo accounts (booking `BK1781019809431`, hospital_companion).
+
+| Test | Result | Notes |
+| --- | --- | --- |
+| UAT 1 Lead | Pass | Lead intake + elder assessment ผ่าน |
+| UAT 2 Profile/Consent | Pass | สร้าง customer/elder + consents ครบ 5 ประเภท (general_service, sensitive_health, family_notification, location_tracking, photo) |
+| UAT 3 Booking/Quote/Confirm | Pass | quote คำนวณจาก `service_price_rules` (เพิ่ม 4 rows สำหรับ hospital_companion/assisted_ride/monthly_transport/home_companion), dispatcher approve + confirm ผ่าน หลัง mandatory consents ครบ |
+| UAT 4 Assignment/Acceptance | Pass (พบ Defect P2, แก้แล้ว) | role isolation ทำงานถูกต้อง (care_assistant ถูก block จาก `/accept`); พบ defect `req.body` undefined crash บน `/accept` และ `/reject` — แก้แล้วใน `assignments.js` |
+| UAT 5 Trip Execution/Family Update | Pass | ส่ง trip events ตาม hospital_companion template (`arrived_at_location`, `patient_checked_in`, `in_consultation`) + family update ผ่าน |
+| UAT 6 Visit Summary/Completion | Pass | visit summary (`visit_outcome`, `family_summary`, `follow_up_requirement`) submit + approve ผ่าน, `visit_summary_submitted`/`completed` events ผ่าน, `POST /complete` -> status=`completed` |
+| UAT 7 Finance/Payment Evidence | Pass (พบ Defect P2, ยังไม่แก้) | payment balance validation, evidence upload (PNG, private bucket), signed URL, receipt/invoice PDF (Thai font), refund ผ่านหมด; พบ defect invoice total (รวม VAT 7%) ไม่ตรงกับ payment balance (อิง `final_price` ไม่รวม VAT) |
+| UAT 8 Portal/Rating | Pass | portal status (public, by booking_no), 5-star + 2-star rating, service recovery (driver -> `driver_quality_reviews` + status `reviewing`) ผ่าน |
+| UAT 9 Security/Admin | Pass | readiness 20/23, สร้าง user ใหม่, PIN rotation (`POST /api/auth/pin` ใช้ field `new_password`), revoke-sessions ทำให้ token เก่าใช้ไม่ได้ (401) ผ่านหมด |
+
+### Defects Found
+
+- **DEFECT-1 (P2, Fixed)**: `POST /api/assignments/:id/accept` และ `/:id/reject` crash ด้วย `Cannot read properties of undefined (reading 'created_by')` เมื่อ request ไม่มี JSON body. แก้โดยใช้ `const body = req.body || {}` ใน `backend/src/routes/assignments.js`.
+- **DEFECT-2 (P2, Open)**: `POST /api/invoices` คำนวณ `total = subtotal + 7% VAT` จาก `booking.final_price`, แต่ `POST /api/payments` ตรวจ remaining balance จาก `final_price` เดิม (ไม่รวม VAT) — ทำให้จ่ายเต็มจำนวนตาม invoice ไม่ได้ (เกิน balance). ต้องเลือกแก้ทางใดทางหนึ่ง: (a) ทำให้ `final_price` รวม VAT แล้ว, หรือ (b) ให้ payment balance อิงจาก invoice total แทน `final_price`.
+
+### Sign-Off
+
+| Test | Owner | Result | Evidence | Defect ID | Notes |
+| --- | --- | --- | --- | --- | --- |
+| UAT 1 Lead | Coordinator | Pass | local run 2026-06-10 |  |  |
+| UAT 2 Profile/Consent | Coordinator | Pass | local run 2026-06-10 |  |  |
+| UAT 3 Booking/Quote | Dispatcher | Pass | local run 2026-06-10 |  | needed `service_price_rules` seed |
+| UAT 4 Assignment | Dispatcher/Driver | Pass | local run 2026-06-10 | DEFECT-1 | fixed in this session |
+| UAT 5 Trip | Driver/Care assistant | Pass | local run 2026-06-10 |  |  |
+| UAT 6 Completion | Dispatcher | Pass | local run 2026-06-10 |  |  |
+| UAT 7 Finance | Finance | Pass | local run 2026-06-10 | DEFECT-2 | open, P2 workaround: pay against booking balance, not invoice total |
+| UAT 8 Portal/Rating | Customer success | Pass | local run 2026-06-10 |  |  |
+| UAT 9 Security | Admin | Pass | local run 2026-06-10 |  |  |
+
 ## Defect Severity
 
 - P0: ข้อมูลผิด, เปิดข้อมูลส่วนบุคคลเกินสิทธิ์, ปิดงานผิด SOP, payment/evidence เสี่ยง, production login ใช้ไม่ได้
