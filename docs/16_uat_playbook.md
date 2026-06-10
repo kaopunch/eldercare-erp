@@ -307,7 +307,7 @@ Pass/Fail:
 ### Defects Found
 
 - **DEFECT-1 (P2, Fixed)**: `POST /api/assignments/:id/accept` และ `/:id/reject` crash ด้วย `Cannot read properties of undefined (reading 'created_by')` เมื่อ request ไม่มี JSON body. แก้โดยใช้ `const body = req.body || {}` ใน `backend/src/routes/assignments.js`.
-- **DEFECT-2 (P2, Open)**: `POST /api/invoices` คำนวณ `total = subtotal + 7% VAT` จาก `booking.final_price`, แต่ `POST /api/payments` ตรวจ remaining balance จาก `final_price` เดิม (ไม่รวม VAT) — ทำให้จ่ายเต็มจำนวนตาม invoice ไม่ได้ (เกิน balance). ต้องเลือกแก้ทางใดทางหนึ่ง: (a) ทำให้ `final_price` รวม VAT แล้ว, หรือ (b) ให้ payment balance อิงจาก invoice total แทน `final_price`.
+- **DEFECT-2 (P2, Fixed 2026-06-10)**: `POST /api/invoices` คำนวณ `total = subtotal + 7% VAT` จาก `booking.final_price`, แต่ `final_price` (จาก `calculateQuote`) รวม VAT 7% อยู่แล้ว — ทำให้ invoice ถูกคิดภาษีซ้ำสอง (เกิน balance ที่จ่ายได้จริง). แก้ใน `backend/src/routes/finance.js`: เมื่อไม่มีการระบุ subtotal/tax/total เอง จะคำนวณ `subtotal`/`tax` ย้อนกลับจาก `final_price` ที่รวม VAT แล้วแทน. ตรวจสอบแล้วว่า `invoice.total == booking.final_price` พอดี.
 
 ### Sign-Off
 
@@ -319,7 +319,7 @@ Pass/Fail:
 | UAT 4 Assignment | Dispatcher/Driver | Pass | local run 2026-06-10 | DEFECT-1 | fixed in this session |
 | UAT 5 Trip | Driver/Care assistant | Pass | local run 2026-06-10 |  |  |
 | UAT 6 Completion | Dispatcher | Pass | local run 2026-06-10 |  |  |
-| UAT 7 Finance | Finance | Pass | local run 2026-06-10 | DEFECT-2 | open, P2 workaround: pay against booking balance, not invoice total |
+| UAT 7 Finance | Finance | Pass | local run 2026-06-10 | DEFECT-2 | fixed 2026-06-10, invoice total now matches booking balance |
 | UAT 8 Portal/Rating | Customer success | Pass | local run 2026-06-10 |  |  |
 | UAT 9 Security | Admin | Pass | local run 2026-06-10 |  |  |
 
