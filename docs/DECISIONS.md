@@ -33,6 +33,16 @@
 - **คำตอบ (ตัดสินใจแทน — เป็น build tooling ไม่ใช่ runtime dependency ใหญ่)**: ใช้ `vite-plugin-pwa` สำหรับ service worker/manifest และ TanStack Query ตามที่ `CLAUDE.md` กำหนด
 - **ผลต่อโค้ด**: devDependencies ของ `frontend/customer` และ `frontend/caregiver`
 
+## 2026-06-11 — M1 implementation decisions (ตัดสินใจแทนระหว่างพัฒนา)
+
+1. **ชื่อตารางใหม่ใช้ prefix `care_`** (`users` → `care_users`, `elder_profiles` → `care_elder_profiles`, ...) — กันชนกับตาราง ERP เดิม (`bookings`, `payments`, `notifications` มีอยู่แล้ว); mapping บันทึกใน header ของ `database/008_care_platform_m1.sql`
+2. **Password hashing ใช้ pbkdf2_sha256 (Node built-in) แทน argon2** — argon2 เป็น native dependency นอก whitelist; ใช้ scheme/iterations เดียวกับ PIN hashing ของ ERP เดิม (`lib/session.js`)
+3. **อัปโหลดเอกสารใช้ base64 JSON body แทน multipart** — ตาม pattern เดิมของ ERP (`lib/storage.js` payment evidence) ไม่ต้องเพิ่ม multer; จำกัด 6 MB, PDF/JPEG/PNG/WebP
+4. **ปักหมุดแผนที่ M1 ใช้ geolocation + พิกัดตัวเลข** — ยังไม่มี Google Maps API key; Map adapter เต็มรูปจะทำใน M2 (หน้า booking ต้องใช้อยู่แล้ว)
+5. **เพิ่ม column `home_lat/home_lng`, `service_area_lat/lng` (denormalized)** ควบคู่ geography — PostgREST คืน geography เป็น WKB hex ซึ่ง echo กลับเป็นพิกัดไม่ได้; geography ยังเป็น source สำหรับ PostGIS query ใน M3 (migration 009)
+6. **Refresh token เป็น opaque token (48 bytes) + rotation single-use** เก็บ hash ใน `care_refresh_tokens` — เพิกถอนได้จริง ต่างจาก JWT refresh
+7. **`shared/` ใน frontend เป็น pure TS เท่านั้น** (i18n, types, fetch client) — ไฟล์ที่ import react/zustand อยู่ใน app แต่ละตัว เพราะ node_modules ไม่ shared ระหว่างแอป
+
 ## ค้างตัดสินใจ / ติดตาม
 
 - Baseline Supabase migration tracking (ไฟล์ 001/003/004/005 ถูก apply โดยไม่ track) — จะทำตอนเริ่ม M1 ก่อน migration ใหม่ตัวแรก

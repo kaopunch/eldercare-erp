@@ -63,8 +63,8 @@ DB migration: ไฟล์ SQL เรียงเลขใน `database/` + appl
 ## สถานะปัจจุบัน
 
 - [x] M0 — audit + scaffold   (2026-06-11 — ดู docs/CORE_AUDIT.md, docs/DECISIONS.md)
-- [ ] M1 — auth + profiles + onboarding   ← **ถัดไป (รอ review M0)**
-- [ ] M2 — booking core + payment
+- [x] M1 — auth + profiles + onboarding   (2026-06-11 — OTP/JWT auth สองฝั่ง, elder CRUD, caregiver onboarding + private storage)
+- [ ] M2 — booking core + payment   ← **ถัดไป (รอ review M1; ต้องมี Omise test keys)**
 - [ ] M3 — matching + accept
 - [ ] M4 — active job + tracking
 - [ ] M5 — LINE + health profile + wallet

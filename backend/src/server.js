@@ -27,6 +27,7 @@ const readiness = require('./routes/readiness');
 const ai = require('./routes/ai');
 const aiWebhooks = require('./routes/aiWebhooks');
 const aiStream = require('./routes/aiStream');
+const { createCareApiRouter } = require('./modules/router'); // อุ่นใจ Care Platform (customer/caregiver portals)
 const { attachActor, requireRoles } = require('./middleware/auth');
 const {
   createCorsOptions,
@@ -75,6 +76,7 @@ app.use(express.static(path.join(__dirname, '../../frontend')));
 app.use('/api/auth', authRateLimit, auth);
 app.use('/api/portal', portalRateLimit, portal);
 app.use('/api/ai/inbound', aiInboundRateLimit, aiWebhooks);
+app.use('/api/v1', createCareApiRouter()); // must stay above attachActor — care portals use their own JWT auth
 app.use('/api', apiRateLimit, attachActor);
 app.use('/api/customers', requireRoles(['owner', 'super_admin', 'admin', 'branch_admin', 'dispatcher', 'coordinator']), customers);
 app.use('/api/elders', requireRoles(['owner', 'super_admin', 'admin', 'branch_admin', 'dispatcher', 'coordinator', 'care_assistant', 'hospital_companion', 'home_companion']), elders);
