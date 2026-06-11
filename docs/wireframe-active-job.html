@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wireframe — Caregiver Active Job · อุ่นใจ Care</title>
+<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500&family=Sarabun:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pine:#10463C;--pine-deep:#0A3029;--mint:#EAF4EF;--mint-line:#CDE3D8;
+  --marigold:#E8A23B;--marigold-deep:#9C6313;--ink:#1E2B27;--muted:#5C6E67;
+  --danger:#C7392B;--paper:#F4F6F4;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Sarabun',sans-serif;background:var(--paper);color:var(--ink);padding:40px 24px 64px}
+.head{max-width:1480px;margin:0 auto 36px}
+.head .mono{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.15em;color:var(--marigold-deep);text-transform:uppercase}
+.head h1{font-family:'Mitr',sans-serif;font-weight:500;font-size:30px;color:var(--pine-deep);margin:6px 0 8px}
+.head p{color:var(--muted);max-width:760px;line-height:1.7;font-size:15px}
+
+.row{max-width:1480px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:28px}
+@media(max-width:1200px){.row{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.row{grid-template-columns:1fr}}
+
+.col .label{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--marigold-deep);letter-spacing:.1em;margin-bottom:6px}
+.col h2{font-family:'Mitr',sans-serif;font-weight:500;font-size:17px;color:var(--pine-deep);margin-bottom:4px}
+.col .state{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:11px;background:var(--mint);color:var(--pine);padding:2px 10px;border-radius:99px;margin-bottom:14px}
+.note{font-size:13.5px;color:var(--muted);line-height:1.65;margin-top:14px}
+.note b{color:var(--pine-deep)}
+
+/* ---- phone frame ---- */
+.phone{
+  width:100%;max-width:360px;aspect-ratio:9/19;background:#fff;border-radius:34px;
+  border:1px solid #D8E2DC;box-shadow:0 18px 40px rgba(16,70,60,.10);
+  overflow:hidden;display:flex;flex-direction:column;position:relative;margin:0 auto;
+}
+.statusbar{height:30px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AAFA6;flex:0 0 auto}
+.appbar{
+  flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:8px 16px 12px;
+}
+.appbar .back{width:30px;height:30px;border-radius:50%;background:var(--mint);display:flex;align-items:center;justify-content:center;color:var(--pine);font-size:15px}
+.appbar .t{font-family:'Mitr',sans-serif;font-weight:500;font-size:15px;color:var(--pine-deep)}
+.sos{
+  margin-left:auto;background:var(--danger);color:#fff;font-family:'Mitr',sans-serif;
+  font-size:12px;font-weight:500;padding:6px 14px;border-radius:99px;letter-spacing:.05em;
+  box-shadow:0 3px 8px rgba(199,57,43,.35);
+}
+.body{flex:1;overflow:hidden;padding:0 16px;display:flex;flex-direction:column;gap:12px}
+
+/* stepper */
+.stepper{display:flex;align-items:center;gap:4px;flex:0 0 auto}
+.stp{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:11px;flex:0 0 auto}
+.stp.done{background:var(--pine);color:#fff}
+.stp.now{background:var(--marigold);color:#fff;box-shadow:0 0 0 4px #F8EDDA}
+.stp.next{background:#E7EEEA;color:#9AAFA6}
+.stp-line{flex:1;height:2px;background:#E7EEEA}
+.stp-line.done{background:var(--pine)}
+
+/* elder card */
+.elder{background:var(--mint);border-radius:16px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start;flex:0 0 auto}
+.avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#CFE3D8,#9CC4B2);display:flex;align-items:center;justify-content:center;font-family:'Mitr',sans-serif;color:var(--pine);font-size:18px;flex:0 0 auto}
+.elder .nm{font-family:'Mitr',sans-serif;font-weight:500;font-size:15px;color:var(--pine-deep)}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.chip{font-size:11px;background:#fff;border:1px solid var(--mint-line);color:var(--pine);padding:2px 9px;border-radius:99px}
+.chip.warn{background:#FBF1DF;border-color:#EBD3A6;color:var(--marigold-deep)}
+.elder .tel{margin-left:auto;width:38px;height:38px;border-radius:50%;background:#fff;border:1px solid var(--mint-line);display:flex;align-items:center;justify-content:center;font-size:16px}
+
+/* map placeholder */
+.map{
+  flex:1;border-radius:16px;position:relative;overflow:hidden;
+  background:
+    linear-gradient(rgba(205,227,216,.5) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(205,227,216,.5) 1px,transparent 1px),#F2F7F4;
+  background-size:26px 26px;
+}
+.map .route{position:absolute;inset:0}
+.pin{position:absolute;width:14px;height:14px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.pin.me{background:var(--marigold)}
+.pin.dest{background:var(--pine)}
+.map .eta{
+  position:absolute;left:12px;bottom:12px;background:#fff;border-radius:12px;
+  padding:8px 12px;font-size:12px;box-shadow:0 4px 12px rgba(0,0,0,.08);
+}
+.map .eta b{font-family:'Mitr',sans-serif;color:var(--pine-deep);font-size:13px}
+.gps{
+  position:absolute;right:12px;top:12px;background:#fff;border-radius:99px;padding:5px 11px;
+  font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--pine);
+  display:flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(0,0,0,.08);
+}
+.dot{width:7px;height:7px;border-radius:50%;background:#2FA66A;animation:pulse 1.6s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* camera */
+.cam{flex:1;border-radius:16px;background:linear-gradient(135deg,#23332E,#10231E);position:relative;display:flex;align-items:center;justify-content:center}
+.cam .frame{width:78%;height:64%;border:2px dashed rgba(255,255,255,.5);border-radius:14px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.75);font-size:13px;text-align:center;padding:14px;line-height:1.6}
+.cam .shutter{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);width:54px;height:54px;border-radius:50%;background:#fff;border:5px solid rgba(255,255,255,.4)}
+
+/* form */
+.form{flex:1;overflow:hidden;display:flex;flex-direction:column;gap:10px}
+.fld label{font-size:12.5px;font-weight:600;color:var(--pine-deep);display:block;margin-bottom:4px}
+.inp{border:1.5px solid var(--mint-line);border-radius:12px;padding:10px 12px;font-size:13px;color:var(--muted);background:#fff}
+.inp.area{min-height:64px}
+.inp .ph{color:#A9B8B1}
+.addrow{display:flex;align-items:center;gap:8px;border:1.5px dashed var(--mint-line);border-radius:12px;padding:9px 12px;color:var(--pine);font-size:12.5px;font-weight:600}
+.medrow{display:flex;align-items:center;gap:8px;background:var(--mint);border-radius:10px;padding:7px 10px;font-size:12px}
+.medrow .x{margin-left:auto;color:var(--muted)}
+.voice{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--marigold-deep);font-weight:600}
+
+/* big action button */
+.cta{
+  flex:0 0 auto;margin:4px 0 18px;height:58px;border-radius:16px;background:var(--pine);
+  color:#fff;font-family:'Mitr',sans-serif;font-weight:500;font-size:17px;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  box-shadow:0 8px 18px rgba(16,70,60,.28);
+}
+.cta.gold{background:var(--marigold);color:#3D2A08;box-shadow:0 8px 18px rgba(232,162,59,.35)}
+.cta.ghost{background:#fff;color:var(--pine);border:1.5px solid var(--mint-line);box-shadow:none;height:46px;font-size:14px;margin:0}
+.cta-sub{flex:0 0 auto;text-align:center;font-size:11.5px;color:var(--muted);margin:-12px 0 14px}
+
+/* timeline mini */
+.tl{flex:0 0 auto;display:flex;flex-direction:column;gap:8px}
+.tl .ev{display:flex;gap:10px;font-size:12px;align-items:flex-start}
+.tl .tdot{width:9px;height:9px;border-radius:50%;background:var(--pine);margin-top:4px;flex:0 0 auto}
+.tl .tdot.wait{background:#D8E2DC}
+.tl .tm{font-family:'IBM Plex Mono',monospace;color:var(--muted);font-size:11px;margin-left:auto;white-space:nowrap}
+
+/* success */
+.done-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:0 10px}
+.bigcheck{width:84px;height:84px;border-radius:50%;background:var(--mint);display:flex;align-items:center;justify-content:center;font-size:38px;color:var(--pine)}
+.done-wrap h3{font-family:'Mitr',sans-serif;font-weight:500;font-size:19px;color:var(--pine-deep)}
+.done-wrap p{font-size:13px;color:var(--muted);line-height:1.7}
+.payout{background:#FBF1DF;border-radius:14px;padding:12px 20px;font-family:'Mitr',sans-serif;color:var(--marigold-deep);font-size:15px}
+.payout b{font-size:21px;display:block;color:#7A4E0E}
+</style>
+</head>
+<body>
+
+<div class="head">
+  <div class="mono">Wireframe · Caregiver Portal · G4 Active Job</div>
+  <h1>หน้า Active Job — 4 สถานะหลักตาม State Machine</h1>
+  <p>หลักออกแบบ: <strong>หนึ่งสถานะ = หนึ่งปุ่มใหญ่ปุ่มเดียว</strong> ใช้มือเดียวได้หน้างาน ข้อมูลผู้สูงวัยที่จำเป็นเห็นตลอด ปุ่ม SOS อยู่ทุกหน้า และทุก action สำคัญเข้า offline queue เมื่อสัญญาณหลุด (อ้างอิง DEVELOPMENT_SPEC.md ข้อ 5.3)</p>
+</div>
+
+<div class="row">
+
+<!-- ============ SCREEN 1: CHECK-IN ============ -->
+<div class="col">
+  <div class="label">SCREEN 1</div>
+  <h2>เช็คอินรับผู้สูงวัย</h2>
+  <span class="state">state: confirmed → in_progress_pickup</span>
+  <div class="phone">
+    <div class="statusbar">08:05 · อุ่นใจ Care</div>
+    <div class="appbar"><div class="back">‹</div><div class="t">งานวันนี้ #A1042</div><div class="sos">SOS</div></div>
+    <div class="body">
+      <div class="stepper">
+        <div class="stp now">1</div><div class="stp-line"></div>
+        <div class="stp next">2</div><div class="stp-line"></div>
+        <div class="stp next">3</div><div class="stp-line"></div>
+        <div class="stp next">4</div><div class="stp-line"></div>
+        <div class="stp next">5</div>
+      </div>
+      <div class="elder">
+        <div class="avatar">ยม</div>
+        <div>
+          <div class="nm">คุณยายมาลี (84)</div>
+          <div class="chips">
+            <span class="chip warn">วีลแชร์</span>
+            <span class="chip">เบาหวาน</span>
+            <span class="chip">หูตึงซ้าย — พูดดังๆ</span>
+          </div>
+        </div>
+        <div class="tel">📞</div>
+      </div>
+      <div class="cam">
+        <div class="frame">ถ่ายภาพยืนยัน<br>การรับคุณยายมาลี</div>
+        <div class="shutter"></div>
+      </div>
+      <div class="cta">📍 เช็คอินรับผู้สูงวัย</div>
+      <div class="cta-sub">GPS ตรงจุดรับ ✓ (ห่าง 38 ม. — เกณฑ์ ≤ 300 ม.)</div>
+    </div>
+  </div>
+  <p class="note"><b>กติกา:</b> ปุ่มกดได้เมื่อถ่ายรูปแล้ว + GPS อยู่ในรัศมี ถ้าเกินเกณฑ์แสดงเหตุผลใต้ปุ่มและปุ่ม "แจ้งปัญหาจุดรับ" · กดสำเร็จ → LINE เด้งหาครอบครัวทันที</p>
+</div>
+
+<!-- ============ SCREEN 2: EN ROUTE ============ -->
+<div class="col">
+  <div class="label">SCREEN 2</div>
+  <h2>ระหว่างเดินทาง / ถึงจุดหมาย</h2>
+  <span class="state">state: in_progress_pickup → at_destination</span>
+  <div class="phone">
+    <div class="statusbar">08:21 · อุ่นใจ Care</div>
+    <div class="appbar"><div class="back">‹</div><div class="t">งานวันนี้ #A1042</div><div class="sos">SOS</div></div>
+    <div class="body">
+      <div class="stepper">
+        <div class="stp done">✓</div><div class="stp-line done"></div>
+        <div class="stp now">2</div><div class="stp-line"></div>
+        <div class="stp next">3</div><div class="stp-line"></div>
+        <div class="stp next">4</div><div class="stp-line"></div>
+        <div class="stp next">5</div>
+      </div>
+      <div class="map">
+        <svg class="route" viewBox="0 0 300 340">
+          <path d="M60 290 C 120 250, 90 170, 160 130 C 210 100, 230 80, 245 52"
+                fill="none" stroke="#10463C" stroke-width="3" stroke-dasharray="2 7" stroke-linecap="round"/>
+        </svg>
+        <div class="pin me" style="left:54px;top:282px"></div>
+        <div class="pin dest" style="left:239px;top:46px"></div>
+        <div class="gps"><span class="dot"></span>GPS ON · ping 30s</div>
+        <div class="eta"><b>รพ.พระนครศรีอยุธยา</b><br>อีก 4.2 กม. · ~12 นาที</div>
+      </div>
+      <div class="tl">
+        <div class="ev"><div class="tdot"></div>เช็คอินรับคุณยายมาลี<div class="tm">08:12</div></div>
+        <div class="ev"><div class="tdot wait"></div>ถึงจุดหมาย<div class="tm">—</div></div>
+      </div>
+      <div class="cta gold">🏥 ถึงจุดหมายแล้ว</div>
+      <div class="cta-sub">ระบบยืนยันอัตโนมัติเมื่อเข้าเขต geofence — ปุ่มนี้คือ fallback</div>
+    </div>
+  </div>
+  <p class="note"><b>กติกา:</b> location ping ทุก 30 วิ → WebSocket (หลุดแล้ว buffer ส่งย้อนหลัง) · ออกนอกเส้นทาง > 2 กม. หรือนิ่ง > 20 นาที → geofence_alert ไป admin โดย caregiver ไม่ต้องทำอะไร</p>
+</div>
+
+<!-- ============ SCREEN 3: HEALTH RECORD ============ -->
+<div class="col">
+  <div class="label">SCREEN 3</div>
+  <h2>บันทึกข้อมูลสุขภาพ</h2>
+  <span class="state">state: at_destination (service_note_added)</span>
+  <div class="phone">
+    <div class="statusbar">11:02 · อุ่นใจ Care</div>
+    <div class="appbar"><div class="back">‹</div><div class="t">บันทึกผลตรวจ</div><div class="sos">SOS</div></div>
+    <div class="body">
+      <div class="stepper">
+        <div class="stp done">✓</div><div class="stp-line done"></div>
+        <div class="stp done">✓</div><div class="stp-line done"></div>
+        <div class="stp now">3</div><div class="stp-line"></div>
+        <div class="stp next">4</div><div class="stp-line"></div>
+        <div class="stp next">5</div>
+      </div>
+      <div class="form">
+        <div class="fld">
+          <label>สรุปสิ่งที่แพทย์แจ้ง <span class="voice">🎙 อัดเสียงแทนการพิมพ์</span></label>
+          <div class="inp area">น้ำตาลลดลงจากครั้งก่อน หมอให้คุมอาหารต่อ นัดเจาะเลือดอีก 3 เดือน…</div>
+        </div>
+        <div class="fld">
+          <label>ยาที่ได้รับ</label>
+          <div class="medrow">💊 Metformin 500mg — เช้า/เย็น <span class="x">✕</span></div>
+          <div class="addrow">＋ เพิ่มยา · 📷 ถ่ายรูปฉลากยา</div>
+        </div>
+        <div class="fld">
+          <label>นัดครั้งถัดไป</label>
+          <div class="inp">📅 10 ก.ย. 2569 · คลินิกเบาหวาน</div>
+        </div>
+        <div class="fld">
+          <label>แนบรูปใบนัด / เอกสาร</label>
+          <div class="addrow">📎 แนบรูป (1 ไฟล์แล้ว)</div>
+        </div>
+      </div>
+      <div class="cta">บันทึกและเริ่มเดินทางกลับ →</div>
+    </div>
+  </div>
+  <p class="note"><b>กติกา:</b> บันทึกนี้เข้า <b>service_health_records</b> ผูกกับ Health Profile ของผู้สูงวัยอัตโนมัติ — นัดถัดไปที่กรอกจะกลายเป็นปุ่ม "จองล่วงหน้า" ฝั่งครอบครัว · ฟอร์มเข้า offline queue ถ้าสัญญาณใน รพ. หลุด</p>
+</div>
+
+<!-- ============ SCREEN 4: CHECKOUT / DONE ============ -->
+<div class="col">
+  <div class="label">SCREEN 4</div>
+  <h2>เช็คเอาท์ — งานเสร็จสมบูรณ์</h2>
+  <span class="state">state: pending_confirmation → completed</span>
+  <div class="phone">
+    <div class="statusbar">12:34 · อุ่นใจ Care</div>
+    <div class="appbar"><div class="back">‹</div><div class="t">งานวันนี้ #A1042</div><div class="sos">SOS</div></div>
+    <div class="body">
+      <div class="stepper">
+        <div class="stp done">✓</div><div class="stp-line done"></div>
+        <div class="stp done">✓</div><div class="stp-line done"></div>
+        <div class="stp done">✓</div><div class="stp-line done"></div>
+        <div class="stp done">✓</div><div class="stp-line done"></div>
+        <div class="stp done">✓</div>
+      </div>
+      <div class="done-wrap">
+        <div class="bigcheck">✓</div>
+        <h3>ส่งคุณยายมาลีถึงบ้านแล้ว</h3>
+        <p>แจ้งครอบครัวทาง LINE แล้ว<br>รอครอบครัวกดยืนยัน (อัตโนมัติใน 24 ชม.)</p>
+        <div class="payout">รายได้งานนี้<b>฿ 800</b>เข้ากระเป๋าเมื่อยืนยันสำเร็จ</div>
+      </div>
+      <div class="cta ghost">ดูสรุปงาน + รีวิวลูกค้า</div>
+      <div style="height:18px"></div>
+    </div>
+  </div>
+  <p class="note"><b>กติกา:</b> check-out ต้อง GPS ≤ 300 ม. จากจุดรับ · เมื่อครอบครัวยืนยัน (หรือครบ 24 ชม.) → escrow ปล่อยเข้า payout_ledger, เปิดรีวิวสองทาง, สถานะ → completed</p>
+</div>
+
+</div>
+</body>
+</html>

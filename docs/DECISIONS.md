@@ -1,0 +1,40 @@
+# DECISIONS.md — บันทึกการตัดสินใจ (อุ่นใจ Care Platform)
+
+> format: วันที่ / คำถาม / คำตอบ / ผลต่อโค้ด
+
+## 2026-06-11 — Backend stack (PHASE 0)
+
+- **คำถาม**: สเปค assume FastAPI/Python แต่ Eldercare Core จริงเป็น Node.js/Express + Supabase — ใช้ stack ไหน?
+- **คำตอบ (user)**: ทางเลือก A — ต่อยอด Node/Express + Supabase เดิม
+- **ผลต่อโค้ด**:
+  - Backend ใหม่อยู่ใน `backend/src/modules/{auth,customer,caregiver,booking,payment,notification}` mount ที่ `/api/v1/customer/*` และ `/api/v1/caregiver/*` — ไม่แตะ route เดิมใต้ `/api/*`
+  - DB ผ่าน Supabase migrations (track ทุกไฟล์) แบบ additive เท่านั้น; เปิด PostGIS ใน M1
+  - ไม่ใช้ Redis เฟสนี้ — realtime ใช้ `ws` ที่มีอยู่ + Supabase Realtime
+  - ไม่ใช้ docker-compose (DB เป็น Supabase managed) — M0 DoD ปรับเป็น "backend tests ผ่าน + frontend dev server รันได้"
+  - ไฟล์เก็บใน Supabase Storage private bucket + signed URL (≤ 15 นาที)
+  - `CLAUDE.md` ส่วนคำสั่ง/stack ปรับให้ตรง Node — กติกาเหล็กคงเดิมทุกข้อ
+  - ตารางใหม่ใช้เงิน **int สตางค์** ตามสเปค; จุดเชื่อมกับตารางเดิม (numeric บาท) แปลงที่ boundary เดียวพร้อม test
+
+## 2026-06-11 — Payment (M2)
+
+- **คำถาม**: Omise escrow ตามสเปค หรือ manual โอน+หลักฐานแบบเดิม?
+- **คำตอบ (user)**: Omise sandbox ตามสเปค
+- **ผลต่อโค้ด**: สร้าง `PaymentGateway` interface + `OmiseGateway` (sandbox) ใน `modules/payment`; payments ตารางใหม่มีสถานะ escrow (pending → held_escrow → released/refunded); user ต้องสมัคร Omise account เพื่อเอา test keys ใส่ `.env` ก่อนเริ่ม M2
+
+## 2026-06-11 — OTP SMS (M1)
+
+- **คำถาม**: สมัครสมาชิกด้วย OTP SMS แต่ยังไม่มี SMS provider?
+- **คำตอบ (user)**: Mock OTP หลัง interface
+- **ผลต่อโค้ด**: สร้าง `SmsProvider` interface ใน `modules/notification` + `MockSmsProvider` (dev: คืน OTP ใน response/log เฉพาะ `NODE_ENV !== 'production'`); flow OTP ครบตามสเปค เปลี่ยน provider จริงภายหลังโดยไม่แก้ flow
+
+## 2026-06-11 — เครื่องมือ build frontend (M0)
+
+- **คำถาม**: สเปคบังคับ PWA แต่ whitelist dependency ไม่ได้ระบุ plugin
+- **คำตอบ (ตัดสินใจแทน — เป็น build tooling ไม่ใช่ runtime dependency ใหญ่)**: ใช้ `vite-plugin-pwa` สำหรับ service worker/manifest และ TanStack Query ตามที่ `CLAUDE.md` กำหนด
+- **ผลต่อโค้ด**: devDependencies ของ `frontend/customer` และ `frontend/caregiver`
+
+## ค้างตัดสินใจ / ติดตาม
+
+- Baseline Supabase migration tracking (ไฟล์ 001/003/004/005 ถูก apply โดยไม่ track) — จะทำตอนเริ่ม M1 ก่อน migration ใหม่ตัวแรก
+- Pin version ใน `backend/package.json` (ตอนนี้เป็น `latest` หลายตัว) — แนะนำทำใน M6 hardening
+- SMS provider จริง (Thaibulksms/SMSMKT) — ก่อน production
