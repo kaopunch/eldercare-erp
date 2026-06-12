@@ -30,6 +30,18 @@ function createCareApiRouter() {
   router.use('/customer', apiRateLimit, createCustomerRouter());
   router.use('/caregiver', apiRateLimit, createCaregiverRouter());
 
+  // LINE webhook — link codes (set this URL in LINE Developers Console).
+  // Signature verification comes with M6 hardening.
+  const { processWebhookEvents } = require('./notification/lineLink');
+  router.post('/line/webhook', apiRateLimit, async (req, res, next) => {
+    try {
+      const result = await processWebhookEvents(req.body?.events || []);
+      res.json({ received: true, ...result });
+    } catch (err) {
+      next(err);
+    }
+  });
+
   // Omise webhook (charge.complete) — no JWT; trust = re-check against payment
   // row by charge id, transition is idempotent on duplicate delivery.
   const { createBookingService } = require('./booking/service');

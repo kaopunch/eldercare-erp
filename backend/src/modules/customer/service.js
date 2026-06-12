@@ -165,6 +165,52 @@ function createElderService({ repository = defaultRepository } = {}) {
     return publicElder(row);
   }
 
+  /** Health Profile timeline (spec C6) — sensitive read, always audit-logged. */
+  async function getHealthRecords(ownerUserId, elderId) {
+    const elder = await repository.findElderById(elderId, ownerUserId);
+    if (!elder) {
+      throw new AppError('ELDER_NOT_FOUND', 'ไม่พบโปรไฟล์ผู้สูงวัย', 404);
+    }
+    await repository.writeAuditLog({
+      actorUserId: ownerUserId,
+      action: 'health_records.read',
+      entityType: 'care_elder_profile',
+      entityId: elderId
+    });
+    const { listHealthRecordsByElder } = require('../booking/repository');
+    const { signedUrlFor } = require('../caregiver/repository');
+    const records = await listHealthRecordsByElder(elderId);
+    const result = [];
+    for (const record of records) {
+      const attachments = [];
+      for (const ref of record.attachments || []) {
+        const url = await signedUrlFor(ref);
+        if (url) attachments.push(url);
+      }
+      const medications = [];
+      for (const med of record.medications_received || []) {
+        medications.push({
+          name: med.name,
+          note: med.note || null,
+          photo_url: med.photo_ref ? await signedUrlFor(med.photo_ref) : null
+        });
+      }
+      result.push({
+        id: record.id,
+        booking_id: record.booking_id,
+        service_date: record.booking?.scheduled_date || null,
+        destination_name: record.booking?.destination_name || null,
+        vital_signs: record.vital_signs || {},
+        doctor_summary: record.doctor_summary,
+        medications_received: medications,
+        next_appointment: record.next_appointment,
+        attachments,
+        created_at: record.created_at
+      });
+    }
+    return result;
+  }
+
   async function deleteElder(ownerUserId, elderId) {
     const row = await repository.softDeleteElder(elderId, ownerUserId);
     if (!row) {
@@ -179,7 +225,7 @@ function createElderService({ repository = defaultRepository } = {}) {
     return { ok: true };
   }
 
-  return { listElders, getElder, createElder, updateElder, deleteElder, CONSENT_VERSION };
+  return { listElders, getElder, createElder, updateElder, deleteElder, getHealthRecords, CONSENT_VERSION };
 }
 
 module.exports = { createElderService, CONSENT_VERSION };

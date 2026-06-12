@@ -342,6 +342,156 @@ async function findElderForJob(elderProfileId) {
   return { ...elder, family_phone: owner?.phone || null };
 }
 
+// ===== wallet ledger (M5 — append-only, single source of truth) =====
+
+async function currentWalletBalance(caregiverUserId) {
+  const row = unwrap(
+    await db()
+      .from('care_payout_ledger')
+      .select('balance_after')
+      .eq('caregiver_user_id', caregiverUserId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+  );
+  return row ? Number(row.balance_after) : 0;
+}
+
+/**
+ * Append a ledger entry and sync the denormalized wallet_balance.
+ * Earnings are once-per-booking (partial unique index); a duplicate insert
+ * returns null so completion stays idempotent.
+ */
+async function appendLedgerEntry({ caregiverUserId, bookingId = null, type, amount, note = null }) {
+  const balance = await currentWalletBalance(caregiverUserId);
+  const balanceAfter = balance + amount;
+  const { data, error } = await db()
+    .from('care_payout_ledger')
+    .insert({
+      caregiver_user_id: caregiverUserId,
+      booking_id: bookingId,
+      type,
+      amount,
+      balance_after: balanceAfter,
+      note
+    })
+    .select('*')
+    .single();
+  if (error) {
+    if (String(error.message || '').includes('duplicate')) return null; // earning already booked
+    throw new AppError('DB_ERROR', 'เกิดข้อผิดพลาดภายในระบบ', 500, { hint: error.message });
+  }
+  await db()
+    .from('care_caregiver_profiles')
+    .update({ wallet_balance: balanceAfter, updated_at: new Date().toISOString() })
+    .eq('user_id', caregiverUserId);
+  return data;
+}
+
+async function listLedgerEntries(caregiverUserId, limit = 50) {
+  return unwrap(
+    await db()
+      .from('care_payout_ledger')
+      .select('id,booking_id,type,amount,balance_after,note,created_at')
+      .eq('caregiver_user_id', caregiverUserId)
+      .order('created_at', { ascending: false })
+      .limit(limit)
+  );
+}
+
+async function insertWithdrawalRequest(row) {
+  return unwrap(await db().from('care_withdrawal_requests').insert(row).select('*').single());
+}
+
+async function listWithdrawalRequests(caregiverUserId) {
+  return unwrap(
+    await db()
+      .from('care_withdrawal_requests')
+      .select('id,amount,bank_info,status,processed_at,note,created_at')
+      .eq('caregiver_user_id', caregiverUserId)
+      .order('created_at', { ascending: false })
+  );
+}
+
+// ===== reviews (M5) =====
+
+async function insertReview(row) {
+  const { data, error } = await db().from('care_reviews').insert(row).select('*').single();
+  if (error) {
+    if (String(error.message || '').includes('duplicate')) {
+      throw new AppError('REVIEW_EXISTS', 'รีวิวงานนี้ไปแล้ว', 409);
+    }
+    throw new AppError('DB_ERROR', 'เกิดข้อผิดพลาดภายในระบบ', 500, { hint: error.message });
+  }
+  return data;
+}
+
+async function listReviewsForUser(revieweeUserId, limit = 50) {
+  return unwrap(
+    await db()
+      .from('care_reviews')
+      .select('id,booking_id,stars,comment,tags,created_at')
+      .eq('reviewee_user_id', revieweeUserId)
+      .eq('direction', 'customer_to_caregiver')
+      .order('created_at', { ascending: false })
+      .limit(limit)
+  );
+}
+
+async function applyReviewToRating(caregiverUserId, stars) {
+  const profile = unwrap(
+    await db()
+      .from('care_caregiver_profiles')
+      .select('rating_avg,rating_count')
+      .eq('user_id', caregiverUserId)
+      .maybeSingle()
+  );
+  if (!profile) return;
+  const count = Number(profile.rating_count) || 0;
+  const avg = Number(profile.rating_avg) || 0;
+  const newCount = count + 1;
+  const newAvg = Math.round(((avg * count + stars) / newCount) * 100) / 100;
+  await db()
+    .from('care_caregiver_profiles')
+    .update({ rating_avg: newAvg, rating_count: newCount, updated_at: new Date().toISOString() })
+    .eq('user_id', caregiverUserId);
+}
+
+/** Completed bookings the customer hasn't reviewed yet (spec C7 popup). */
+async function listUnreviewedCompletedBookings(customerUserId) {
+  const bookings = unwrap(
+    await db()
+      .from('care_bookings')
+      .select('id,scheduled_date,destination_name,caregiver_user_id')
+      .eq('customer_user_id', customerUserId)
+      .eq('status', 'completed')
+      .order('updated_at', { ascending: false })
+      .limit(10)
+  );
+  if (!bookings.length) return [];
+  const reviews = unwrap(
+    await db()
+      .from('care_reviews')
+      .select('booking_id')
+      .eq('direction', 'customer_to_caregiver')
+      .in('booking_id', bookings.map((booking) => booking.id))
+  );
+  const reviewed = new Set(reviews.map((review) => review.booking_id));
+  return bookings.filter((booking) => !reviewed.has(booking.id));
+}
+
+// ===== health records timeline (M5 — C6) =====
+
+async function listHealthRecordsByElder(elderProfileId) {
+  return unwrap(
+    await db()
+      .from('care_service_health_records')
+      .select('*, booking:care_bookings(scheduled_date,destination_name)')
+      .eq('elder_profile_id', elderProfileId)
+      .order('created_at', { ascending: false })
+  );
+}
+
 /** Public caregiver info shown to the customer after match — name/photo only. */
 async function findCaregiverPublicInfo(userId) {
   const profile = unwrap(
@@ -379,6 +529,16 @@ module.exports = {
   findHealthRecordByBooking,
   incrementJobsCompleted,
   findElderForJob,
+  currentWalletBalance,
+  appendLedgerEntry,
+  listLedgerEntries,
+  insertWithdrawalRequest,
+  listWithdrawalRequests,
+  insertReview,
+  listReviewsForUser,
+  applyReviewToRating,
+  listUnreviewedCompletedBookings,
+  listHealthRecordsByElder,
   insertBooking,
   findBookingById,
   listBookingsByCustomer,

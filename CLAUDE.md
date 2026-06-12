@@ -67,7 +67,7 @@ DB migration: ไฟล์ SQL เรียงเลขใน `database/` + appl
 - [x] M2 — booking core + payment   (2026-06-12 — state machine, pricing/cancel config ใน DB, MockGateway default + OmiseGateway พร้อมสลับ)
 - [x] M3 — matching + accept   (2026-06-12 — ปฏิทินรับงาน, broadcast batch 5/10นาที, first-accept-wins, auto-confirm 2ชม.)
 - [x] M4 — active job + tracking   (2026-06-12 — check-in/out GPS 300ม., health record, WS แผนที่สด, geofence alert, auto-complete 24ชม.)
-- [ ] M5 — LINE + health profile + wallet   ← **ถัดไป (รอ review M4; LINE ต้องการ CHANNEL_ACCESS_TOKEN)**
-- [ ] M6 — hardening
+- [x] M5 — LINE + health profile + wallet   (2026-06-12 — notifier 3 ชั้น line/sms/mock, สมุดสุขภาพ+จองตามนัด, รีวิว, ledger+ถอนเงิน; LINE จริงรอ token)
+- [ ] M6 — hardening   ← **ถัดไป (รอ review M5)**
 
 (อัปเดต checklist นี้เมื่อจบแต่ละ milestone)

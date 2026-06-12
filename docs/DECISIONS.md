@@ -74,6 +74,16 @@
 7. **Ping buffer ฝั่ง client เป็น in-memory retry** — offline queue เต็มรูป (service worker, ครอบ check-in/out + health record) เป็นข้อ M6 ตามสเปค
 8. **location_pings ยังไม่ partition** — pilot scale ใช้ตาราง+index พอ มี comment ใน migration ให้ใช้ pg_partman ก่อนสเกล
 
+## 2026-06-12 — M5 implementation decisions
+
+1. **Notification engine 3 ชั้น: LINE → SMS (เฉพาะ event สำคัญ) → mock** — ทุกการส่งบันทึกลง `care_notifications` ทำให้ matrix ตรวจสอบได้แม้ยังไม่มี LINE token; สลับเป็น LINE จริงทันทีที่ตั้ง `LINE_CHANNEL_ACCESS_TOKEN` (reuse `lib/line.js` ของ ERP — sendLinePush)
+2. **เชื่อม LINE ด้วย link code** (`CARE-XXXXXX`, อายุ 15 นาที) — webhook ของ care platform เองที่ `/api/v1/line/webhook`; ถ้าจะใช้ LINE OA ตัวเดียวกับ ERP AI webhook ต้องเลือก URL เดียวหรือรวม handler (รอ user ตัดสินใจตอนตั้งค่า LINE จริง)
+3. **ถอนเงินตัดยอดทันทีตอนยื่นคำขอ** (hold) — ledger เป็น append-only เสมอ; ปฏิเสธ = เขียน adjustment คืนยอด ผ่าน `scripts/process_withdrawal.js --id X [--reject]` (admin dashboard อยู่นอก scope); ถอนขั้นต่ำ 100 บาท
+4. **Earning เข้า ledger ครั้งเดียวต่อ booking** ด้วย partial unique index — settleCompletion เรียกซ้ำปลอดภัย; booking ที่ complete ก่อน ledger เกิด (จาก M4 smoke) backfill แล้ว
+5. **รีวิวฝั่ง customer→caregiver เท่านั้นในเฟสนี้** — โครง DB รองรับสองทิศ; tags จำกัดตาม whitelist 5 แบบ; rating อัปเดต incremental ไม่ recompute ทั้งตาราง
+6. **รีวิวที่ได้รับแสดงในหน้า Wallet** แทนหน้า profile แยก (G6) — ลด surface; ย้ายได้ภายหลัง
+7. **Export PDF สมุดสุขภาพ = print stylesheet** ตามที่สเปคกำหนดเฟสนี้ (`window.print` + Tailwind `print:` utilities)
+
 ## ค้างตัดสินใจ / ติดตาม
 
 - Baseline Supabase migration tracking (ไฟล์ 001/003/004/005 ถูก apply โดยไม่ track) — จะทำตอนเริ่ม M1 ก่อน migration ใหม่ตัวแรก

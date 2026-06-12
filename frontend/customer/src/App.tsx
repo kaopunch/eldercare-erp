@@ -7,6 +7,7 @@ import ElderFormPage from './pages/ElderFormPage'
 import BookPage from './pages/BookPage'
 import BookingsPage from './pages/BookingsPage'
 import TrackingPage from './pages/TrackingPage'
+import ElderHealthPage from './pages/ElderHealthPage'
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const user = useAuthStore((state) => state.user)
@@ -64,6 +65,14 @@ function App() {
         element={
           <RequireAuth>
             <TrackingPage />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/elders/:id/health"
+        element={
+          <RequireAuth>
+            <ElderHealthPage />
           </RequireAuth>
         }
       />

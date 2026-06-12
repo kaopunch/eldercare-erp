@@ -213,3 +213,40 @@ export const trackApi = {
     return `${base.replace(/^http/, 'ws')}/ws/care/track/${bookingId}?token=${encodeURIComponent(token)}`;
   },
 };
+
+// ===== M5: health profile, reviews, wallet, LINE =====
+
+import type { HealthRecord, PendingReview, ReceivedReview, Wallet, LineLinkCode } from './types';
+
+export const healthApi = {
+  records(elderId: string): Promise<HealthRecord[]> {
+    return api(`/api/v1/customer/elders/${elderId}/health-records`);
+  },
+};
+
+export const reviewsApi = {
+  pending(): Promise<PendingReview[]> {
+    return api('/api/v1/customer/reviews/pending');
+  },
+  create(input: { booking_id: string; stars: number; comment?: string | null; tags?: string[] }): Promise<{ id: string; stars: number }> {
+    return post('/api/v1/customer/reviews', input);
+  },
+  received(): Promise<ReceivedReview[]> {
+    return api('/api/v1/caregiver/reviews');
+  },
+};
+
+export const walletApi = {
+  get(): Promise<Wallet> {
+    return api('/api/v1/caregiver/wallet');
+  },
+  withdraw(input: { amount_satang: number; bank_info: { bank: string; account_no: string; account_name: string } }): Promise<{ id: string; amount_satang: number; status: string; balance_satang: number }> {
+    return post('/api/v1/caregiver/wallet/withdraw', input);
+  },
+};
+
+export const lineApi = {
+  linkCode(portal: Portal): Promise<LineLinkCode> {
+    return post(`/api/v1/${portal}/line/link-code`, {});
+  },
+};

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { th } from '@shared/i18n/th'
 import { bookingsApi, eldersApi } from '@shared/api/care'
@@ -29,6 +29,7 @@ function baht(satang: number): string {
 
 export default function BookPage() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const elders = useQuery({ queryKey: ['elders'], queryFn: eldersApi.list })
 
   const [step, setStep] = useState(0)
@@ -36,14 +37,14 @@ export default function BookPage() {
   const [busy, setBusy] = useState(false)
 
   // step 1
-  const [elderId, setElderId] = useState('')
+  const [elderId, setElderId] = useState(searchParams.get('elder') ?? '')
   const [serviceType, setServiceType] = useState<ServiceType>('hospital_visit')
   const [duration, setDuration] = useState<DurationType>('half_day')
-  const [date, setDate] = useState('')
+  const [date, setDate] = useState(searchParams.get('date') ?? '')
   const [time, setTime] = useState('09:00')
-  const [destName, setDestName] = useState('')
+  const [destName, setDestName] = useState(searchParams.get('destination') ?? '')
   const [destPin, setDestPin] = useState<LatLng | null>(null)
-  const [appointment, setAppointment] = useState('')
+  const [appointment, setAppointment] = useState(searchParams.get('detail') ?? '')
   // step 2
   const [wheelchair, setWheelchair] = useState(false)
   const [english, setEnglish] = useState(false)

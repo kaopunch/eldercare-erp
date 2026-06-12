@@ -9,6 +9,7 @@ const bookingRepository = require('../booking/repository');
 const caregiverRepository = require('./repository');
 const { createBookingStateMachine } = require('../booking/stateMachine');
 const { createMatchingEngine } = require('../booking/matching');
+const { notifySafe } = require('../notification/notifier');
 const { AppError } = require('../shared/appError');
 
 const ACTIVE_STATUSES = [
@@ -73,9 +74,10 @@ function jobView(booking) {
   };
 }
 
-function createJobsService({ repository = bookingRepository, profileRepository = caregiverRepository, now = () => new Date() } = {}) {
+function createJobsService({ repository = bookingRepository, profileRepository = caregiverRepository, notifier = null, now = () => new Date() } = {}) {
   const machine = createBookingStateMachine({ repository });
-  const matching = createMatchingEngine({ repository, now });
+  const notify = notifier || (repository === bookingRepository ? notifySafe : () => {});
+  const matching = createMatchingEngine({ repository, notifier: notify, now });
 
   async function assertVerified(caregiverUserId) {
     const profile = await profileRepository.findProfileByUserId(caregiverUserId);
@@ -155,6 +157,19 @@ function createJobsService({ repository = bookingRepository, profileRepository =
     }
     await repository.setOfferStatus(bookingId, caregiverUserId, 'accepted');
     await repository.markOtherOffersLost(bookingId, caregiverUserId);
+    const profile = await profileRepository.findProfileByUserId(caregiverUserId);
+    notify({
+      userId: booking.customer_user_id,
+      bookingId,
+      template: 'accepted_customer',
+      data: { caregiver_name: profile?.full_name || '', scheduled_date: booking.scheduled_date }
+    });
+    notify({
+      userId: caregiverUserId,
+      bookingId,
+      template: 'accepted_caregiver',
+      data: { scheduled_date: booking.scheduled_date, pickup_time: booking.pickup_time }
+    });
     return jobView(result.booking);
   }
 

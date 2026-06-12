@@ -4,6 +4,7 @@ import { th } from '@shared/i18n/th'
 const TABS = [
   { key: 'jobs', to: '/jobs', label: th.caregiver.nav_jobs, icon: '💼' },
   { key: 'availability', to: '/availability', label: th.caregiver.nav_availability, icon: '📅' },
+  { key: 'wallet', to: '/wallet', label: th.wallet.title, icon: '👛' },
   { key: 'profile', to: '/onboard', label: th.caregiver.nav_profile, icon: '👤' },
 ] as const
 

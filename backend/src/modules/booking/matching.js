@@ -95,7 +95,7 @@ function searchTimedOut(booking, now = new Date()) {
  *   listOffersForBooking(bookingId), insertOffers(rows),
  *   expireOffers(bookingId, nowIso), findBookingById(id)
  */
-function createMatchingEngine({ repository, now = () => new Date() }) {
+function createMatchingEngine({ repository, notifier = null, now = () => new Date() }) {
   /**
    * Create the next offer batch for a searching booking (idempotent: skips
    * caregivers already offered; no-op when a live batch exists or search
@@ -132,7 +132,21 @@ function createMatchingEngine({ repository, now = () => new Date() }) {
         expires_at: expiresAt
       }))
     );
-    return { batch_no: batchNo, offered: nextUp.length };
+    if (notifier) {
+      for (const candidate of nextUp) {
+        notifier({
+          userId: candidate.user_id,
+          bookingId: booking.id,
+          template: 'new_offer',
+          data: {
+            scheduled_date: booking.scheduled_date,
+            pickup_time: booking.pickup_time,
+            payout_satang: booking.caregiver_payout
+          }
+        });
+      }
+    }
+    return { batch_no: batchNo, offered: nextUp.length, offered_user_ids: nextUp.map((candidate) => candidate.user_id) };
   }
 
   return { advanceOffers, rankCandidates, requiredSlots, searchTimedOut };

@@ -11,6 +11,7 @@ const { calculateCancellation } = require('./cancellation');
 const { createBookingStateMachine, CANCELLABLE } = require('./stateMachine');
 const { createMatchingEngine, searchTimedOut } = require('./matching');
 const { getPaymentGateway } = require('../payment/gateway');
+const { notifySafe } = require('../notification/notifier');
 const { AppError } = require('../shared/appError');
 
 const PAYMENT_WINDOW_MINUTES = 30;
@@ -69,9 +70,16 @@ function publicBooking(row) {
   };
 }
 
-function createBookingService({ repository = defaultRepository, gateway = null, now = () => new Date() } = {}) {
+function createBookingService({
+  repository = defaultRepository,
+  gateway = null,
+  notifier = null,
+  now = () => new Date()
+} = {}) {
   const machine = createBookingStateMachine({ repository });
-  const matching = createMatchingEngine({ repository, now });
+  // default repository = real DB -> real notifier; injected fakes (tests) stay silent
+  const notify = notifier || (repository === defaultRepository ? notifySafe : () => {});
+  const matching = createMatchingEngine({ repository, notifier: notify, now });
   const paymentGateway = () => gateway || getPaymentGateway();
 
   async function quote(input) {
@@ -206,8 +214,12 @@ function createBookingService({ repository = defaultRepository, gateway = null, 
     return booking;
   }
 
-  /** Side effects of completion: release escrow + credit the caregiver's stats. */
-  async function settleCompletion(booking, paymentEventPayload = {}) {
+  /**
+   * Side effects of completion: release escrow, write the earning into the
+   * payout ledger (single source of the wallet), credit caregiver stats,
+   * notify "money in". Idempotent — the earning row is once-per-booking.
+   */
+  async function settleCompletion(booking) {
     const payment = await repository.findPaymentByBooking(booking.id);
     if (payment && payment.status === 'held_escrow') {
       await repository.updatePayment(payment.id, {
@@ -215,10 +227,24 @@ function createBookingService({ repository = defaultRepository, gateway = null, 
         released_at: now().toISOString()
       });
     }
-    if (booking.caregiver_user_id) {
-      await repository.incrementJobsCompleted(booking.caregiver_user_id);
+    if (booking.caregiver_user_id && booking.caregiver_payout) {
+      const entry = await repository.appendLedgerEntry({
+        caregiverUserId: booking.caregiver_user_id,
+        bookingId: booking.id,
+        type: 'earning',
+        amount: booking.caregiver_payout,
+        note: `งานวันที่ ${booking.scheduled_date}`
+      });
+      if (entry) {
+        await repository.incrementJobsCompleted(booking.caregiver_user_id);
+        notify({
+          userId: booking.caregiver_user_id,
+          bookingId: booking.id,
+          template: 'money_in',
+          data: { amount_satang: entry.amount, balance_satang: entry.balance_after }
+        });
+      }
     }
-    return paymentEventPayload;
   }
 
   /** Auto-complete: pending_confirmation for over 24h flips to completed on read. */
@@ -385,6 +411,12 @@ function createBookingService({ repository = defaultRepository, gateway = null, 
         payload: { payment_id: payment.id, amount_satang: booking.price_total }
       });
       await matching.advanceOffers(updated); // batch 1 goes out immediately
+      notify({
+        userId: booking.customer_user_id,
+        bookingId: booking.id,
+        template: 'paid',
+        data: { amount_satang: booking.price_total, scheduled_date: booking.scheduled_date }
+      });
       return { booking: publicBooking(updated), payment_status: 'held_escrow' };
     }
 
@@ -418,6 +450,12 @@ function createBookingService({ repository = defaultRepository, gateway = null, 
         payload: { payment_id: payment.id, via: 'webhook' }
       });
       await matching.advanceOffers(updated);
+      notify({
+        userId: booking.customer_user_id,
+        bookingId: booking.id,
+        template: 'paid',
+        data: { amount_satang: booking.price_total, scheduled_date: booking.scheduled_date }
+      });
     }
     return { handled: true };
   }

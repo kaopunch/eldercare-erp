@@ -346,3 +346,67 @@ export type TrackMessage =
   | { type: 'status'; status: BookingStatus }
   | { type: 'location'; lat: number; lng: number; recorded_at: string }
   | { type: 'event'; event_type: string; actor: string; payload: Record<string, unknown>; created_at: string };
+
+// ===== M5: health profile, reviews, wallet, LINE =====
+
+export interface HealthRecord {
+  id: string;
+  booking_id: string;
+  service_date: string | null;
+  destination_name: string | null;
+  vital_signs: { bp?: string; pulse?: string; temp?: string };
+  doctor_summary: string | null;
+  medications_received: { name: string; note: string | null; photo_url: string | null }[];
+  next_appointment: { date: string; department?: string; note?: string } | null;
+  attachments: string[];
+  created_at: string;
+}
+
+export interface PendingReview {
+  id: string;
+  scheduled_date: string;
+  destination_name: string;
+  caregiver_user_id: string;
+}
+
+export interface ReceivedReview {
+  id: string;
+  booking_id: string;
+  stars: number;
+  comment: string | null;
+  tags: string[];
+  created_at: string;
+}
+
+export interface LedgerEntry {
+  id: string;
+  booking_id: string | null;
+  type: 'earning' | 'withdrawal' | 'adjustment';
+  amount: number;
+  balance_after: number;
+  note: string | null;
+  created_at: string;
+}
+
+export interface WithdrawalRequest {
+  id: string;
+  amount: number;
+  bank_info: { bank: string; account_no: string; account_name: string };
+  status: 'pending' | 'paid' | 'rejected';
+  processed_at: string | null;
+  note: string | null;
+  created_at: string;
+}
+
+export interface Wallet {
+  balance_satang: number;
+  ledger: LedgerEntry[];
+  withdrawals: WithdrawalRequest[];
+}
+
+export interface LineLinkCode {
+  code: string;
+  expires_in: number;
+  oa_url: string | null;
+  instruction: string;
+}

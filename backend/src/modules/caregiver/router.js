@@ -5,6 +5,18 @@ const { requireCareUser } = require('../shared/careAuth');
 const { createOnboardingService } = require('./service');
 const { createJobsService } = require('./jobsService');
 const { createActiveJobService } = require('./activeJobService');
+const { createWalletService } = require('./walletService');
+const { createReviewService } = require('../customer/reviewService');
+const { createLinkCode } = require('../notification/lineLink');
+
+const withdrawSchema = z.object({
+  amount_satang: z.number().int().positive(),
+  bank_info: z.object({
+    bank: z.string().min(1).max(100),
+    account_no: z.string().min(5).max(30),
+    account_name: z.string().min(1).max(200)
+  })
+});
 
 const locationSchema = z.object({ lat: z.number(), lng: z.number() });
 
@@ -81,7 +93,9 @@ const documentSchema = z.object({
 function createCaregiverRouter(
   service = createOnboardingService(),
   jobsService = createJobsService(),
-  activeJobService = createActiveJobService()
+  activeJobService = createActiveJobService(),
+  walletService = createWalletService(),
+  reviewService = createReviewService()
 ) {
   const router = express.Router();
   router.use(requireCareUser(['caregiver']));
@@ -211,6 +225,43 @@ function createCaregiverRouter(
   router.get('/jobs/:id', async (req, res, next) => {
     try {
       res.json(await jobsService.getJob(req.careUser.id, req.params.id));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // ===== wallet (G5) =====
+
+  router.get('/wallet', async (req, res, next) => {
+    try {
+      res.json(await walletService.getWallet(req.careUser.id));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.post('/wallet/withdraw', async (req, res, next) => {
+    try {
+      const body = withdrawSchema.parse(req.body || {});
+      res.status(201).json(await walletService.requestWithdrawal(req.careUser.id, body));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // ===== reviews received (G6) =====
+
+  router.get('/reviews', async (req, res, next) => {
+    try {
+      res.json(await reviewService.receivedReviews(req.careUser.id));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.post('/line/link-code', async (req, res, next) => {
+    try {
+      res.json(await createLinkCode(req.careUser.id));
     } catch (err) {
       next(err);
     }

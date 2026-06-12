@@ -64,6 +64,12 @@ export default function EldersListPage() {
               </div>
               <div className="flex gap-2">
                 <Link
+                  to={`/elders/${elder.id}/health`}
+                  className="rounded-lg border border-teal-600 px-3 py-2 text-sm font-medium text-teal-700"
+                >
+                  {th.health.title}
+                </Link>
+                <Link
                   to={`/elders/${elder.id}/edit`}
                   className="rounded-lg border border-teal-600 px-3 py-2 text-sm font-medium text-teal-700"
                 >

@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { th } from '@shared/i18n/th'
 import { bookingsApi, bookingConfirmApi } from '@shared/api/care'
 import type { Booking, BookingStatus, CancelPreview } from '@shared/api/types'
+import ReviewPrompt from '../components/ReviewPrompt'
 
 const STATUS_LABEL: Record<BookingStatus, string> = {
   draft: th.booking.status_pending_payment,
@@ -220,6 +221,7 @@ export default function BookingsPage() {
       </Link>
 
       {cancelTarget && <CancelDialog booking={cancelTarget} onClose={() => setCancelTarget(null)} />}
+      <ReviewPrompt />
     </main>
   )
 }

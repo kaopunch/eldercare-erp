@@ -15,7 +15,12 @@ const caregiverRepository = require('./repository');
 const { createBookingStateMachine } = require('../booking/stateMachine');
 const { haversineKm } = require('../booking/pricing');
 const { publish } = require('../realtime/trackingHub');
+const { notifySafe, adminGroupTarget } = require('../notification/notifier');
 const { AppError } = require('../shared/appError');
+
+function thaiTime(date = new Date()) {
+  return date.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' });
+}
 
 const CHECKIN_RADIUS_KM = 0.3;
 const ROUTE_DEVIATION_KM = 2;
@@ -41,9 +46,26 @@ function createActiveJobService({
   repository = bookingRepository,
   storageRepository = caregiverRepository,
   publishFn = publish,
+  notifier = null,
   now = () => new Date()
 } = {}) {
   const machine = createBookingStateMachine({ repository });
+  // real repository -> real notifier; injected fakes (tests) stay silent
+  const notify = notifier || (repository === bookingRepository ? notifySafe : () => {});
+
+  /** LINE → ครอบครัว ทุก checkpoint (spec section 6). */
+  function notifyCheckpoint(booking, template) {
+    notify({
+      userId: booking.customer_user_id,
+      bookingId: booking.id,
+      template,
+      data: {
+        booking_id: booking.id,
+        destination_name: booking.destination_name,
+        time: thaiTime(now())
+      }
+    });
+  }
 
   async function ownedBooking(caregiverUserId, bookingId) {
     const booking = await repository.findBookingById(bookingId);
@@ -124,6 +146,7 @@ function createActiveJobService({
       location,
       payload: { photo_ref: photoRef, distance_m: distanceM }
     });
+    notifyCheckpoint(booking, 'checkin_home');
     return { status: updated.status };
   }
 
@@ -145,6 +168,7 @@ function createActiveJobService({
       location: location || null,
       payload: distanceM === null ? {} : { distance_m: distanceM }
     });
+    notifyCheckpoint(booking, 'arrived_destination');
     return { status: updated.status };
   }
 
@@ -204,6 +228,7 @@ function createActiveJobService({
       eventType: 'departing',
       location: location || null
     });
+    notifyCheckpoint(booking, 'departing');
     return { status: updated.status };
   }
 
@@ -227,6 +252,7 @@ function createActiveJobService({
       patch: { checkout_at: now().toISOString() },
       payload: { distance_m: distanceM }
     });
+    notifyCheckpoint(booking, 'checkout_home');
     return { status: updated.status };
   }
 
@@ -244,7 +270,13 @@ function createActiveJobService({
       lng: location?.lng ?? null,
       payload: { note: note || null }
     });
-    console.error(`[SOS] booking=${booking.id} caregiver=${caregiverUserId}`); // ops visibility until LINE admin group (M5)
+    console.error(`[SOS] booking=${booking.id} caregiver=${caregiverUserId}`);
+    notify({
+      lineTo: adminGroupTarget(),
+      bookingId: booking.id,
+      template: 'sos_admin',
+      data: { booking_id: booking.id, note: note || '' }
+    });
     broadcast(booking.id, {
       type: 'event',
       event_type: 'sos',
@@ -280,7 +312,13 @@ function createActiveJobService({
           lng,
           payload: { deviation_km: Math.round(deviation * 10) / 10 }
         });
-        console.error(`[geofence] booking=${booking.id} deviation=${deviation.toFixed(1)}km`); // LINE admin group in M5
+        console.error(`[geofence] booking=${booking.id} deviation=${deviation.toFixed(1)}km`);
+        notify({
+          lineTo: adminGroupTarget(),
+          bookingId: booking.id,
+          template: 'geofence_admin',
+          data: { booking_id: booking.id, deviation_km: Math.round(deviation * 10) / 10 }
+        });
       }
     }
     return { stored: true };
