@@ -131,3 +131,41 @@ export const bookingsApi = {
     return api(`/api/v1/customer/bookings/${id}/events`);
   },
 };
+
+// ===== M3: availability + jobs (caregiver), confirm (customer) =====
+
+import type { AvailabilityDay, JobOffer, CaregiverJob } from './types';
+
+export const availabilityApi = {
+  list(from?: string, to?: string): Promise<AvailabilityDay[]> {
+    const params = new URLSearchParams();
+    if (from) params.set('from', from);
+    if (to) params.set('to', to);
+    const query = params.toString();
+    return api(`/api/v1/caregiver/availability${query ? `?${query}` : ''}`);
+  },
+  save(days: AvailabilityDay[]): Promise<AvailabilityDay[]> {
+    return api('/api/v1/caregiver/availability', { method: 'PUT', body: JSON.stringify({ days }) });
+  },
+};
+
+export const jobsApi = {
+  offers(): Promise<JobOffer[]> {
+    return api('/api/v1/caregiver/jobs/offers');
+  },
+  accept(bookingId: string): Promise<CaregiverJob> {
+    return post(`/api/v1/caregiver/jobs/${bookingId}/accept`, {});
+  },
+  active(): Promise<CaregiverJob[]> {
+    return api('/api/v1/caregiver/jobs/active');
+  },
+  history(): Promise<CaregiverJob[]> {
+    return api('/api/v1/caregiver/jobs/history');
+  },
+};
+
+export const bookingConfirmApi = {
+  confirm(bookingId: string): Promise<Booking> {
+    return post(`/api/v1/customer/bookings/${bookingId}/confirm`, {});
+  },
+};

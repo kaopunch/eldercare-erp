@@ -170,6 +170,14 @@ function createCustomerRouter(service = createElderService(), bookingService = c
     }
   });
 
+  router.post('/bookings/:id/confirm', async (req, res, next) => {
+    try {
+      res.json(await bookingService.confirmCaregiver(req.careUser.id, req.params.id));
+    } catch (err) {
+      next(err);
+    }
+  });
+
   router.get('/bookings/:id/cancel-preview', async (req, res, next) => {
     try {
       res.json(await bookingService.cancelPreview(req.careUser.id, req.params.id));

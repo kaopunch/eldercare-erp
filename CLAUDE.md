@@ -65,8 +65,8 @@ DB migration: ไฟล์ SQL เรียงเลขใน `database/` + appl
 - [x] M0 — audit + scaffold   (2026-06-11 — ดู docs/CORE_AUDIT.md, docs/DECISIONS.md)
 - [x] M1 — auth + profiles + onboarding   (2026-06-11 — OTP/JWT auth สองฝั่ง, elder CRUD, caregiver onboarding + private storage)
 - [x] M2 — booking core + payment   (2026-06-12 — state machine, pricing/cancel config ใน DB, MockGateway default + OmiseGateway พร้อมสลับ)
-- [ ] M3 — matching + accept   ← **ถัดไป (รอ review M2)**
-- [ ] M4 — active job + tracking
+- [x] M3 — matching + accept   (2026-06-12 — ปฏิทินรับงาน, broadcast batch 5/10นาที, first-accept-wins, auto-confirm 2ชม.)
+- [ ] M4 — active job + tracking   ← **ถัดไป (รอ review M3)**
 - [ ] M5 — LINE + health profile + wallet
 - [ ] M6 — hardening
 

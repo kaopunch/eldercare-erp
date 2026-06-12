@@ -234,6 +234,8 @@ export interface Booking {
   refund_pct: number | null;
   created_at: string;
   updated_at: string;
+  caregiver?: BookingCaregiverInfo;
+  search_timed_out?: boolean;
 }
 
 export interface PayResult {
@@ -259,4 +261,53 @@ export interface BookingEvent {
   lng: number | null;
   payload: Record<string, unknown>;
   created_at: string;
+}
+
+// ===== M3: matching =====
+
+export interface AvailabilityDay {
+  date: string;
+  slots: { morning: boolean; afternoon: boolean };
+}
+
+export interface JobOffer {
+  booking_id: string;
+  batch_no: number;
+  expires_at: string;
+  scheduled_date: string;
+  pickup_time: string;
+  service_type: ServiceType;
+  duration_type: DurationType;
+  destination_name: string;
+  special_requirements: SpecialRequirements;
+  distance_km: number | null;
+  payout_satang: number;
+  area_approx: LatLng | null;
+}
+
+export interface CaregiverJob {
+  id: string;
+  status: BookingStatus;
+  service_type: ServiceType;
+  duration_type: DurationType;
+  scheduled_date: string;
+  pickup_time: string;
+  pickup_address: string | null;
+  pickup_location: LatLng | null;
+  destination_name: string;
+  destination_address: string | null;
+  destination_location: LatLng | null;
+  appointment_detail: string | null;
+  special_requirements: SpecialRequirements;
+  payout_satang: number | null;
+  matched_at: string | null;
+}
+
+export interface BookingCaregiverInfo {
+  full_name: string;
+  gender: string | null;
+  rating_avg: number;
+  jobs_completed: number;
+  verified_badge: boolean;
+  phone: string | null;
 }

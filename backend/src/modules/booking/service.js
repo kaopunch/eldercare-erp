@@ -9,11 +9,13 @@ const defaultRepository = require('./repository');
 const { calculateQuote } = require('./pricing');
 const { calculateCancellation } = require('./cancellation');
 const { createBookingStateMachine, CANCELLABLE } = require('./stateMachine');
+const { createMatchingEngine, searchTimedOut } = require('./matching');
 const { getPaymentGateway } = require('../payment/gateway');
 const { AppError } = require('../shared/appError');
 
 const PAYMENT_WINDOW_MINUTES = 30;
 const MAX_ADVANCE_DAYS = 30;
+const AUTO_CONFIRM_HOURS = 2; // spec: confirmed auto when customer doesn't reject in 2h
 
 function toWktPoint(location) {
   if (!location) return null;
@@ -68,6 +70,7 @@ function publicBooking(row) {
 
 function createBookingService({ repository = defaultRepository, gateway = null, now = () => new Date() } = {}) {
   const machine = createBookingStateMachine({ repository });
+  const matching = createMatchingEngine({ repository, now });
   const paymentGateway = () => gateway || getPaymentGateway();
 
   async function quote(input) {
@@ -181,20 +184,82 @@ function createBookingService({ repository = defaultRepository, gateway = null, 
     return booking;
   }
 
+  /** Auto-confirm: matched for over AUTO_CONFIRM_HOURS flips to confirmed on read. */
+  async function autoConfirmIfNeeded(booking) {
+    if (
+      booking.status === 'matched' &&
+      booking.matched_at &&
+      now().getTime() - new Date(booking.matched_at).getTime() > AUTO_CONFIRM_HOURS * 60 * 60 * 1000
+    ) {
+      try {
+        const { booking: confirmed } = await machine.transition(booking, 'confirmed', {
+          actor: 'system',
+          payload: { via: 'auto_confirm' }
+        });
+        return confirmed;
+      } catch (err) {
+        if (err.code === 'TRANSITION_CONFLICT') return repository.findBookingById(booking.id);
+        throw err;
+      }
+    }
+    return booking;
+  }
+
+  async function decorate(booking) {
+    const view = publicBooking(booking);
+    if (booking.caregiver_user_id && !['draft', 'pending_payment', 'searching'].includes(booking.status)) {
+      const caregiver = await repository.findCaregiverPublicInfo(booking.caregiver_user_id);
+      if (caregiver) {
+        view.caregiver = {
+          full_name: caregiver.full_name,
+          gender: caregiver.gender,
+          rating_avg: Number(caregiver.rating_avg) || 0,
+          jobs_completed: caregiver.jobs_completed,
+          verified_badge: caregiver.verified_badge,
+          // spec: เฟสแรกแสดงเบอร์จริงหลัง confirmed
+          phone: booking.status !== 'matched' ? caregiver.phone : null
+        };
+      }
+    }
+    if (booking.status === 'searching') {
+      view.search_timed_out = searchTimedOut(booking, now());
+    }
+    return view;
+  }
+
   async function getBooking(customerUserId, bookingId) {
     let booking = await repository.findBookingById(bookingId, customerUserId);
     if (!booking) {
       throw new AppError('BOOKING_NOT_FOUND', 'ไม่พบรายการจอง', 404);
     }
     booking = await expireIfNeeded(booking);
-    return publicBooking(booking);
+    booking = await autoConfirmIfNeeded(booking);
+    if (booking.status === 'searching') {
+      await matching.advanceOffers(booking); // keep batches moving while customer watches
+    }
+    return decorate(booking);
+  }
+
+  /** Customer explicitly confirms the matched caregiver (spec: หรือกดยืนยันเอง). */
+  async function confirmCaregiver(customerUserId, bookingId) {
+    const booking = await repository.findBookingById(bookingId, customerUserId);
+    if (!booking) {
+      throw new AppError('BOOKING_NOT_FOUND', 'ไม่พบรายการจอง', 404);
+    }
+    if (booking.status === 'confirmed') return decorate(booking); // idempotent
+    const { booking: confirmed } = await machine.transition(booking, 'confirmed', {
+      actor: 'customer',
+      payload: { via: 'customer_confirm' }
+    });
+    return decorate(confirmed);
   }
 
   async function listBookings(customerUserId, scope) {
     const rows = await repository.listBookingsByCustomer(customerUserId);
     const result = [];
     for (const row of rows) {
-      result.push(publicBooking(await expireIfNeeded(row)));
+      const fresh = await autoConfirmIfNeeded(await expireIfNeeded(row));
+      result.push(await decorate(fresh));
     }
     if (scope === 'upcoming') {
       return result.filter((booking) =>
@@ -248,8 +313,10 @@ function createBookingService({ repository = defaultRepository, gateway = null, 
       const { booking: updated } = await machine.transition(booking, 'searching', {
         actor: 'system',
         eventType: 'paid',
+        patch: { search_started_at: now().toISOString() },
         payload: { payment_id: payment.id, amount_satang: booking.price_total }
       });
+      await matching.advanceOffers(updated); // batch 1 goes out immediately
       return { booking: publicBooking(updated), payment_status: 'held_escrow' };
     }
 
@@ -276,11 +343,13 @@ function createBookingService({ repository = defaultRepository, gateway = null, 
     });
     const booking = await repository.findBookingById(payment.booking_id);
     if (booking && booking.status === 'pending_payment') {
-      await machine.transition(booking, 'searching', {
+      const { booking: updated } = await machine.transition(booking, 'searching', {
         actor: 'system',
         eventType: 'paid',
+        patch: { search_started_at: now().toISOString() },
         payload: { payment_id: payment.id, via: 'webhook' }
       });
+      await matching.advanceOffers(updated);
     }
     return { handled: true };
   }
@@ -292,13 +361,22 @@ function createBookingService({ repository = defaultRepository, gateway = null, 
     }
     const rules = await repository.listCancellationRules();
     const paid = booking.status !== 'pending_payment' && booking.status !== 'draft';
-    const result = calculateCancellation({
-      rules,
-      cancelledBy: 'customer',
-      hoursBefore: hoursUntilPickup(booking, now()),
-      priceTotalSatang: booking.price_total || 0,
-      caregiverPayoutSatang: booking.caregiver_payout || 0
-    });
+    // no caregiver assigned yet -> full refund regardless of tier (DECISIONS.md M3)
+    const result =
+      booking.status === 'searching'
+        ? {
+            refund_pct: 100,
+            refund_satang: booking.price_total || 0,
+            caregiver_comp_pct: 0,
+            caregiver_comp_satang: 0
+          }
+        : calculateCancellation({
+            rules,
+            cancelledBy: 'customer',
+            hoursBefore: hoursUntilPickup(booking, now()),
+            priceTotalSatang: booking.price_total || 0,
+            caregiverPayoutSatang: booking.caregiver_payout || 0
+          });
     return {
       cancellable: CANCELLABLE.includes(booking.status),
       paid,
@@ -322,14 +400,24 @@ function createBookingService({ repository = defaultRepository, gateway = null, 
     const paid = booking.status !== 'pending_payment';
     let refund = { refund_pct: 100, refund_satang: 0, caregiver_comp_pct: 0, caregiver_comp_satang: 0 };
     if (paid) {
-      const rules = await repository.listCancellationRules();
-      refund = calculateCancellation({
-        rules,
-        cancelledBy: 'customer',
-        hoursBefore: hoursUntilPickup(booking, now()),
-        priceTotalSatang: booking.price_total || 0,
-        caregiverPayoutSatang: booking.caregiver_payout || 0
-      });
+      if (booking.status === 'searching') {
+        // no caregiver assigned yet -> full refund regardless of tier
+        refund = {
+          refund_pct: 100,
+          refund_satang: booking.price_total || 0,
+          caregiver_comp_pct: 0,
+          caregiver_comp_satang: 0
+        };
+      } else {
+        const rules = await repository.listCancellationRules();
+        refund = calculateCancellation({
+          rules,
+          cancelledBy: 'customer',
+          hoursBefore: hoursUntilPickup(booking, now()),
+          priceTotalSatang: booking.price_total || 0,
+          caregiverPayoutSatang: booking.caregiver_payout || 0
+        });
+      }
       const payment = await repository.findPaymentByBooking(bookingId);
       if (payment && payment.status === 'held_escrow' && refund.refund_satang > 0) {
         const gw = paymentGateway();
@@ -377,6 +465,7 @@ function createBookingService({ repository = defaultRepository, gateway = null, 
     handleChargeComplete,
     cancel,
     cancelPreview,
+    confirmCaregiver,
     listEvents,
     publicBooking,
     hoursUntilPickup

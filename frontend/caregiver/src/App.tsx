@@ -3,6 +3,8 @@ import { useAuthStore } from './stores/auth'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import OnboardPage from './pages/OnboardPage'
+import JobsPage from './pages/JobsPage'
+import AvailabilityPage from './pages/AvailabilityPage'
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const user = useAuthStore((state) => state.user)
@@ -23,7 +25,23 @@ function App() {
           </RequireAuth>
         }
       />
-      <Route path="*" element={<Navigate to="/onboard" replace />} />
+      <Route
+        path="/jobs"
+        element={
+          <RequireAuth>
+            <JobsPage />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/availability"
+        element={
+          <RequireAuth>
+            <AvailabilityPage />
+          </RequireAuth>
+        }
+      />
+      <Route path="*" element={<Navigate to="/jobs" replace />} />
     </Routes>
   )
 }

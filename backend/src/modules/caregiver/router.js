@@ -3,6 +3,19 @@ const express = require('express');
 const { z } = require('zod');
 const { requireCareUser } = require('../shared/careAuth');
 const { createOnboardingService } = require('./service');
+const { createJobsService } = require('./jobsService');
+
+const availabilitySchema = z.object({
+  days: z
+    .array(
+      z.object({
+        date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+        slots: z.object({ morning: z.boolean(), afternoon: z.boolean() })
+      })
+    )
+    .min(1)
+    .max(120)
+});
 
 const profileSchema = z.object({
   full_name: z.string().min(1).max(200),
@@ -26,9 +39,66 @@ const documentSchema = z.object({
   data_base64: z.string().min(1)
 });
 
-function createCaregiverRouter(service = createOnboardingService()) {
+function createCaregiverRouter(service = createOnboardingService(), jobsService = createJobsService()) {
   const router = express.Router();
   router.use(requireCareUser(['caregiver']));
+
+  // ===== availability (G2) =====
+
+  router.get('/availability', async (req, res, next) => {
+    try {
+      const from = String(req.query.from || new Date().toISOString().slice(0, 10));
+      const to = String(
+        req.query.to || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+      );
+      res.json(await jobsService.getAvailability(req.careUser.id, from, to));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.put('/availability', async (req, res, next) => {
+    try {
+      const body = availabilitySchema.parse(req.body || {});
+      res.json(await jobsService.saveAvailability(req.careUser.id, body.days));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // ===== jobs (G3) =====
+
+  router.get('/jobs/offers', async (req, res, next) => {
+    try {
+      res.json(await jobsService.listOffers(req.careUser.id));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.post('/jobs/:id/accept', async (req, res, next) => {
+    try {
+      res.json(await jobsService.acceptJob(req.careUser.id, req.params.id));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.get('/jobs/active', async (req, res, next) => {
+    try {
+      res.json(await jobsService.listActiveJobs(req.careUser.id));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.get('/jobs/history', async (req, res, next) => {
+    try {
+      res.json(await jobsService.listHistory(req.careUser.id));
+    } catch (err) {
+      next(err);
+    }
+  });
 
   router.post('/onboard/profile', async (req, res, next) => {
     try {

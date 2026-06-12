@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { th } from '@shared/i18n/th'
-import { bookingsApi } from '@shared/api/care'
+import { bookingsApi, bookingConfirmApi } from '@shared/api/care'
 import type { Booking, BookingStatus, CancelPreview } from '@shared/api/types'
 
 const STATUS_LABEL: Record<BookingStatus, string> = {
@@ -93,9 +93,14 @@ function CancelDialog({ booking, onClose }: { booking: Booking; onClose: () => v
 export default function BookingsPage() {
   const [scope, setScope] = useState<'upcoming' | 'past'>('upcoming')
   const [cancelTarget, setCancelTarget] = useState<Booking | null>(null)
+  const queryClient = useQueryClient()
   const bookings = useQuery({
     queryKey: ['bookings', scope],
     queryFn: () => bookingsApi.list(scope),
+  })
+  const confirmMutation = useMutation({
+    mutationFn: (id: string) => bookingConfirmApi.confirm(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['bookings'] }),
   })
 
   return (
@@ -143,6 +148,37 @@ export default function BookingsPage() {
                 {STATUS_LABEL[booking.status]}
               </span>
             </div>
+            {booking.caregiver && (
+              <div className="mt-2 rounded-lg bg-teal-50 p-3">
+                <p className="text-sm font-medium text-teal-900">
+                  {th.booking.your_caregiver}: {booking.caregiver.full_name}
+                  {booking.caregiver.verified_badge && ' ✓'}
+                </p>
+                <p className="text-sm text-teal-800">
+                  ★ {booking.caregiver.rating_avg.toFixed(1)} · {booking.caregiver.jobs_completed}{' '}
+                  {th.booking.jobs_done}
+                  {booking.caregiver.phone && ` · ${booking.caregiver.phone}`}
+                </p>
+                {booking.status === 'matched' && (
+                  <>
+                    <button
+                      type="button"
+                      disabled={confirmMutation.isPending}
+                      onClick={() => confirmMutation.mutate(booking.id)}
+                      className="mt-2 min-h-12 w-full rounded-xl bg-teal-600 font-semibold text-white disabled:opacity-50"
+                    >
+                      {th.booking.confirm_caregiver}
+                    </button>
+                    <p className="mt-1 text-xs text-gray-500">{th.booking.auto_confirm_note}</p>
+                  </>
+                )}
+              </div>
+            )}
+            {booking.status === 'searching' && booking.search_timed_out && (
+              <p className="mt-2 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">
+                {th.booking.search_timeout_note}
+              </p>
+            )}
             {booking.status === 'cancelled' && booking.refund_pct !== null && (
               <p className="mt-2 text-sm text-gray-500">
                 {th.booking.refund_done} {booking.refund_pct}%

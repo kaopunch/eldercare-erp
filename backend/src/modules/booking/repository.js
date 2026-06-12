@@ -144,9 +144,160 @@ async function findElderForCustomer(elderId, customerUserId) {
   );
 }
 
+// ===== matching: candidates + offers (M3) =====
+
+/** Verified caregivers with their availability slots for a given date. */
+async function listVerifiedCaregiversWithAvailability(date) {
+  const availability = unwrap(
+    await db()
+      .from('care_caregiver_availability')
+      .select('caregiver_user_id,slots')
+      .eq('date', date)
+  );
+  if (!availability.length) return [];
+  const byUser = new Map(availability.map((row) => [row.caregiver_user_id, row.slots]));
+  const profiles = unwrap(
+    await db()
+      .from('care_caregiver_profiles')
+      .select(
+        'user_id,gender,languages,service_area_lat,service_area_lng,service_radius_km,verification_status,rating_avg,jobs_completed'
+      )
+      .eq('verification_status', 'verified')
+      .in('user_id', [...byUser.keys()])
+  );
+  return profiles.map((profile) => ({ ...profile, availability: byUser.get(profile.user_id) || null }));
+}
+
+async function listOffersForBooking(bookingId) {
+  return unwrap(
+    await db()
+      .from('care_booking_offers')
+      .select('*')
+      .eq('booking_id', bookingId)
+      .order('batch_no', { ascending: true })
+  );
+}
+
+async function insertOffers(rows) {
+  if (!rows.length) return [];
+  return unwrap(await db().from('care_booking_offers').insert(rows).select('id'));
+}
+
+async function expireOffers(bookingId, nowIso) {
+  const { error } = await db()
+    .from('care_booking_offers')
+    .update({ status: 'expired' })
+    .eq('booking_id', bookingId)
+    .eq('status', 'offered')
+    .lte('expires_at', nowIso);
+  if (error) throw new AppError('DB_ERROR', 'เกิดข้อผิดพลาดภายในระบบ', 500, { hint: error.message });
+}
+
+async function listActiveOffersForCaregiver(caregiverUserId, nowIso) {
+  return unwrap(
+    await db()
+      .from('care_booking_offers')
+      .select('*, booking:care_bookings(*)')
+      .eq('caregiver_user_id', caregiverUserId)
+      .eq('status', 'offered')
+      .gt('expires_at', nowIso)
+      .order('expires_at', { ascending: true })
+  );
+}
+
+async function setOfferStatus(bookingId, caregiverUserId, status) {
+  const { error } = await db()
+    .from('care_booking_offers')
+    .update({ status, responded_at: new Date().toISOString() })
+    .eq('booking_id', bookingId)
+    .eq('caregiver_user_id', caregiverUserId);
+  if (error) throw new AppError('DB_ERROR', 'เกิดข้อผิดพลาดภายในระบบ', 500, { hint: error.message });
+}
+
+async function markOtherOffersLost(bookingId, winnerUserId) {
+  const { error } = await db()
+    .from('care_booking_offers')
+    .update({ status: 'lost' })
+    .eq('booking_id', bookingId)
+    .eq('status', 'offered')
+    .neq('caregiver_user_id', winnerUserId);
+  if (error) throw new AppError('DB_ERROR', 'เกิดข้อผิดพลาดภายในระบบ', 500, { hint: error.message });
+}
+
+async function listSearchingBookings() {
+  return unwrap(await db().from('care_bookings').select('*').eq('status', 'searching'));
+}
+
+async function listBookingsByCaregiver(caregiverUserId, statuses) {
+  let query = db()
+    .from('care_bookings')
+    .select('*')
+    .eq('caregiver_user_id', caregiverUserId)
+    .order('scheduled_date', { ascending: true });
+  if (statuses?.length) query = query.in('status', statuses);
+  return unwrap(await query);
+}
+
+// ===== availability (G2) =====
+
+async function listAvailability(caregiverUserId, fromDate, toDate) {
+  return unwrap(
+    await db()
+      .from('care_caregiver_availability')
+      .select('date,slots')
+      .eq('caregiver_user_id', caregiverUserId)
+      .gte('date', fromDate)
+      .lte('date', toDate)
+      .order('date', { ascending: true })
+  );
+}
+
+async function upsertAvailability(caregiverUserId, days) {
+  const rows = days.map((day) => ({
+    caregiver_user_id: caregiverUserId,
+    date: day.date,
+    slots: day.slots,
+    updated_at: new Date().toISOString()
+  }));
+  return unwrap(
+    await db()
+      .from('care_caregiver_availability')
+      .upsert(rows, { onConflict: 'caregiver_user_id,date' })
+      .select('date,slots')
+  );
+}
+
+/** Public caregiver info shown to the customer after match — name/photo only. */
+async function findCaregiverPublicInfo(userId) {
+  const profile = unwrap(
+    await db()
+      .from('care_caregiver_profiles')
+      .select('full_name,gender,rating_avg,jobs_completed,verified_badge')
+      .eq('user_id', userId)
+      .maybeSingle()
+  );
+  if (!profile) return null;
+  const user = unwrap(
+    await db().from('care_users').select('phone').eq('id', userId).maybeSingle()
+  );
+  return { ...profile, phone: user?.phone || null };
+}
+
 module.exports = {
   findPricingRule,
   listCancellationRules,
+  listVerifiedCaregiversWithAvailability,
+  listOffersForBooking,
+  insertOffers,
+  expireOffers,
+  listActiveOffersForCaregiver,
+  setOfferStatus,
+  markOtherOffersLost,
+  listSearchingBookings,
+  listBookingsByCaregiver,
+  listAvailability,
+  upsertAvailability,
+  findCaregiverPublicInfo,
   insertBooking,
   findBookingById,
   listBookingsByCustomer,

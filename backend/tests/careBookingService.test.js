@@ -95,6 +95,20 @@ function createFakeBookingRepository() {
         home_lng: 100.5018,
         mobility: 'wheelchair'
       };
+    },
+    // matching stubs (no caregivers in these tests)
+    async listVerifiedCaregiversWithAvailability() {
+      return [];
+    },
+    async listOffersForBooking() {
+      return [];
+    },
+    async insertOffers(rows) {
+      return rows;
+    },
+    async expireOffers() {},
+    async findCaregiverPublicInfo() {
+      return null;
     }
   };
 }
@@ -184,10 +198,24 @@ test('expired pending_payment flips to cancelled on read', async () => {
   await assert.rejects(service.pay(CUSTOMER, booking.id, { method: 'mock' }), (err) => err.code === 'PAYMENT_NOT_ALLOWED');
 });
 
-test('cancel after payment refunds per tier and records refund on payment', async () => {
+test('cancel while searching (no caregiver yet) always refunds 100%', async () => {
+  const { repository, service } = buildService();
+  const { booking } = await service.createBooking(CUSTOMER, validCreateInput(2)); // would be 50% tier
+  await service.pay(CUSTOMER, booking.id, { method: 'mock' });
+  const result = await service.cancel(CUSTOMER, booking.id, 'หาไม่ทัน');
+  assert.equal(result.booking.refund_pct, 100);
+  assert.equal(result.refund_satang, booking.price_total_satang);
+  assert.equal(repository.payments[0].status, 'refunded');
+});
+
+test('cancel after caregiver matched refunds per tier and records refund on payment', async () => {
   const { repository, service } = buildService();
   const { booking } = await service.createBooking(CUSTOMER, validCreateInput(12)); // 6-24h tier
   await service.pay(CUSTOMER, booking.id, { method: 'mock' });
+  // simulate a caregiver having accepted (M3 matched state)
+  const row = repository.bookings.find((item) => item.id === booking.id);
+  row.status = 'confirmed';
+  row.caregiver_user_id = 'caregiver-9';
   const result = await service.cancel(CUSTOMER, booking.id, 'เปลี่ยนแผน');
   assert.equal(result.booking.status, 'cancelled');
   assert.equal(result.booking.refund_pct, 80);

@@ -52,6 +52,17 @@
 5. **จุดหมาย M2 ใช้พิกัด + ชื่อสถานที่พิมพ์เอง** — hospital autocomplete ต้องใช้ Places API จะมาพร้อม Map adapter
 6. **Webhook Omise ไม่ตรวจ signature ในเฟสนี้** (Omise ไม่มี signing secret มาตรฐาน) — ความปลอดภัยมาจากการ lookup ด้วย charge id ที่เราสร้างเอง + idempotent transition; M6 จะเพิ่มการ verify ด้วย retrieve charge จาก API ก่อนเชื่อ
 
+## 2026-06-12 — M3 implementation decisions
+
+1. **Matching คำนวณฝั่ง JS ด้วย lat/lng denormalized** (haversine) แทน PostGIS ST_DWithin — ถูกต้องเท่ากันที่ pilot scale, unit test ง่าย; เปลี่ยนเป็น PostGIS query เมื่อจำนวนผู้ดูแลโต
+2. **Batch progression แบบ lazy** — batch ถัดไป (5 คน/10 นาที) ถูกสร้างเมื่อมีการอ่าน (caregiver poll offers ทุก 30 วิ หรือ customer เปิดหน้า booking) ไม่ใช้ background worker; แบบเดียวกับ payment expiry
+3. **First-accept-wins ใช้ conditional update ของ state machine** (`WHERE status='searching'`) — คนแรกที่ DB commit ชนะ คนหลังได้ JOB_TAKEN
+4. **ยกเลิกระหว่าง searching คืนเงิน 100% เสมอ** — tier 3.1 เริ่มใช้เมื่อมีผู้ดูแล (matched ขึ้นไป) เพราะยังไม่มีใครเสียโอกาสงาน
+5. **Recurring availability ทำฝั่ง client** — ปุ่ม "ทำซ้ำ 4 สัปดาห์" copy pattern สัปดาห์นี้แล้ว upsert เป็นรายวัน ไม่มีตาราง recurring แยก (โครงสร้างข้อมูลเรียบกว่า แก้รายวันได้อิสระ)
+6. **การ์ดงานปิดบังที่อยู่** — ส่งเฉพาะพิกัดปัดเศษ ~1 กม. + ระยะทาง + จุดหมาย; ที่อยู่เต็มเห็นหลังกดรับงานเท่านั้น (ตามสเปค G3)
+7. **Verify caregiver ผ่านสคริปต์** `backend/scripts/verify_caregiver.js --phone X` — admin dashboard อยู่นอก scope
+8. **แจ้ง search timeout (4 ชม./<3 ชม.ก่อนนัด)** — เฟสนี้แสดง banner ใน app + ยกเลิกคืนเต็ม; LINE notification มาใน M5
+
 ## ค้างตัดสินใจ / ติดตาม
 
 - Baseline Supabase migration tracking (ไฟล์ 001/003/004/005 ถูก apply โดยไม่ track) — จะทำตอนเริ่ม M1 ก่อน migration ใหม่ตัวแรก

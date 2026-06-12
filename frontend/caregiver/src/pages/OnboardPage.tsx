@@ -6,6 +6,7 @@ import { onboardApi } from '@shared/api/care'
 import type { ApiError } from '@shared/api/client'
 import type { CaregiverBackground, DocumentType, LatLng } from '@shared/api/types'
 import { useAuthStore } from '../stores/auth'
+import CaregiverNav from '../components/CaregiverNav'
 
 const STEPS = [
   th.caregiver.onboard_step1,
@@ -152,7 +153,7 @@ export default function OnboardPage() {
   const verificationStatus = status.data?.verification_status ?? 'pending'
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col gap-4 p-4">
+    <main className="mx-auto flex min-h-screen max-w-md flex-col gap-4 p-4 pb-24">
       <header className="flex items-start justify-between">
         <div>
           <h1 className="text-xl font-bold text-amber-700">{th.caregiver.onboard_title}</h1>
@@ -382,6 +383,7 @@ export default function OnboardPage() {
           </button>
         </section>
       )}
+      <CaregiverNav active="profile" />
     </main>
   )
 }
