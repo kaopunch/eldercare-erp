@@ -36,6 +36,13 @@ const SERVICE_LABEL: Record<string, string> = {
 }
 
 const CANCELLABLE: BookingStatus[] = ['pending_payment', 'searching', 'matched', 'confirmed']
+const TRACKABLE: BookingStatus[] = [
+  'confirmed',
+  'in_progress_pickup',
+  'at_destination',
+  'returning',
+  'pending_confirmation',
+]
 
 function baht(satang: number | null): string {
   return satang === null ? '-' : (satang / 100).toLocaleString('th-TH', { maximumFractionDigits: 2 })
@@ -183,6 +190,14 @@ export default function BookingsPage() {
               <p className="mt-2 text-sm text-gray-500">
                 {th.booking.refund_done} {booking.refund_pct}%
               </p>
+            )}
+            {TRACKABLE.includes(booking.status) && (
+              <Link
+                to={`/bookings/${booking.id}/track`}
+                className="mt-3 flex min-h-12 items-center justify-center rounded-xl bg-teal-600 font-semibold text-white"
+              >
+                📍 {th.booking.track_live}
+              </Link>
             )}
             {CANCELLABLE.includes(booking.status) && (
               <button

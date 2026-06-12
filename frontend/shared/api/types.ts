@@ -311,3 +311,38 @@ export interface BookingCaregiverInfo {
   verified_badge: boolean;
   phone: string | null;
 }
+
+// ===== M4: active job + tracking =====
+
+export interface ElderJobCard {
+  full_name: string;
+  nickname: string | null;
+  mobility: Mobility | null;
+  chronic_conditions: string[];
+  special_notes: string | null;
+  family_phone: string | null;
+}
+
+export interface PhotoUpload {
+  content_type?: string;
+  data_base64: string;
+}
+
+export interface HealthRecordInput {
+  vital_signs?: { bp?: string; pulse?: string; temp?: string };
+  doctor_summary?: string | null;
+  medications_received?: { name: string; note?: string; photo?: PhotoUpload }[];
+  next_appointment?: { date: string; department?: string; note?: string } | null;
+  attachments?: PhotoUpload[];
+}
+
+export interface TrackSnapshot {
+  booking: Booking;
+  last_location: { lat: number; lng: number; recorded_at: string } | null;
+  events: BookingEvent[];
+}
+
+export type TrackMessage =
+  | { type: 'status'; status: BookingStatus }
+  | { type: 'location'; lat: number; lng: number; recorded_at: string }
+  | { type: 'event'; event_type: string; actor: string; payload: Record<string, unknown>; created_at: string };

@@ -16,6 +16,7 @@ const { AppError } = require('../shared/appError');
 const PAYMENT_WINDOW_MINUTES = 30;
 const MAX_ADVANCE_DAYS = 30;
 const AUTO_CONFIRM_HOURS = 2; // spec: confirmed auto when customer doesn't reject in 2h
+const AUTO_COMPLETE_HOURS = 24; // spec: completed auto 24h after checkout
 
 function toWktPoint(location) {
   if (!location) return null;
@@ -205,6 +206,72 @@ function createBookingService({ repository = defaultRepository, gateway = null, 
     return booking;
   }
 
+  /** Side effects of completion: release escrow + credit the caregiver's stats. */
+  async function settleCompletion(booking, paymentEventPayload = {}) {
+    const payment = await repository.findPaymentByBooking(booking.id);
+    if (payment && payment.status === 'held_escrow') {
+      await repository.updatePayment(payment.id, {
+        status: 'released',
+        released_at: now().toISOString()
+      });
+    }
+    if (booking.caregiver_user_id) {
+      await repository.incrementJobsCompleted(booking.caregiver_user_id);
+    }
+    return paymentEventPayload;
+  }
+
+  /** Auto-complete: pending_confirmation for over 24h flips to completed on read. */
+  async function autoCompleteIfNeeded(booking) {
+    if (
+      booking.status === 'pending_confirmation' &&
+      booking.checkout_at &&
+      now().getTime() - new Date(booking.checkout_at).getTime() > AUTO_COMPLETE_HOURS * 60 * 60 * 1000
+    ) {
+      try {
+        const { booking: completed } = await machine.transition(booking, 'completed', {
+          actor: 'system',
+          payload: { via: 'auto_complete' }
+        });
+        await settleCompletion(completed);
+        return completed;
+      } catch (err) {
+        if (err.code === 'TRANSITION_CONFLICT') return repository.findBookingById(booking.id);
+        throw err;
+      }
+    }
+    return booking;
+  }
+
+  /** Customer confirms the job is done (spec: ปล่อย escrow + เปิดรีวิว). */
+  async function confirmComplete(customerUserId, bookingId) {
+    const booking = await repository.findBookingById(bookingId, customerUserId);
+    if (!booking) {
+      throw new AppError('BOOKING_NOT_FOUND', 'ไม่พบรายการจอง', 404);
+    }
+    if (booking.status === 'completed') return decorate(booking); // idempotent
+    if (booking.status !== 'pending_confirmation') {
+      throw new AppError('CONFIRM_NOT_ALLOWED', 'งานยังไม่อยู่ในขั้นตอนรอยืนยันจบงาน', 409);
+    }
+    const { booking: completed } = await machine.transition(booking, 'completed', {
+      actor: 'customer',
+      eventType: 'customer_confirmed',
+      payload: { via: 'customer_confirm' }
+    });
+    await settleCompletion(completed);
+    return decorate(completed);
+  }
+
+  /** Initial snapshot for the tracking page; live updates come over the WS. */
+  async function getTrackSnapshot(customerUserId, bookingId) {
+    const booking = await getBooking(customerUserId, bookingId);
+    const [lastPing, events] = await Promise.all([
+      repository.latestLocationPing(bookingId),
+      listEvents(customerUserId, bookingId)
+    ]);
+    return { booking, last_location: lastPing || null, events };
+  }
+
   async function decorate(booking) {
     const view = publicBooking(booking);
     if (booking.caregiver_user_id && !['draft', 'pending_payment', 'searching'].includes(booking.status)) {
@@ -234,6 +301,7 @@ function createBookingService({ repository = defaultRepository, gateway = null, 
     }
     booking = await expireIfNeeded(booking);
     booking = await autoConfirmIfNeeded(booking);
+    booking = await autoCompleteIfNeeded(booking);
     if (booking.status === 'searching') {
       await matching.advanceOffers(booking); // keep batches moving while customer watches
     }
@@ -258,7 +326,7 @@ function createBookingService({ repository = defaultRepository, gateway = null, 
     const rows = await repository.listBookingsByCustomer(customerUserId);
     const result = [];
     for (const row of rows) {
-      const fresh = await autoConfirmIfNeeded(await expireIfNeeded(row));
+      const fresh = await autoCompleteIfNeeded(await autoConfirmIfNeeded(await expireIfNeeded(row)));
       result.push(await decorate(fresh));
     }
     if (scope === 'upcoming') {
@@ -453,7 +521,19 @@ function createBookingService({ repository = defaultRepository, gateway = null, 
     if (!booking) {
       throw new AppError('BOOKING_NOT_FOUND', 'ไม่พบรายการจอง', 404);
     }
-    return repository.listBookingEvents(bookingId);
+    const events = await repository.listBookingEvents(bookingId);
+    // resolve private-bucket photo refs to short-lived signed URLs for the timeline
+    const { signedUrlFor } = require('../caregiver/repository');
+    for (const event of events) {
+      if (event.payload?.photo_ref) {
+        event.payload = {
+          ...event.payload,
+          photo_url: await signedUrlFor(event.payload.photo_ref)
+        };
+        delete event.payload.photo_ref;
+      }
+    }
+    return events;
   }
 
   return {
@@ -466,6 +546,8 @@ function createBookingService({ repository = defaultRepository, gateway = null, 
     cancel,
     cancelPreview,
     confirmCaregiver,
+    confirmComplete,
+    getTrackSnapshot,
     listEvents,
     publicBooking,
     hoursUntilPickup

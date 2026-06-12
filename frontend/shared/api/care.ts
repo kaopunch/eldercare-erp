@@ -169,3 +169,47 @@ export const bookingConfirmApi = {
     return post(`/api/v1/customer/bookings/${bookingId}/confirm`, {});
   },
 };
+
+// ===== M4: active job (caregiver) + tracking (customer) =====
+
+import type { ElderJobCard, HealthRecordInput, PhotoUpload, TrackSnapshot, LatLng as Point } from './types';
+
+export const activeJobApi = {
+  get(bookingId: string): Promise<CaregiverJob & { elder?: ElderJobCard }> {
+    return api(`/api/v1/caregiver/jobs/${bookingId}`);
+  },
+  checkin(bookingId: string, photo: PhotoUpload, location: Point): Promise<{ status: string }> {
+    return post(`/api/v1/caregiver/jobs/${bookingId}/checkin`, { photo, location });
+  },
+  arrive(bookingId: string, location: Point | null): Promise<{ status: string }> {
+    return post(`/api/v1/caregiver/jobs/${bookingId}/arrive`, { location });
+  },
+  healthRecord(bookingId: string, input: HealthRecordInput): Promise<{ id: string }> {
+    return post(`/api/v1/caregiver/jobs/${bookingId}/health-record`, input);
+  },
+  departing(bookingId: string, location: Point | null): Promise<{ status: string }> {
+    return post(`/api/v1/caregiver/jobs/${bookingId}/departing`, { location });
+  },
+  checkout(bookingId: string, location: Point): Promise<{ status: string }> {
+    return post(`/api/v1/caregiver/jobs/${bookingId}/checkout`, { location });
+  },
+  sos(bookingId: string, location: Point | null, note?: string): Promise<{ ok: boolean }> {
+    return post(`/api/v1/caregiver/jobs/${bookingId}/sos`, { location, note });
+  },
+  ping(bookingId: string, lat: number, lng: number, accuracyM?: number | null): Promise<{ stored: boolean }> {
+    return post(`/api/v1/caregiver/jobs/${bookingId}/location`, { lat, lng, accuracy_m: accuracyM ?? null });
+  },
+};
+
+export const trackApi = {
+  snapshot(bookingId: string): Promise<TrackSnapshot> {
+    return api(`/api/v1/customer/bookings/${bookingId}/track`);
+  },
+  confirmComplete(bookingId: string): Promise<Booking> {
+    return post(`/api/v1/customer/bookings/${bookingId}/confirm-complete`, {});
+  },
+  wsUrl(bookingId: string, token: string): string {
+    const base = (import.meta.env.VITE_API_BASE_URL as string) || window.location.origin;
+    return `${base.replace(/^http/, 'ws')}/ws/care/track/${bookingId}?token=${encodeURIComponent(token)}`;
+  },
+};

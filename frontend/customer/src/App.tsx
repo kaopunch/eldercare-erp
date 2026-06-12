@@ -6,6 +6,7 @@ import EldersListPage from './pages/EldersListPage'
 import ElderFormPage from './pages/ElderFormPage'
 import BookPage from './pages/BookPage'
 import BookingsPage from './pages/BookingsPage'
+import TrackingPage from './pages/TrackingPage'
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const user = useAuthStore((state) => state.user)
@@ -55,6 +56,14 @@ function App() {
         element={
           <RequireAuth>
             <BookingsPage />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/bookings/:id/track"
+        element={
+          <RequireAuth>
+            <TrackingPage />
           </RequireAuth>
         }
       />

@@ -203,6 +203,22 @@ function createCustomerRouter(service = createElderService(), bookingService = c
     }
   });
 
+  router.post('/bookings/:id/confirm-complete', async (req, res, next) => {
+    try {
+      res.json(await bookingService.confirmComplete(req.careUser.id, req.params.id));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.get('/bookings/:id/track', async (req, res, next) => {
+    try {
+      res.json(await bookingService.getTrackSnapshot(req.careUser.id, req.params.id));
+    } catch (err) {
+      next(err);
+    }
+  });
+
   return router;
 }
 

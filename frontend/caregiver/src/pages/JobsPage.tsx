@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { th } from '@shared/i18n/th'
 import { jobsApi } from '@shared/api/care'
@@ -144,6 +145,12 @@ export default function JobsPage() {
             <p className="mt-1 font-medium text-amber-700">
               {baht(job.payout_satang)} {th.booking.baht}
             </p>
+            <Link
+              to={`/jobs/${job.id}/active`}
+              className="mt-3 flex min-h-12 items-center justify-center rounded-xl bg-amber-600 font-semibold text-white"
+            >
+              {th.caregiver.open_active_job}
+            </Link>
           </li>
         ))}
       </ul>

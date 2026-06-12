@@ -125,4 +125,10 @@ app.use((err, req, res, next) => {
 });
 
 const port = process.env.PORT || 8080;
-app.listen(port, () => console.log(`ElderCare ERP API listening on ${port}`));
+const server = app.listen(port, () => console.log(`ElderCare ERP API listening on ${port}`));
+
+// อุ่นใจ Care: live tracking WebSocket (/ws/care/track/:bookingId) — additive,
+// ignores all other upgrade paths
+const { attachTrackingHub } = require('./modules/realtime/trackingHub');
+const { findBookingById } = require('./modules/booking/repository');
+attachTrackingHub(server, { findBookingById });

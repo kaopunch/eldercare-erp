@@ -267,6 +267,81 @@ async function upsertAvailability(caregiverUserId, days) {
   );
 }
 
+// ===== active job: pings + health records (M4) =====
+
+async function insertLocationPing({ bookingId, lat, lng, accuracyM = null, recordedAt = null }) {
+  return unwrap(
+    await db()
+      .from('care_location_pings')
+      .insert({
+        booking_id: bookingId,
+        lat,
+        lng,
+        accuracy_m: accuracyM,
+        recorded_at: recordedAt || new Date().toISOString()
+      })
+      .select('id,lat,lng,recorded_at')
+      .single()
+  );
+}
+
+async function latestLocationPing(bookingId) {
+  return unwrap(
+    await db()
+      .from('care_location_pings')
+      .select('lat,lng,accuracy_m,recorded_at')
+      .eq('booking_id', bookingId)
+      .order('recorded_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+  );
+}
+
+async function upsertHealthRecord(row) {
+  return unwrap(
+    await db()
+      .from('care_service_health_records')
+      .upsert({ ...row, updated_at: new Date().toISOString() }, { onConflict: 'booking_id' })
+      .select('*')
+      .single()
+  );
+}
+
+async function findHealthRecordByBooking(bookingId) {
+  return unwrap(
+    await db().from('care_service_health_records').select('*').eq('booking_id', bookingId).maybeSingle()
+  );
+}
+
+async function incrementJobsCompleted(caregiverUserId) {
+  const { data, error } = await db()
+    .from('care_caregiver_profiles')
+    .select('jobs_completed')
+    .eq('user_id', caregiverUserId)
+    .maybeSingle();
+  if (error || !data) return;
+  await db()
+    .from('care_caregiver_profiles')
+    .update({ jobs_completed: (data.jobs_completed || 0) + 1, updated_at: new Date().toISOString() })
+    .eq('user_id', caregiverUserId);
+}
+
+/** Elder card shown on the caregiver active-job screen + family emergency phone. */
+async function findElderForJob(elderProfileId) {
+  const elder = unwrap(
+    await db()
+      .from('care_elder_profiles')
+      .select('id,full_name,nickname,mobility,chronic_conditions,special_notes,photo_url,owner_user_id')
+      .eq('id', elderProfileId)
+      .maybeSingle()
+  );
+  if (!elder) return null;
+  const owner = unwrap(
+    await db().from('care_users').select('phone').eq('id', elder.owner_user_id).maybeSingle()
+  );
+  return { ...elder, family_phone: owner?.phone || null };
+}
+
 /** Public caregiver info shown to the customer after match — name/photo only. */
 async function findCaregiverPublicInfo(userId) {
   const profile = unwrap(
@@ -298,6 +373,12 @@ module.exports = {
   listAvailability,
   upsertAvailability,
   findCaregiverPublicInfo,
+  insertLocationPing,
+  latestLocationPing,
+  upsertHealthRecord,
+  findHealthRecordByBooking,
+  incrementJobsCompleted,
+  findElderForJob,
   insertBooking,
   findBookingById,
   listBookingsByCustomer,

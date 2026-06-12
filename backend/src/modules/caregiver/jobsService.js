@@ -158,6 +158,28 @@ function createJobsService({ repository = bookingRepository, profileRepository =
     return jobView(result.booking);
   }
 
+  /** Single job with the elder card pinned on the active-job screen (spec G4). */
+  async function getJob(caregiverUserId, bookingId) {
+    const booking = await repository.findBookingById(bookingId);
+    if (!booking || booking.caregiver_user_id !== caregiverUserId) {
+      throw new AppError('BOOKING_NOT_FOUND', 'ไม่พบงานนี้', 404);
+    }
+    const view = jobView(booking);
+    const elder = await repository.findElderForJob(booking.elder_profile_id);
+    if (elder) {
+      view.elder = {
+        full_name: elder.full_name,
+        nickname: elder.nickname || null,
+        mobility: elder.mobility || null,
+        chronic_conditions: elder.chronic_conditions || [],
+        special_notes: elder.special_notes || null,
+        // family emergency phone unlocks once the booking is confirmed
+        family_phone: booking.status === 'matched' ? null : elder.family_phone
+      };
+    }
+    return view;
+  }
+
   async function listActiveJobs(caregiverUserId) {
     const rows = await repository.listBookingsByCaregiver(caregiverUserId, ACTIVE_STATUSES);
     return rows.map(jobView);
@@ -168,7 +190,7 @@ function createJobsService({ repository = bookingRepository, profileRepository =
     return rows.map(jobView);
   }
 
-  return { getAvailability, saveAvailability, listOffers, acceptJob, listActiveJobs, listHistory };
+  return { getAvailability, saveAvailability, listOffers, acceptJob, getJob, listActiveJobs, listHistory };
 }
 
 module.exports = { createJobsService, ACTIVE_STATUSES };

@@ -66,8 +66,8 @@ DB migration: ไฟล์ SQL เรียงเลขใน `database/` + appl
 - [x] M1 — auth + profiles + onboarding   (2026-06-11 — OTP/JWT auth สองฝั่ง, elder CRUD, caregiver onboarding + private storage)
 - [x] M2 — booking core + payment   (2026-06-12 — state machine, pricing/cancel config ใน DB, MockGateway default + OmiseGateway พร้อมสลับ)
 - [x] M3 — matching + accept   (2026-06-12 — ปฏิทินรับงาน, broadcast batch 5/10นาที, first-accept-wins, auto-confirm 2ชม.)
-- [ ] M4 — active job + tracking   ← **ถัดไป (รอ review M3)**
-- [ ] M5 — LINE + health profile + wallet
+- [x] M4 — active job + tracking   (2026-06-12 — check-in/out GPS 300ม., health record, WS แผนที่สด, geofence alert, auto-complete 24ชม.)
+- [ ] M5 — LINE + health profile + wallet   ← **ถัดไป (รอ review M4; LINE ต้องการ CHANNEL_ACCESS_TOKEN)**
 - [ ] M6 — hardening
 
 (อัปเดต checklist นี้เมื่อจบแต่ละ milestone)
