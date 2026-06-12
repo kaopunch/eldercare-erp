@@ -30,6 +30,22 @@ function createCareApiRouter() {
   router.use('/customer', apiRateLimit, createCustomerRouter());
   router.use('/caregiver', apiRateLimit, createCaregiverRouter());
 
+  // Omise webhook (charge.complete) — no JWT; trust = re-check against payment
+  // row by charge id, transition is idempotent on duplicate delivery.
+  const { createBookingService } = require('./booking/service');
+  const webhookBookingService = createBookingService();
+  router.post('/payments/webhook/omise', apiRateLimit, async (req, res, next) => {
+    try {
+      const event = req.body || {};
+      if (event.key === 'charge.complete' && event.data?.id) {
+        await webhookBookingService.handleChargeComplete(event.data.id, event.data.status);
+      }
+      res.json({ received: true });
+    } catch (err) {
+      next(err);
+    }
+  });
+
   // central error handler for /api/v1 — AppError + zod + fallback
   // eslint-disable-next-line no-unused-vars
   router.use((err, req, res, next) => {

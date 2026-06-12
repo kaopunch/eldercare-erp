@@ -92,3 +92,42 @@ function fileToBase64(file: File): Promise<string> {
     reader.readAsDataURL(file);
   });
 }
+
+// ===== customer: bookings (M2) =====
+
+import type {
+  QuoteInput,
+  Quote,
+  BookingCreateInput,
+  Booking,
+  PayResult,
+  CancelPreview,
+  BookingEvent,
+} from './types';
+
+export const bookingsApi = {
+  quote(input: QuoteInput): Promise<Quote> {
+    return post('/api/v1/customer/bookings/quote', input);
+  },
+  create(input: BookingCreateInput): Promise<{ booking: Booking; quote: Quote }> {
+    return post('/api/v1/customer/bookings', input);
+  },
+  list(scope?: 'upcoming' | 'past'): Promise<Booking[]> {
+    return api(`/api/v1/customer/bookings${scope ? `?scope=${scope}` : ''}`);
+  },
+  get(id: string): Promise<Booking> {
+    return api(`/api/v1/customer/bookings/${id}`);
+  },
+  pay(id: string, input: { method: 'promptpay' | 'card' | 'mock'; card_token?: string }): Promise<PayResult> {
+    return post(`/api/v1/customer/bookings/${id}/pay`, input);
+  },
+  cancelPreview(id: string): Promise<CancelPreview> {
+    return api(`/api/v1/customer/bookings/${id}/cancel-preview`);
+  },
+  cancel(id: string, reason?: string): Promise<{ booking: Booking; refund_satang: number | null }> {
+    return post(`/api/v1/customer/bookings/${id}/cancel`, { reason });
+  },
+  events(id: string): Promise<BookingEvent[]> {
+    return api(`/api/v1/customer/bookings/${id}/events`);
+  },
+};

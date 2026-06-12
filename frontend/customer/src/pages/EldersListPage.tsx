@@ -26,6 +26,9 @@ export default function EldersListPage() {
     <main className="mx-auto flex min-h-screen max-w-md flex-col gap-4 p-4">
       <header className="flex items-center justify-between">
         <h1 className="text-xl font-bold text-teal-700">{th.customer.elders_title}</h1>
+        <Link to="/bookings" className="text-sm font-medium text-teal-700 underline">
+          {th.booking.my_bookings}
+        </Link>
         <button
           type="button"
           onClick={() => {

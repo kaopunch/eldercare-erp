@@ -3,6 +3,7 @@ const express = require('express');
 const { z } = require('zod');
 const { requireCareUser } = require('../shared/careAuth');
 const { createElderService } = require('./service');
+const { createBookingService } = require('../booking/service');
 
 const locationSchema = z.object({ lat: z.number(), lng: z.number() }).nullable();
 
@@ -37,7 +38,47 @@ const elderCreateSchema = elderBaseSchema.extend({
 
 const elderUpdateSchema = elderBaseSchema.partial();
 
-function createCustomerRouter(service = createElderService()) {
+const pointSchema = z.object({ lat: z.number(), lng: z.number() });
+
+const specialRequirementsSchema = z
+  .object({
+    wheelchair: z.boolean().optional(),
+    english: z.boolean().optional(),
+    caregiver_gender: z.enum(['male', 'female']).nullable().optional()
+  })
+  .optional();
+
+const quoteSchema = z.object({
+  service_type: z.enum(['hospital_visit', 'errand', 'companion']),
+  duration_type: z.enum(['half_day', 'full_day']),
+  pickup: pointSchema,
+  destination: pointSchema,
+  special_requirements: specialRequirementsSchema
+});
+
+const bookingCreateSchema = z.object({
+  elder_profile_id: z.string().uuid(),
+  service_type: z.enum(['hospital_visit', 'errand', 'companion']),
+  duration_type: z.enum(['half_day', 'full_day']),
+  scheduled_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  pickup_time: z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/),
+  pickup_address: z.string().max(1000).nullable().optional(),
+  pickup_location: pointSchema.nullable().optional(),
+  destination_name: z.string().min(1).max(300),
+  destination_address: z.string().max(1000).nullable().optional(),
+  destination_location: pointSchema,
+  appointment_detail: z.string().max(2000).nullable().optional(),
+  special_requirements: specialRequirementsSchema
+});
+
+const paySchema = z.object({
+  method: z.enum(['promptpay', 'card', 'mock']).default('promptpay'),
+  card_token: z.string().optional()
+});
+
+const cancelSchema = z.object({ reason: z.string().max(500).optional() });
+
+function createCustomerRouter(service = createElderService(), bookingService = createBookingService()) {
   const router = express.Router();
   router.use(requireCareUser(['customer']));
 
@@ -78,6 +119,77 @@ function createCustomerRouter(service = createElderService()) {
   router.delete('/elders/:id', async (req, res, next) => {
     try {
       res.json(await service.deleteElder(req.careUser.id, req.params.id));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // ===== bookings (spec 4.2) =====
+
+  router.post('/bookings/quote', async (req, res, next) => {
+    try {
+      const body = quoteSchema.parse(req.body || {});
+      res.json(await bookingService.quote(body));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.post('/bookings', async (req, res, next) => {
+    try {
+      const body = bookingCreateSchema.parse(req.body || {});
+      res.status(201).json(await bookingService.createBooking(req.careUser.id, body));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.get('/bookings', async (req, res, next) => {
+    try {
+      const scope = ['upcoming', 'past'].includes(req.query.scope) ? req.query.scope : null;
+      res.json(await bookingService.listBookings(req.careUser.id, scope));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.get('/bookings/:id', async (req, res, next) => {
+    try {
+      res.json(await bookingService.getBooking(req.careUser.id, req.params.id));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.post('/bookings/:id/pay', async (req, res, next) => {
+    try {
+      const body = paySchema.parse(req.body || {});
+      res.json(await bookingService.pay(req.careUser.id, req.params.id, body));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.get('/bookings/:id/cancel-preview', async (req, res, next) => {
+    try {
+      res.json(await bookingService.cancelPreview(req.careUser.id, req.params.id));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.post('/bookings/:id/cancel', async (req, res, next) => {
+    try {
+      const body = cancelSchema.parse(req.body || {});
+      res.json(await bookingService.cancel(req.careUser.id, req.params.id, body.reason));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.get('/bookings/:id/events', async (req, res, next) => {
+    try {
+      res.json(await bookingService.listEvents(req.careUser.id, req.params.id));
     } catch (err) {
       next(err);
     }

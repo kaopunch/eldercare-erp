@@ -143,3 +143,120 @@ export interface OnboardStatus {
     documents: { id_card: boolean; photo: boolean; certificate: boolean };
   };
 }
+
+// ===== bookings (M2) =====
+
+export type ServiceType = 'hospital_visit' | 'errand' | 'companion';
+export type DurationType = 'half_day' | 'full_day';
+export type BookingStatus =
+  | 'draft'
+  | 'pending_payment'
+  | 'searching'
+  | 'matched'
+  | 'confirmed'
+  | 'in_progress_pickup'
+  | 'at_destination'
+  | 'returning'
+  | 'pending_confirmation'
+  | 'completed'
+  | 'cancelled'
+  | 'disputed';
+
+export interface SpecialRequirements {
+  wheelchair?: boolean;
+  english?: boolean;
+  caregiver_gender?: 'male' | 'female' | null;
+}
+
+export interface QuoteInput {
+  service_type: ServiceType;
+  duration_type: DurationType;
+  pickup: LatLng;
+  destination: LatLng;
+  special_requirements?: SpecialRequirements;
+}
+
+export interface Quote {
+  service_type: ServiceType;
+  duration_type: DurationType;
+  distance_km: number;
+  breakdown: {
+    base_satang: number;
+    distance_surcharge_satang: number;
+    english_premium_satang: number;
+    insurance_fee_satang: number;
+  };
+  price_total_satang: number;
+  platform_fee_satang: number;
+  caregiver_payout_satang: number;
+  insurance_fee_satang: number;
+}
+
+export interface BookingCreateInput {
+  elder_profile_id: string;
+  service_type: ServiceType;
+  duration_type: DurationType;
+  scheduled_date: string;
+  pickup_time: string;
+  pickup_address?: string | null;
+  pickup_location?: LatLng | null;
+  destination_name: string;
+  destination_address?: string | null;
+  destination_location: LatLng;
+  appointment_detail?: string | null;
+  special_requirements?: SpecialRequirements;
+}
+
+export interface Booking {
+  id: string;
+  elder_profile_id: string;
+  caregiver_user_id: string | null;
+  service_type: ServiceType;
+  duration_type: DurationType;
+  scheduled_date: string;
+  pickup_time: string;
+  pickup_address: string | null;
+  pickup_location: LatLng | null;
+  destination_name: string;
+  destination_address: string | null;
+  destination_location: LatLng | null;
+  appointment_detail: string | null;
+  special_requirements: SpecialRequirements;
+  distance_km: number | null;
+  price_total_satang: number | null;
+  platform_fee_satang: number | null;
+  insurance_fee_satang: number | null;
+  status: BookingStatus;
+  payment_expires_at: string | null;
+  cancelled_by: string | null;
+  cancel_reason: string | null;
+  cancelled_at: string | null;
+  refund_pct: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PayResult {
+  booking: Booking;
+  payment_status: 'held_escrow' | 'pending' | 'failed';
+  qr_image_url?: string | null;
+}
+
+export interface CancelPreview {
+  cancellable: boolean;
+  paid: boolean;
+  refund_pct: number;
+  refund_satang: number;
+  caregiver_comp_pct: number;
+  caregiver_comp_satang: number;
+}
+
+export interface BookingEvent {
+  id: string;
+  event_type: string;
+  actor: string;
+  lat: number | null;
+  lng: number | null;
+  payload: Record<string, unknown>;
+  created_at: string;
+}

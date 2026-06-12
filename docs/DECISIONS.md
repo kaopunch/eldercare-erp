@@ -43,6 +43,15 @@
 6. **Refresh token เป็น opaque token (48 bytes) + rotation single-use** เก็บ hash ใน `care_refresh_tokens` — เพิกถอนได้จริง ต่างจาก JWT refresh
 7. **`shared/` ใน frontend เป็น pure TS เท่านั้น** (i18n, types, fetch client) — ไฟล์ที่ import react/zustand อยู่ใน app แต่ละตัว เพราะ node_modules ไม่ shared ระหว่างแอป
 
+## 2026-06-12 — M2 implementation decisions
+
+1. **MockGateway เป็น payment gateway default** (`CARE_PAYMENT_GATEWAY=mock`) — จ่ายสำเร็จทันทีให้ flow ถึง searching ครบตาม DoD; `OmiseGateway` เขียนเสร็จแล้ว (PromptPay source+charge, card token, refund, webhook charge.complete) สลับด้วย env เมื่อได้ test keys
+2. **Booking expiry แบบ lazy** — pending_payment เกิน 30 นาทีจะถูกเปลี่ยนเป็น cancelled ตอนถูกอ่าน/จ่าย ไม่ใช้ cron (pilot scale เพียงพอ; เพิ่ม pg_cron ได้ภายหลัง)
+3. **Concurrency ใช้ conditional update** (`WHERE status = from_status`) แทน row lock — first-writer-wins, ฝั่งแพ้ได้ TRANSITION_CONFLICT ให้อ่านใหม่
+4. **ตาราง cancel tier**: เลือก tier จาก `min_hours_before` สูงสุดที่ <= ชั่วโมงก่อนนัด; ยกเลิกโดย caregiver/system/admin คืนเงิน 100% เสมอ (strike caregiver มาใน M3)
+5. **จุดหมาย M2 ใช้พิกัด + ชื่อสถานที่พิมพ์เอง** — hospital autocomplete ต้องใช้ Places API จะมาพร้อม Map adapter
+6. **Webhook Omise ไม่ตรวจ signature ในเฟสนี้** (Omise ไม่มี signing secret มาตรฐาน) — ความปลอดภัยมาจากการ lookup ด้วย charge id ที่เราสร้างเอง + idempotent transition; M6 จะเพิ่มการ verify ด้วย retrieve charge จาก API ก่อนเชื่อ
+
 ## ค้างตัดสินใจ / ติดตาม
 
 - Baseline Supabase migration tracking (ไฟล์ 001/003/004/005 ถูก apply โดยไม่ track) — จะทำตอนเริ่ม M1 ก่อน migration ใหม่ตัวแรก

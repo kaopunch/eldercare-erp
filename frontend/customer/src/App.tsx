@@ -4,6 +4,8 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import EldersListPage from './pages/EldersListPage'
 import ElderFormPage from './pages/ElderFormPage'
+import BookPage from './pages/BookPage'
+import BookingsPage from './pages/BookingsPage'
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const user = useAuthStore((state) => state.user)
@@ -40,7 +42,23 @@ function App() {
           </RequireAuth>
         }
       />
-      <Route path="*" element={<Navigate to="/elders" replace />} />
+      <Route
+        path="/book"
+        element={
+          <RequireAuth>
+            <BookPage />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/bookings"
+        element={
+          <RequireAuth>
+            <BookingsPage />
+          </RequireAuth>
+        }
+      />
+      <Route path="*" element={<Navigate to="/bookings" replace />} />
     </Routes>
   )
 }
