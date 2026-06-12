@@ -7,16 +7,17 @@
     "check:supabase-key": "node scripts/check_supabase_key.js",
     "set:user-password": "node scripts/set_user_pin.js",
     "set:user-pin": "node scripts/set_user_pin.js",
-    "seed:demo": "node scripts/seed_demo.js"
+    "seed:demo": "node scripts/seed_demo.js",
+    "test:e2e": "node scripts/e2e_booking_flow.js"
   },
   "dependencies": {
-    "@supabase/supabase-js": "latest",
-    "cors": "latest",
-    "dotenv": "latest",
-    "express": "latest",
-    "morgan": "latest",
+    "@supabase/supabase-js": "^2.105.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "morgan": "^1.10.1",
     "pdfkit": "^0.18.0",
-    "ws": "^8.20.0",
-    "zod": "latest"
+    "ws": "^8.21.0",
+    "zod": "^4.4.3"
   }
 }

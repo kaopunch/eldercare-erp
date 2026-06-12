@@ -68,6 +68,8 @@ DB migration: ไฟล์ SQL เรียงเลขใน `database/` + appl
 - [x] M3 — matching + accept   (2026-06-12 — ปฏิทินรับงาน, broadcast batch 5/10นาที, first-accept-wins, auto-confirm 2ชม.)
 - [x] M4 — active job + tracking   (2026-06-12 — check-in/out GPS 300ม., health record, WS แผนที่สด, geofence alert, auto-complete 24ชม.)
 - [x] M5 — LINE + health profile + wallet   (2026-06-12 — notifier 3 ชั้น line/sms/mock, สมุดสุขภาพ+จองตามนัด, รีวิว, ledger+ถอนเงิน; LINE จริงรอ token)
-- [ ] M6 — hardening   ← **ถัดไป (รอ review M5)**
+- [x] M6 — hardening   (2026-06-12 — webhook signatures, offline outbox, PDPA audit ครบ, advisors แก้แล้ว, pinned deps, E2E `npm run test:e2e` ผ่าน)
+
+**ทุก milestone เสร็จแล้ว** — ค้างฝั่ง user: Omise test keys, LINE token/secret, push ขึ้น GitHub
 
 (อัปเดต checklist นี้เมื่อจบแต่ละ milestone)

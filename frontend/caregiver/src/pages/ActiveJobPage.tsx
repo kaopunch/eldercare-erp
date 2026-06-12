@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { th } from '@shared/i18n/th'
 import { activeJobApi } from '@shared/api/care'
+import { postCritical, onOutboxChange } from '../lib/outbox'
 import type { ApiError } from '@shared/api/client'
 import type { BookingStatus, LatLng, PhotoUpload } from '@shared/api/types'
 
@@ -55,6 +56,8 @@ export default function ActiveJobPage() {
   const [error, setError] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [checkinPhoto, setCheckinPhoto] = useState<PhotoUpload | null>(null)
+  const [queuedCount, setQueuedCount] = useState(0)
+  useEffect(() => onOutboxChange(setQueuedCount), [])
   // health record form
   const [bp, setBp] = useState('')
   const [pulse, setPulse] = useState('')
@@ -113,7 +116,7 @@ export default function ActiveJobPage() {
     setBusy(true)
     setError(null)
     try {
-      await activeJobApi.healthRecord(id!, {
+      await postCritical(`/api/v1/caregiver/jobs/${id}/health-record`, {
         vital_signs: { ...(bp && { bp }), ...(pulse && { pulse }), ...(temp && { temp }) },
         doctor_summary: doctorSummary || null,
         medications_received: meds.filter((med) => med.name.trim()),
@@ -186,6 +189,11 @@ export default function ActiveJobPage() {
         </section>
       )}
 
+      {queuedCount > 0 && (
+        <p className="rounded-lg bg-amber-100 p-3 text-amber-900">
+          {th.common.offline_notice} ({queuedCount})
+        </p>
+      )}
       {notice && <p className="rounded-lg bg-green-50 p-3 text-green-700">{notice}</p>}
       {error && <p className="rounded-lg bg-red-50 p-3 text-red-700">{error}</p>}
       {status && PINGABLE.includes(status) && (
@@ -211,7 +219,7 @@ export default function ActiveJobPage() {
           <button
             type="button"
             disabled={busy || !checkinPhoto}
-            onClick={() => runStep((location) => activeJobApi.checkin(id!, checkinPhoto!, location))}
+            onClick={() => runStep((location) => postCritical(`/api/v1/caregiver/jobs/${id}/checkin`, { photo: checkinPhoto, location }))}
             className={bigButton}
           >
             {busy ? th.common.loading : th.caregiver.step_checkin}
@@ -223,7 +231,7 @@ export default function ActiveJobPage() {
         <button
           type="button"
           disabled={busy}
-          onClick={() => runStep((location) => activeJobApi.arrive(id!, location))}
+          onClick={() => runStep((location) => postCritical(`/api/v1/caregiver/jobs/${id}/arrive`, { location }))}
           className={bigButton}
         >
           {busy ? th.common.loading : th.caregiver.step_arrive}
@@ -324,7 +332,7 @@ export default function ActiveJobPage() {
           <button
             type="button"
             disabled={busy || !healthSaved}
-            onClick={() => runStep((location) => activeJobApi.departing(id!, location))}
+            onClick={() => runStep((location) => postCritical(`/api/v1/caregiver/jobs/${id}/departing`, { location }))}
             className={bigButton}
           >
             {busy ? th.common.loading : th.caregiver.step_departing}
@@ -338,7 +346,7 @@ export default function ActiveJobPage() {
           <button
             type="button"
             disabled={busy}
-            onClick={() => runStep((location) => activeJobApi.checkout(id!, location))}
+            onClick={() => runStep((location) => postCritical(`/api/v1/caregiver/jobs/${id}/checkout`, { location }))}
             className={bigButton}
           >
             {busy ? th.common.loading : th.caregiver.step_checkout}

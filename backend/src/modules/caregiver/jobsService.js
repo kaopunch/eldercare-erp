@@ -182,6 +182,15 @@ function createJobsService({ repository = bookingRepository, profileRepository =
     const view = jobView(booking);
     const elder = await repository.findElderForJob(booking.elder_profile_id);
     if (elder) {
+      // PDPA: the elder card carries health data (conditions/notes) — log the read
+      const { writeAuditLog } = require('../customer/repository');
+      await writeAuditLog({
+        actorUserId: caregiverUserId,
+        action: 'elder_profile.read_for_job',
+        entityType: 'care_elder_profile',
+        entityId: booking.elder_profile_id,
+        payload: { booking_id: booking.id }
+      });
       view.elder = {
         full_name: elder.full_name,
         nickname: elder.nickname || null,

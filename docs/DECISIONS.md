@@ -84,6 +84,16 @@
 6. **รีวิวที่ได้รับแสดงในหน้า Wallet** แทนหน้า profile แยก (G6) — ลด surface; ย้ายได้ภายหลัง
 7. **Export PDF สมุดสุขภาพ = print stylesheet** ตามที่สเปคกำหนดเฟสนี้ (`window.print` + Tailwind `print:` utilities)
 
+## 2026-06-12 — M6 hardening decisions
+
+1. **Offline queue ใช้ localStorage outbox + replay ตามลำดับ** แทน Service Worker Background Sync — ครอบ checkin/arrive/health-record/departing/checkout; network error → เข้าคิว, business error (เช่น step ซ้ำ) → ทิ้งและไปต่อ (ทุก step idempotent); Background Sync มีปัญหา token refresh + browser support, outbox ได้ผลลัพธ์เดียวกัน ("ไม่เสียข้อมูล") ที่ความซับซ้อนต่ำกว่า
+2. **LINE webhook ตรวจ X-Line-Signature** (HMAC-SHA256 ของ raw body) เมื่อตั้ง `LINE_CHANNEL_SECRET`; เพิ่ม rawBody capture ใน `express.json verify` (แตะ core 1 บรรทัด, additive)
+3. **Omise webhook ไม่เชื่อ payload** — เมื่อ gateway เป็น omise จะ retrieve charge จาก API ก่อนทุกครั้ง (Omise ไม่มี signing secret มาตรฐาน)
+4. **Supabase advisors**: WARN function search_path → แก้ด้วย migration 014; ตาราง "RLS no policy" ทั้งหมดเป็น INFO และตั้งใจ (backend-only ผ่าน service role ตาม pattern 006)
+5. **Pin dependency versions** ใน backend/package.json จาก lock จริง (เดิมเป็น `latest`)
+6. **E2E = `npm run test:e2e`** spawn server แยก port + ผู้ใช้สุ่มเบอร์ 06xx + ลบข้อมูลทดสอบทั้งหมดตอนจบ — วิ่งครบ booking→completed รวม 300m rule, escrow, ledger, review
+7. **PWA icons** สร้างเป็น solid-color PNG ชั่วคราว (teal/amber) — เปลี่ยนเป็นโลโก้จริงเมื่อมี asset
+
 ## ค้างตัดสินใจ / ติดตาม
 
 - Baseline Supabase migration tracking (ไฟล์ 001/003/004/005 ถูก apply โดยไม่ track) — จะทำตอนเริ่ม M1 ก่อน migration ใหม่ตัวแรก

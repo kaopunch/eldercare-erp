@@ -31,10 +31,25 @@ function createCareApiRouter() {
   router.use('/caregiver', apiRateLimit, createCaregiverRouter());
 
   // LINE webhook — link codes (set this URL in LINE Developers Console).
-  // Signature verification comes with M6 hardening.
+  // When LINE_CHANNEL_SECRET is set, X-Line-Signature (HMAC-SHA256 of the raw
+  // body) is enforced; without it (dev/mock) the check is skipped.
+  const crypto = require('crypto');
   const { processWebhookEvents } = require('./notification/lineLink');
   router.post('/line/webhook', apiRateLimit, async (req, res, next) => {
     try {
+      const secret = process.env.LINE_CHANNEL_SECRET;
+      if (secret) {
+        const signature = String(req.headers['x-line-signature'] || '');
+        const expected = crypto
+          .createHmac('sha256', secret)
+          .update(req.rawBody || Buffer.alloc(0))
+          .digest('base64');
+        const a = Buffer.from(signature);
+        const b = Buffer.from(expected);
+        if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
+          return res.status(401).json({ code: 'SIGNATURE_INVALID', message: 'invalid signature' });
+        }
+      }
       const result = await processWebhookEvents(req.body?.events || []);
       res.json({ received: true, ...result });
     } catch (err) {
@@ -42,15 +57,22 @@ function createCareApiRouter() {
     }
   });
 
-  // Omise webhook (charge.complete) — no JWT; trust = re-check against payment
-  // row by charge id, transition is idempotent on duplicate delivery.
+  // Omise webhook (charge.complete) — Omise has no signing secret, so the
+  // payload is never trusted: when the omise gateway is active, the charge
+  // status is re-fetched from the Omise API before any transition.
   const { createBookingService } = require('./booking/service');
+  const { getPaymentGateway } = require('./payment/gateway');
   const webhookBookingService = createBookingService();
   router.post('/payments/webhook/omise', apiRateLimit, async (req, res, next) => {
     try {
       const event = req.body || {};
       if (event.key === 'charge.complete' && event.data?.id) {
-        await webhookBookingService.handleChargeComplete(event.data.id, event.data.status);
+        const gateway = getPaymentGateway();
+        const status =
+          gateway.name === 'omise' && gateway.retrieveChargeStatus
+            ? await gateway.retrieveChargeStatus(event.data.id)
+            : event.data.status; // mock/dev path
+        await webhookBookingService.handleChargeComplete(event.data.id, status);
       }
       res.json({ received: true });
     } catch (err) {

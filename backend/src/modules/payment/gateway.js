@@ -44,15 +44,15 @@ class OmiseGateway {
     }
   }
 
-  async omiseRequest(path, body) {
+  async omiseRequest(path, body, method = 'POST') {
     const auth = Buffer.from(`${this.secretKey}:`).toString('base64');
     const response = await fetch(`https://api.omise.co${path}`, {
-      method: 'POST',
+      method,
       headers: {
         Authorization: `Basic ${auth}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(body)
+      body: method === 'GET' ? undefined : JSON.stringify(body)
     });
     const data = await response.json();
     if (!response.ok || data.object === 'error') {
@@ -93,6 +93,12 @@ class OmiseGateway {
   async refund({ chargeId, amountSatang }) {
     const refund = await this.omiseRequest(`/charges/${chargeId}/refunds`, { amount: amountSatang });
     return { refundId: refund.id, status: refund.status || 'closed', chargeId, amountSatang };
+  }
+
+  /** Webhook hardening: never trust the webhook payload — re-fetch the charge. */
+  async retrieveChargeStatus(chargeId) {
+    const charge = await this.omiseRequest(`/charges/${chargeId}`, null, 'GET');
+    return charge.status === 'successful' ? 'successful' : charge.status === 'failed' ? 'failed' : 'pending';
   }
 }
 

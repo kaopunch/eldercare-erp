@@ -66,7 +66,8 @@ const aiInboundRateLimit = createRateLimiter({
 
 app.use(createSecurityHeaders());
 app.use(cors(createCorsOptions()));
-app.use(express.json({ limit: '10mb' }));
+// rawBody is required for webhook signature verification (LINE X-Line-Signature)
+app.use(express.json({ limit: '10mb', verify: (req, _res, buf) => { req.rawBody = buf; } }));
 app.use(express.urlencoded({ extended: false, limit: '1mb' }));
 app.use(morgan(':method :safe-url :status :response-time ms - :res[content-length]'));
 
