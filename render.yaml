@@ -30,7 +30,7 @@ services:
       - key: PORTAL_TOKEN_SECRET
         sync: false
       - key: ELDERCARE_CORS_ORIGINS
-        value: https://eldercare-erp.onrender.com
+        value: https://eldercare-erp.onrender.com,https://aunjai-care-customer.onrender.com,https://aunjai-care-caregiver.onrender.com
       - key: ELDERCARE_PUBLIC_BASE_URL
         value: https://eldercare-erp.onrender.com
       - key: ELDERCARE_API_RATE_LIMIT_MAX
@@ -53,3 +53,62 @@ services:
         sync: false
       - key: LINE_CHANNEL_ACCESS_TOKEN
         sync: false
+      # ---- อุ่นใจ Care Platform (customer/caregiver portals) ----
+      - key: CARE_JWT_SECRET
+        generateValue: true
+      - key: CARE_ENCRYPTION_KEY
+        generateValue: true
+      - key: CARE_DOCUMENTS_BUCKET
+        value: care-documents
+      - key: CARE_PAYMENT_GATEWAY
+        value: mock # switch to "omise" when OMISE_SECRET_KEY is set
+      - key: CARE_SMS_PROVIDER
+        value: mock
+      - key: CARE_AUTH_RATE_LIMIT_MAX
+        value: "30"
+      - key: CARE_API_RATE_LIMIT_MAX
+        value: "600"
+      - key: CARE_PORTAL_BASE_URL
+        value: https://aunjai-care-customer.onrender.com
+      - key: CARE_CAREGIVER_PORTAL_BASE_URL
+        value: https://aunjai-care-caregiver.onrender.com
+      - key: OMISE_PUBLIC_KEY
+        sync: false
+      - key: OMISE_SECRET_KEY
+        sync: false
+      - key: LINE_CHANNEL_SECRET
+        sync: false
+      - key: CARE_LINE_ADMIN_GROUP_ID
+        sync: false
+      - key: CARE_LINE_OA_URL
+        sync: false
+
+  # ---- อุ่นใจ Care — Customer PWA ----
+  - type: web
+    runtime: static
+    name: aunjai-care-customer
+    buildCommand: cd frontend/customer && npm ci && npm run build
+    staticPublishPath: frontend/customer/dist
+    autoDeployTrigger: commit
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://eldercare-erp.onrender.com
+
+  # ---- อุ่นใจ Care — Caregiver PWA ----
+  - type: web
+    runtime: static
+    name: aunjai-care-caregiver
+    buildCommand: cd frontend/caregiver && npm ci && npm run build
+    staticPublishPath: frontend/caregiver/dist
+    autoDeployTrigger: commit
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://eldercare-erp.onrender.com
